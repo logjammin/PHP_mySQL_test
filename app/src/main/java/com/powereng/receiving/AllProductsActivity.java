@@ -31,19 +31,19 @@ public class AllProductsActivity extends ListActivity {
     // Creating JSON Parser object
     JSONParser jParser = new JSONParser();
 
-    ArrayList<HashMap<String, String>> productsList;
+    ArrayList<HashMap<String, String>> packagesList;
 
-    // url to get all products list
-    private static String url_all_products = "http://api.androidhive.info/android_connect/get_all_products.php";
+    // url to get all packages list
+    private static String url_all_packages = "http://boi40310ll.powereng.com/android_connect/get_log_all.php";
 
     // JSON Node names
     private static final String TAG_SUCCESS = "success";
-    private static final String TAG_PRODUCTS = "products";
-    private static final String TAG_PID = "pid";
-    private static final String TAG_NAME = "name";
+    private static final String TAG_ENTRIES = "receiving_log";
+    private static final String TAG_TRACKING = "tracking";
+    private static final String TAG_DATE = "date_received";
 
-    // products JSONArray
-    JSONArray products = null;
+    // packages JSONArray
+    JSONArray packages = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,15 +51,15 @@ public class AllProductsActivity extends ListActivity {
         setContentView(R.layout.all_products);
 
         // Hashmap for ListView
-        productsList = new ArrayList<HashMap<String, String>>();
+        packagesList = new ArrayList<HashMap<String, String>>();
 
-        // Loading products in Background Thread
+        // Loading packages in Background Thread
         new LoadAllProducts().execute();
 
         // Get listview
         ListView lv = getListView();
 
-        // on seleting single product
+        // on selecting single product
         // launching Edit Product Screen
         lv.setOnItemClickListener(new OnItemClickListener() {
 
@@ -67,14 +67,14 @@ public class AllProductsActivity extends ListActivity {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 // getting values from selected ListItem
-                String pid = ((TextView) view.findViewById(R.id.pid)).getText()
+                String tracking = ((TextView) view.findViewById(R.id.pid)).getText()
                         .toString();
 
                 // Starting new intent
                 Intent in = new Intent(getApplicationContext(),
                         EditProductActivity.class);
                 // sending pid to next activity
-                in.putExtra(TAG_PID, pid);
+                in.putExtra(TAG_TRACKING, tracking);
 
                 // starting new activity and expecting some response back
                 startActivityForResult(in, 100);
@@ -111,53 +111,53 @@ public class AllProductsActivity extends ListActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             pDialog = new ProgressDialog(AllProductsActivity.this);
-            pDialog.setMessage("Loading products. Please wait...");
+            pDialog.setMessage("Loading packages. Please wait...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
             pDialog.show();
         }
 
         /**
-         * getting All products from url
+         * getting All packages from url
          * */
         protected String doInBackground(String... args) {
             // Building Parameters
             List<NameValuePair> params = new ArrayList<NameValuePair>();
             // getting JSON string from URL
-            JSONObject json = jParser.makeHttpRequest(url_all_products, "GET", params);
+            JSONObject json = jParser.makeHttpRequest(url_all_packages, "GET", params);
 
             // Check your log cat for JSON reponse
-            Log.d("All Products: ", json.toString());
+            Log.d("All Packages: ", json.toString());
 
             try {
                 // Checking for SUCCESS TAG
                 int success = json.getInt(TAG_SUCCESS);
 
                 if (success == 1) {
-                    // products found
+                    // packages found
                     // Getting Array of Products
-                    products = json.getJSONArray(TAG_PRODUCTS);
+                    packages = json.getJSONArray(TAG_ENTRIES);
 
                     // looping through All Products
-                    for (int i = 0; i < products.length(); i++) {
-                        JSONObject c = products.getJSONObject(i);
+                    for (int i = 0; i < packages.length(); i++) {
+                        JSONObject c = packages.getJSONObject(i);
 
                         // Storing each json item in variable
-                        String id = c.getString(TAG_PID);
-                        String name = c.getString(TAG_NAME);
+                        String tracking = c.getString(TAG_TRACKING);
+                        String date = c.getString(TAG_DATE);
 
                         // creating new HashMap
                         HashMap<String, String> map = new HashMap<String, String>();
 
                         // adding each child node to HashMap key => value
-                        map.put(TAG_PID, id);
-                        map.put(TAG_NAME, name);
+                        map.put(TAG_TRACKING, tracking);
+                        map.put(TAG_DATE, date);
 
                         // adding HashList to ArrayList
-                        productsList.add(map);
+                        packagesList.add(map);
                     }
                 } else {
-                    // no products found
+                    // no packages found
                     // Launch Add New product Activity
                     Intent i = new Intent(getApplicationContext(),
                             NewProductActivity.class);
@@ -176,7 +176,7 @@ public class AllProductsActivity extends ListActivity {
          * After completing background task Dismiss the progress dialog
          * **/
         protected void onPostExecute(String file_url) {
-            // dismiss the dialog after getting all products
+            // dismiss the dialog after getting all packages
             pDialog.dismiss();
             // updating UI from Background Thread
             runOnUiThread(new Runnable() {
@@ -185,9 +185,9 @@ public class AllProductsActivity extends ListActivity {
                      * Updating parsed JSON data into ListView
                      * */
                     ListAdapter adapter = new SimpleAdapter(
-                            AllProductsActivity.this, productsList,
-                            R.layout.list_item, new String[] { TAG_PID,
-                            TAG_NAME},
+                            AllProductsActivity.this, packagesList,
+                            R.layout.list_item, new String[] {TAG_TRACKING,
+                            TAG_DATE},
                             new int[] { R.id.pid, R.id.name });
                     // updating listview
                     setListAdapter(adapter);

@@ -20,19 +20,19 @@ public class MainScreenActivity extends Activity{
         btnViewProducts = (Button) findViewById(R.id.btnViewProducts);
         btnNewProduct = (Button) findViewById(R.id.btnCreateProduct);
 
-        // view products click event
+        // view packages click event
         btnViewProducts.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                // Launching All products Activity
+                // Launching All packages Activity
                 Intent i = new Intent(getApplicationContext(), AllProductsActivity.class);
                 startActivity(i);
 
             }
         });
 
-        // view products click event
+        // view packages click event
         btnNewProduct.setOnClickListener(new View.OnClickListener() {
 
             @Override
