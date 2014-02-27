@@ -2,23 +2,80 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical" >
+    android:orientation="horizontal" >
 
     <!-- Product id (pid) - will be HIDDEN - used to pass to other activity -->
     <TextView
-        android:id="@+id/pid"
+        android:id="@+id/date"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:visibility="gone" />
 
     <!-- Name Label -->
     <TextView
-        android:id="@+id/name"
-        android:layout_width="fill_parent"
+        android:id="@+id/tracking"
+        android:layout_width="0dp"
+        android:layout_weight="2"
         android:layout_height="wrap_content"
         android:paddingTop="6dip"
         android:paddingLeft="6dip"
-        android:textSize="17dip"
-        android:textStyle="bold" />
+        android:layout_gravity="center"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/carrier"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:paddingTop="6dip"
+        android:paddingLeft="6dip"
+        android:layout_gravity="center"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/sender"
+        android:layout_width="0dp"
+        android:layout_weight="1.5"
+        android:layout_height="wrap_content"
+        android:paddingTop="6dip"
+        android:paddingLeft="6dip"
+        android:layout_gravity="center"
+        android:gravity="center" />
+    <TextView
+        android:id="@+id/recipient"
+        android:layout_width="0dp"
+        android:layout_weight="1.5"
+        android:layout_height="wrap_content"
+        android:paddingTop="6dip"
+        android:paddingLeft="6dip"
+        android:layout_gravity="center"
+        android:gravity="center" />
+    <TextView
+        android:id="@+id/numpack"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:paddingTop="6dip"
+        android:paddingLeft="6dip"
+        android:layout_gravity="center"
+        android:gravity="center" />
+    <TextView
+        android:id="@+id/ponum"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:paddingTop="6dip"
+        android:paddingLeft="6dip"
+        android:layout_gravity="center"
+        android:gravity="center" />
+    <TextView
+        android:id="@+id/signature"
+        android:layout_width="0dp"
+        android:layout_weight="2"
+        android:layout_height="wrap_content"
+        android:paddingTop="6dip"
+        android:paddingLeft="6dip"
+        android:layout_gravity="center"
+        android:gravity="center" />
 
 </LinearLayout>

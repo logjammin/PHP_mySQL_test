@@ -4,5 +4,13 @@
     <string name="app_name">PHP mySQL test</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="tracking">Tracking #</string>
+    <string name="carrier">Carrier</string>
+    <string name="sender">Sender</string>
+    <string name="recipient">Recipient</string>
+    <string name="pcs"># of pcs.</string>
+    <string name="signature">Signature</string>
+    <string name="ponum">PO #</string>
+
 
 </resources>

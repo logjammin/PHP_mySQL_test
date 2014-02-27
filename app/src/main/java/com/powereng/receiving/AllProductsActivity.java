@@ -41,7 +41,12 @@ public class AllProductsActivity extends ListActivity {
     private static final String TAG_ENTRIES = "receiving_log";
     private static final String TAG_TRACKING = "tracking";
     private static final String TAG_DATE = "date_received";
-
+    private static final String TAG_CARRIER = "carrier";
+    private static final String TAG_SENDER = "sender";
+    private static final String TAG_RECIPIENT = "recipient";
+    private static final String TAG_PCS = "numpackages";
+    private static final String TAG_PO = "po_num";
+    private static final String TAG_SIG = "sig";
     // packages JSONArray
     JSONArray packages = null;
 
@@ -49,15 +54,16 @@ public class AllProductsActivity extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.all_products);
-
+        //Button button = (Button)
         // Hashmap for ListView
         packagesList = new ArrayList<HashMap<String, String>>();
 
         // Loading packages in Background Thread
         new LoadAllProducts().execute();
-
+        View header = getLayoutInflater().inflate(R.layout.log_header, null);
         // Get listview
         ListView lv = getListView();
+        lv.addHeaderView(header);
 
         // on selecting single product
         // launching Edit Product Screen
@@ -67,7 +73,7 @@ public class AllProductsActivity extends ListActivity {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 // getting values from selected ListItem
-                String tracking = ((TextView) view.findViewById(R.id.pid)).getText()
+                String tracking = ((TextView) view.findViewById(R.id.tracking)).getText()
                         .toString();
 
                 // Starting new intent
@@ -143,15 +149,27 @@ public class AllProductsActivity extends ListActivity {
                         JSONObject c = packages.getJSONObject(i);
 
                         // Storing each json item in variable
-                        String tracking = c.getString(TAG_TRACKING);
                         String date = c.getString(TAG_DATE);
+                        String tracking = c.getString(TAG_TRACKING);
+                        String carrier = c.getString(TAG_CARRIER);
+                        String sender = c.getString(TAG_SENDER);
+                        String recipient = c.getString(TAG_RECIPIENT);
+                        String pcs = c.getString(TAG_PCS);
+                        String ponum = c.getString(TAG_PO);
+                        String sig = c.getString(TAG_SIG);
 
                         // creating new HashMap
                         HashMap<String, String> map = new HashMap<String, String>();
 
                         // adding each child node to HashMap key => value
-                        map.put(TAG_TRACKING, tracking);
                         map.put(TAG_DATE, date);
+                        map.put(TAG_TRACKING, tracking);
+                        map.put(TAG_CARRIER, carrier);
+                        map.put(TAG_SENDER, sender);
+                        map.put(TAG_RECIPIENT, recipient);
+                        map.put(TAG_PCS, pcs);
+                        map.put(TAG_PO, ponum);
+                        map.put(TAG_SIG, sig);
 
                         // adding HashList to ArrayList
                         packagesList.add(map);
@@ -186,9 +204,11 @@ public class AllProductsActivity extends ListActivity {
                      * */
                     ListAdapter adapter = new SimpleAdapter(
                             AllProductsActivity.this, packagesList,
-                            R.layout.list_item, new String[] {TAG_TRACKING,
-                            TAG_DATE},
-                            new int[] { R.id.pid, R.id.name });
+                            R.layout.list_item, new String[] {TAG_DATE,TAG_TRACKING,
+                            TAG_CARRIER,TAG_SENDER,TAG_RECIPIENT,TAG_PCS,TAG_PO,TAG_SIG},
+                            new int[] { R.id.date, R.id.tracking, R.id.carrier, R.id.sender,
+                                    R.id.recipient, R.id.numpack, R.id.ponum, R.id.signature});
+
                     // updating listview
                     setListAdapter(adapter);
                 }
