@@ -11,6 +11,11 @@
     <string name="pcs"># of pcs.</string>
     <string name="signature">Signature</string>
     <string name="ponum">PO #</string>
+    <string name="scan">Scan tracking #</string>
+    <string name="save">Save Changes</string>
+    <string name="delete">Delete</string>
+    <string name="update">Update</string>
+    <string name="refresh">Refresh</string>
 
 
 </resources>

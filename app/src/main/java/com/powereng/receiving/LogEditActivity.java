@@ -19,7 +19,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EditProductActivity extends Activity {
+public class LogEditActivity extends Activity {
 
     EditText txtName;
     EditText txtPrice;
@@ -56,11 +56,11 @@ public class EditProductActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.edit_product);
+        setContentView(R.layout.log_edit);
 
         // save button
         btnSave = (Button) findViewById(R.id.btnSave);
-        btnDelete = (Button) findViewById(R.id.btnDelete);
+        btnDelete = (Button) findViewById(R.id.btnUpdate);
 
         // getting product details from intent
         Intent i = getIntent();
@@ -104,7 +104,7 @@ public class EditProductActivity extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(EditProductActivity.this);
+            pDialog = new ProgressDialog(LogEditActivity.this);
             pDialog.setMessage("Loading product details. Please wait...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
@@ -187,7 +187,7 @@ public class EditProductActivity extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(EditProductActivity.this);
+            pDialog = new ProgressDialog(LogEditActivity.this);
             pDialog.setMessage("Saving product ...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
@@ -256,7 +256,7 @@ public class EditProductActivity extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(EditProductActivity.this);
+            pDialog = new ProgressDialog(LogEditActivity.this);
             pDialog.setMessage("Deleting Product...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);

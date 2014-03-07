@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="carriers">
+    <item>UPS</item>
+    <item>FedEx Ground</item>
+    <item>FedEx Express</item>
+    <item>FleetStreet</item>
+    <item>PaperClips A\'Mor</item>
+    <item>Other...</item>
+    </string-array>
+</resources>

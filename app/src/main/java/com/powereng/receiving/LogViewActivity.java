@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class AllProductsActivity extends ListActivity {
+public class LogViewActivity extends ListActivity {
 
     // Progress Dialog
     private ProgressDialog pDialog;
@@ -34,7 +34,7 @@ public class AllProductsActivity extends ListActivity {
     ArrayList<HashMap<String, String>> packagesList;
 
     // url to get all packages list
-    private static String url_all_packages = "http://boi40310ll.powereng.com/android_connect/get_log_all.php";
+    private static String url_all_packages = "http://boi40310ll.powereng.com/get_log_all.php";
 
     // JSON Node names
     private static final String TAG_SUCCESS = "success";
@@ -53,7 +53,7 @@ public class AllProductsActivity extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.all_products);
+        setContentView(R.layout.log_view_all);
         //Button button = (Button)
         // Hashmap for ListView
         packagesList = new ArrayList<HashMap<String, String>>();
@@ -78,7 +78,7 @@ public class AllProductsActivity extends ListActivity {
 
                 // Starting new intent
                 Intent in = new Intent(getApplicationContext(),
-                        EditProductActivity.class);
+                        LogEditActivity.class);
                 // sending pid to next activity
                 in.putExtra(TAG_TRACKING, tracking);
 
@@ -116,7 +116,7 @@ public class AllProductsActivity extends ListActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(AllProductsActivity.this);
+            pDialog = new ProgressDialog(LogViewActivity.this);
             pDialog.setMessage("Loading packages. Please wait...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
@@ -178,7 +178,7 @@ public class AllProductsActivity extends ListActivity {
                     // no packages found
                     // Launch Add New product Activity
                     Intent i = new Intent(getApplicationContext(),
-                            NewProductActivity.class);
+                            LogNewActivity.class);
                     // Closing all previous activities
                     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(i);
@@ -203,7 +203,7 @@ public class AllProductsActivity extends ListActivity {
                      * Updating parsed JSON data into ListView
                      * */
                     ListAdapter adapter = new SimpleAdapter(
-                            AllProductsActivity.this, packagesList,
+                            LogViewActivity.this, packagesList,
                             R.layout.list_item, new String[] {TAG_DATE,TAG_TRACKING,
                             TAG_CARRIER,TAG_SENDER,TAG_RECIPIENT,TAG_PCS,TAG_PO,TAG_SIG},
                             new int[] { R.id.date, R.id.tracking, R.id.carrier, R.id.sender,

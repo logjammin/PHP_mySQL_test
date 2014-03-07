@@ -21,19 +21,19 @@
         </activity>
         <!-- All Product Activity -->
         <activity
-            android:name=".AllProductsActivity"
+            android:name=".LogViewActivity"
             android:label="All Products" >
         </activity>
 
         <!-- Add Product Activity -->
         <activity
-            android:name=".NewProductActivity"
+            android:name=".LogNewActivity"
             android:label="Add New Product" >
         </activity>
 
         <!-- Edit Product Activity -->
         <activity
-            android:name=".EditProductActivity"
+            android:name=".LogEditActivity"
             android:label="Edit Product" >
         </activity>
     </application>
