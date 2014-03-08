@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -32,7 +33,7 @@ public class LogViewActivity extends ListActivity {
     JSONParser jParser = new JSONParser();
 
     ArrayList<HashMap<String, String>> packagesList;
-
+    ImageView sigView;
     // url to get all packages list
     private static String url_all_packages = "http://boi40310ll.powereng.com/get_log_all.php";
 
@@ -54,40 +55,46 @@ public class LogViewActivity extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.log_view_all);
-        //Button button = (Button)
+        sigView = (ImageView) findViewById(R.id.signature);
         // Hashmap for ListView
         packagesList = new ArrayList<HashMap<String, String>>();
 
         // Loading packages in Background Thread
         new LoadAllProducts().execute();
         View header = getLayoutInflater().inflate(R.layout.log_header, null);
+
         // Get listview
         ListView lv = getListView();
         lv.addHeaderView(header);
 
         // on selecting single product
         // launching Edit Product Screen
+
         lv.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
+
                 // getting values from selected ListItem
                 String tracking = ((TextView) view.findViewById(R.id.tracking)).getText()
                         .toString();
 
-                // Starting new intent
-                Intent in = new Intent(getApplicationContext(),
-                        LogEditActivity.class);
-                // sending pid to next activity
-                in.putExtra(TAG_TRACKING, tracking);
+                View view1 = (View) parent.getItemAtPosition(position);
+                if ((sigView.isClickable()) && (view1 == sigView)) {
+                    Intent in = new Intent(getApplicationContext(),
+                            CaptureSignature.class);
+                    // sending pid to next activity
+                    in.putExtra(TAG_TRACKING, tracking);
 
-                // starting new activity and expecting some response back
-                startActivityForResult(in, 100);
+                    // starting new activity and expecting some response back
+                    startActivityForResult(in, 100);
+                }
             }
         });
 
     }
+
 
     // Response from Edit Product Activity
     @Override

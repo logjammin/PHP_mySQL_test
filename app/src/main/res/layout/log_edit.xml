@@ -33,6 +33,7 @@
             android:layout_height="wrap_content"
             android:text="@string/scan"
             android:id="@+id/btnScan"
+            android:onClick="mScan2"
             android:layout_gravity="right" />
 
     </LinearLayout>
@@ -91,19 +92,24 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <!-- Button Create Product -->
-        <Button android:id="@+id/btnSave"
+        <Button android:id="@+id/btn1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/save"
             android:layout_weight="1"/>
 
         <!-- Button update -->
-        <Button android:id="@+id/btnUpdate"
+        <Button android:id="@+id/btn2"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/update"
             android:layout_weight="1"/>
     </LinearLayout>
+        <Button android:id="@+id/btn3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:visibility="gone"/>
 
 
 </LinearLayout>

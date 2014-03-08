@@ -3,7 +3,7 @@
     package="com.powereng.receiving" >
 
     <uses-sdk android:minSdkVersion="15" />
-
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <application
         android:configChanges="keyboardHidden|orientation"
         android:allowBackup="true"
@@ -35,6 +35,14 @@
         <activity
             android:name=".LogEditActivity"
             android:label="Edit Product" >
+        </activity>
+
+        <!-- CaptureSignature Activity -->
+
+        <!-- CaptureSignature Activity -->
+        <activity
+            android:name=".CaptureSignature"
+            android:label="Capture Signature" >
         </activity>
     </application>
     <uses-permission android:name="android.permission.INTERNET" />

@@ -10,6 +10,7 @@ public class MainScreenActivity extends Activity{
 
     Button btnViewProducts;
     Button btnNewProduct;
+    Button btnSignature;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -19,6 +20,7 @@ public class MainScreenActivity extends Activity{
         // Buttons
         btnViewProducts = (Button) findViewById(R.id.btnViewProducts);
         btnNewProduct = (Button) findViewById(R.id.btnCreateProduct);
+        btnSignature = (Button) findViewById(R.id.btnSignature);
 
         // view packages click event
         btnViewProducts.setOnClickListener(new View.OnClickListener() {
@@ -43,5 +45,14 @@ public class MainScreenActivity extends Activity{
 
             }
         });
+
+        btnSignature.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(),CaptureSignature.class);
+                startActivity(i);
+            }
+        });
+
     }
 }

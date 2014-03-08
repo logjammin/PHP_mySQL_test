@@ -20,4 +20,11 @@
         android:text="Add New Item"
         android:layout_marginTop="25dip"/>
 
+    <!--  Button to add signature screen -->
+    <Button android:id="@+id/btnSignature"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Signature"
+        android:layout_marginTop="25dip"/>
+
 </LinearLayout>

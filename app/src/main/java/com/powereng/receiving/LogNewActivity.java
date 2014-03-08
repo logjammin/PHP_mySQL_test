@@ -13,6 +13,8 @@ import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
@@ -35,7 +37,7 @@ public class LogNewActivity extends Activity {
     EditText inputSender;
     EditText inputRecipient;
     EditText inputPoNum;
-
+    Button scanTracking;
 
     // url to create new product
     private static String url_create_log_row = "http://boi40310ll.powereng.com/create_log_row.php";
@@ -60,7 +62,9 @@ public class LogNewActivity extends Activity {
                 .append(yy).append(" ").append("-").append(mm + 1).append("-")
                 .append(dd));
 
+        scanTracking = (Button) findViewById(R.id.btnScan);
 
+        //scanTracking.setOnClickListener(mScan);
         // Edit Text
         inputTracking = (EditText) findViewById(R.id.inputTracking);
         inputCarrier = (Spinner) findViewById(R.id.spinCarrier);
@@ -72,11 +76,13 @@ public class LogNewActivity extends Activity {
         inputSender = (EditText) findViewById(R.id.inputSender);
         inputRecipient = (EditText) findViewById(R.id.inputRecipient);
 
-        // Create button
-        Button btnSave = (Button) findViewById(R.id.btnSave);
+        Button btnBack = (Button) findViewById(R.id.btn1);
+        btnBack.setText(R.string.back);
+        Button btnNext = (Button) findViewById(R.id.btn2);
+        btnNext.setText(R.string.nextItem);
 
         // button click event
-        btnSave.setOnClickListener(new View.OnClickListener() {
+        btnNext.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
@@ -84,6 +90,30 @@ public class LogNewActivity extends Activity {
                 new AddLogEntry().execute();
             }
         });
+    }
+
+    public void mScan2(View view) {
+        IntentIntegrator intentIntegrator = new IntentIntegrator(this); // where this is activity
+        intentIntegrator.initiateScan(IntentIntegrator.ALL_CODE_TYPES); // or QR_CODE_TYPES if you need to scan QR
+    }
+    public Button.OnClickListener mScan = new Button.OnClickListener() {
+        public void onClick(View v) {
+            Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+            intent.putExtra("SCAN_MODE", "ALL_CODE_TYPES");
+            startActivityForResult(intent, 0);
+        }
+    };
+
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == 0) {
+            if (resultCode == RESULT_OK) {
+                String contents = intent.getStringExtra("SCAN_RESULT");
+                String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
+                inputTracking.setText(contents);
+            } else if (resultCode == RESULT_CANCELED) {
+                // Handle cancel
+            }
+        }
     }
 
     /**
@@ -140,7 +170,7 @@ public class LogNewActivity extends Activity {
 
                 if (success == 1) {
                     // successfully created product
-                    Intent i = new Intent(getApplicationContext(), LogViewActivity.class);
+                    Intent i = new Intent(getApplicationContext(), LogNewActivity.class);
                     startActivity(i);
 
                     // closing this screen

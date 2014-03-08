@@ -37,13 +37,13 @@ public class LogEditActivity extends Activity {
     JSONParser jsonParser = new  JSONParser();
 
     // single product url
-    private static final String url_product_details = "http://boi40310ll.powereng.com/android_connect/get_log_row.php";
+    private static final String url_product_details = "http://boi40310ll.powereng.com/get_log_row.php";
 
     // url to update product
-    private static final String url_update_product = "http://boi40310ll.powereng.com/android_connect/update_log_row.php";
+    private static final String url_update_product = "http://boi40310ll.powereng.com/update_log_row.php";
 
     // url to delete product
-    private static final String url_delete_product = "http://boi40310ll.powereng.com/android_connect/delete_log_row.php";
+    private static final String url_delete_product = "http://boi40310ll.powereng.com/delete_log_row.php";
 
     // JSON Node names
     private static final String TAG_SUCCESS = "success";
@@ -59,8 +59,8 @@ public class LogEditActivity extends Activity {
         setContentView(R.layout.log_edit);
 
         // save button
-        btnSave = (Button) findViewById(R.id.btnSave);
-        btnDelete = (Button) findViewById(R.id.btnUpdate);
+        btnSave = (Button) findViewById(R.id.btn1);
+        btnDelete = (Button) findViewById(R.id.btn2);
 
         // getting product details from intent
         Intent i = getIntent();
