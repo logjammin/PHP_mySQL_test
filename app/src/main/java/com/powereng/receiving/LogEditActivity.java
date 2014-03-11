@@ -1,7 +1,10 @@
 package com.powereng.receiving;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,6 +12,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.NumberPicker;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+import com.google.zxing.integration.android.IntentIntegrator;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -21,14 +29,18 @@ import java.util.List;
 
 public class LogEditActivity extends Activity {
 
-    EditText txtName;
-    EditText txtPrice;
-    EditText txtDesc;
-    EditText txtCreatedAt;
+    TextView inputDate;
+    EditText inputTracking;
+    Spinner inputCarrier;
+    NumberPicker inputPcs;
+    EditText inputSender;
+    EditText inputRecipient;
+    EditText inputPoNum;
     Button btnSave;
-    Button btnDelete;
+    Button btnDelete;   
+    Button scanTracking;
 
-    String pid;
+    String tracking;
 
     // Progress Dialog
     private ProgressDialog pDialog;
@@ -37,39 +49,42 @@ public class LogEditActivity extends Activity {
     JSONParser jsonParser = new  JSONParser();
 
     // single product url
-    private static final String url_product_details = "http://boi40310ll.powereng.com/get_log_row.php";
+    private static final String url_item_detail = "http://boi40310ll.powereng.com/get_log_row.php";
 
     // url to update product
-    private static final String url_update_product = "http://boi40310ll.powereng.com/update_log_row.php";
+    private static final String url_update_item = "http://boi40310ll.powereng.com/update_log_row.php";
 
     // url to delete product
-    private static final String url_delete_product = "http://boi40310ll.powereng.com/delete_log_row.php";
+    private static final String url_delete_item = "http://boi40310ll.powereng.com/delete_log_row.php";
 
     // JSON Node names
     private static final String TAG_SUCCESS = "success";
-    private static final String TAG_PRODUCT = "product";
-    private static final String TAG_PID = "pid";
-    private static final String TAG_NAME = "name";
-    private static final String TAG_PRICE = "price";
-    private static final String TAG_DESCRIPTION = "description";
+    private static final String TAG_ITEM = "item";
+    private static final String TAG_DATE = "date_received";
+    private static final String TAG_TRACKING = "tracking";
+    private static final String TAG_CARRIER = "carrier";
+    private static final String TAG_NUMPACKAGES = "numpackages";
+    private static final String TAG_SENDER = "sender";
+    private static final String TAG_RECIPIENT = "recipient";
+    private static final String TAG_PONUM = "po_num";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.log_edit);
+        setContentView(R.layout.activity_log_edit);
 
         // save button
         btnSave = (Button) findViewById(R.id.btn1);
         btnDelete = (Button) findViewById(R.id.btn2);
-
+        scanTracking = (Button) findViewById(R.id.btnScan);
         // getting product details from intent
         Intent i = getIntent();
 
-        // getting product id (pid) from intent
-        pid = i.getStringExtra(TAG_PID);
+        // getting product id (tracking) from intent
+        tracking = i.getStringExtra(TAG_TRACKING);
 
         // Getting complete product details in background thread
-        new GetProductDetails().execute();
+        new GetLogDetail().execute();
 
         // save button click event
         btnSave.setOnClickListener(new View.OnClickListener() {
@@ -77,7 +92,7 @@ public class LogEditActivity extends Activity {
             @Override
             public void onClick(View arg0) {
                 // starting background task to update product
-                new SaveProductDetails().execute();
+                new SaveItemDetail().execute();
             }
         });
 
@@ -87,16 +102,56 @@ public class LogEditActivity extends Activity {
             @Override
             public void onClick(View arg0) {
                 // deleting product in background thread
-                new DeleteProduct().execute();
+                deleteDialog();
             }
         });
 
     }
 
+    public Dialog deleteDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                new DeleteItem().execute();
+            }
+        });
+
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setMessage(R.string.delete_message).setTitle(R.string.delete_title);
+
+        AlertDialog dialog = builder.create();
+
+        return dialog;
+    }
+
+    public void mScan2(View view) {
+        IntentIntegrator intentIntegrator = new IntentIntegrator(this); // where this is activity
+        intentIntegrator.initiateScan(IntentIntegrator.ALL_CODE_TYPES); // or QR_CODE_TYPES if you need to scan QR
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == 0) {
+            if (resultCode == RESULT_OK) {
+                String contents = intent.getStringExtra("SCAN_RESULT");
+                String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
+                inputTracking.setText(contents);
+            } else if (resultCode == RESULT_CANCELED) {
+                // Handle cancel
+            }
+        }
+    }
+
+
     /**
      * Background Async Task to Get complete product details
      * */
-    class GetProductDetails extends AsyncTask<String, String, String> {
+    class GetLogDetail extends AsyncTask<String, String, String> {
 
         /**
          * Before starting background thread Show Progress Dialog
@@ -105,14 +160,14 @@ public class LogEditActivity extends Activity {
         protected void onPreExecute() {
             super.onPreExecute();
             pDialog = new ProgressDialog(LogEditActivity.this);
-            pDialog.setMessage("Loading product details. Please wait...");
+            pDialog.setMessage("Loading item detail. Please wait...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
             pDialog.show();
         }
 
         /**
-         * Getting product details in background thread
+         * Getting item detail in background thread
          * */
         protected String doInBackground(String... params) {
 
@@ -124,39 +179,49 @@ public class LogEditActivity extends Activity {
                     try {
                         // Building Parameters
                         List<NameValuePair> params = new ArrayList<NameValuePair>();
-                        params.add(new BasicNameValuePair("pid", pid));
+                        params.add(new BasicNameValuePair("tracking", tracking));
 
                         // getting product details by making HTTP request
                         // Note that product details url will use GET request
                         JSONObject json = jsonParser.makeHttpRequest(
-                                url_product_details, "GET", params);
+                                url_item_detail, "GET", params);
 
                         // check your log for json response
-                        Log.d("Single Product Details", json.toString());
+                        Log.d("Single Item Detail", json.toString());
 
                         // json success tag
                         success = json.getInt(TAG_SUCCESS);
                         if (success == 1) {
-                            // successfully received product details
-                            JSONArray productObj = json
-                                    .getJSONArray(TAG_PRODUCT); // JSON Array
+                            // successfully received item details
+                            //TODO:Change LogEdit php to create a json array named "item"
+                            JSONArray itemObj = json
+                                    .getJSONArray(TAG_ITEM); // JSON Array
 
-                            // get first product object from JSON Array
-                            JSONObject product = productObj.getJSONObject(0);
+                            // get first item object from JSON Array
+                            JSONObject item = itemObj.getJSONObject(0);
 
-                            // product with this pid found
+                            // item with this tracking found
                             // Edit Text
-                            txtName = (EditText) findViewById(R.id.inputName);
-                            txtPrice = (EditText) findViewById(R.id.inputPrice);
-                            txtDesc = (EditText) findViewById(R.id.inputDesc);
+                            inputDate = (TextView) findViewById(R.id.inputDate);
+                            inputTracking = (EditText) findViewById(R.id.inputTracking);
+                            inputCarrier = (Spinner) findViewById(R.id.spinCarrier);
+                            inputPcs = (NumberPicker) findViewById(R.id.numberPicker);
+                            inputSender = (EditText) findViewById(R.id.inputSender);
+                            inputRecipient = (EditText) findViewById(R.id.inputRecipient);
+                            inputPoNum = (EditText) findViewById(R.id.inputPoNum);
 
-                            // display product data in EditText
-                            txtName.setText(product.getString(TAG_NAME));
-                            txtPrice.setText(product.getString(TAG_PRICE));
-                            txtDesc.setText(product.getString(TAG_DESCRIPTION));
+                            // display item data in EditText
+                            inputDate.setText(item.getString(TAG_DATE));
+                            inputTracking.setText(TAG_TRACKING);
+                            inputCarrier.setSelection(0);
+                            inputPcs.setValue(item.getInt(TAG_NUMPACKAGES));
+                            inputSender.setText(item.getString(TAG_SENDER));
+                            inputRecipient.setText(item.getString(TAG_RECIPIENT));
+                            inputPoNum.setText(item.getString(TAG_PONUM));
+                            //TODO: Deal with signature image
 
                         }else{
-                            // product with pid not found
+                            // item with tracking not found
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -179,7 +244,7 @@ public class LogEditActivity extends Activity {
     /**
      * Background Async Task to  Save product Details
      * */
-    class SaveProductDetails extends AsyncTask<String, String, String> {
+    class SaveItemDetail extends AsyncTask<String, String, String> {
 
         /**
          * Before starting background thread Show Progress Dialog
@@ -188,7 +253,7 @@ public class LogEditActivity extends Activity {
         protected void onPreExecute() {
             super.onPreExecute();
             pDialog = new ProgressDialog(LogEditActivity.this);
-            pDialog.setMessage("Saving product ...");
+            pDialog.setMessage("Saving Item ...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
             pDialog.show();
@@ -200,20 +265,27 @@ public class LogEditActivity extends Activity {
         protected String doInBackground(String... args) {
 
             // getting updated data from EditTexts
-            String name = txtName.getText().toString();
-            String price = txtPrice.getText().toString();
-            String description = txtDesc.getText().toString();
+            String date = inputDate.getText().toString();
+            String tracking = inputTracking.getText().toString();
+            String carrier = inputCarrier.getSelectedItem().toString();
+            String numpackages = String.valueOf(inputPcs.getValue());
+            String sender = inputSender.getText().toString();
+            String recipient = inputRecipient.getText().toString();
+            String ponum = inputPoNum.getText().toString();
 
             // Building Parameters
             List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair(TAG_PID, pid));
-            params.add(new BasicNameValuePair(TAG_NAME, name));
-            params.add(new BasicNameValuePair(TAG_PRICE, price));
-            params.add(new BasicNameValuePair(TAG_DESCRIPTION, description));
+            params.add(new BasicNameValuePair(TAG_DATE, date));
+            params.add(new BasicNameValuePair(TAG_TRACKING, tracking));
+            params.add(new BasicNameValuePair(TAG_CARRIER, carrier));
+            params.add(new BasicNameValuePair(TAG_NUMPACKAGES, numpackages));
+            params.add(new BasicNameValuePair(TAG_SENDER, sender));
+            params.add(new BasicNameValuePair(TAG_RECIPIENT, recipient));
+            params.add(new BasicNameValuePair(TAG_PONUM, ponum));
 
             // sending modified data through http request
             // Notice that update product url accepts POST method
-            JSONObject json = jsonParser.makeHttpRequest(url_update_product,
+            JSONObject json = jsonParser.makeHttpRequest(url_update_item,
                     "POST", params);
 
             // check json success tag
@@ -240,15 +312,15 @@ public class LogEditActivity extends Activity {
          * After completing background task Dismiss the progress dialog
          * **/
         protected void onPostExecute(String file_url) {
-            // dismiss the dialog once product uupdated
+            // dismiss the dialog once item updated
             pDialog.dismiss();
         }
     }
 
     /*****************************************************************
-     * Background Async Task to Delete Product
+     * Background Async Task to Delete item
      * */
-    class DeleteProduct extends AsyncTask<String, String, String> {
+    class DeleteItem extends AsyncTask<String, String, String> {
 
         /**
          * Before starting background thread Show Progress Dialog
@@ -257,7 +329,7 @@ public class LogEditActivity extends Activity {
         protected void onPreExecute() {
             super.onPreExecute();
             pDialog = new ProgressDialog(LogEditActivity.this);
-            pDialog.setMessage("Deleting Product...");
+            pDialog.setMessage("Deleting Item...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
             pDialog.show();
@@ -273,22 +345,22 @@ public class LogEditActivity extends Activity {
             try {
                 // Building Parameters
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("pid", pid));
+                params.add(new BasicNameValuePair("tracking", tracking));
 
-                // getting product details by making HTTP request
+                // getting item details by making HTTP request
                 JSONObject json = jsonParser.makeHttpRequest(
-                        url_delete_product, "POST", params);
+                        url_delete_item, "POST", params);
 
                 // check your log for json response
-                Log.d("Delete Product", json.toString());
+                Log.d("Delete Item", json.toString());
 
                 // json success tag
                 success = json.getInt(TAG_SUCCESS);
                 if (success == 1) {
-                    // product successfully deleted
+                    // item successfully deleted
                     // notify previous activity by sending code 100
                     Intent i = getIntent();
-                    // send result code 100 to notify about product deletion
+                    // send result code 100 to notify about item deletion
                     setResult(100, i);
                     finish();
                 }
@@ -303,7 +375,7 @@ public class LogEditActivity extends Activity {
          * After completing background task Dismiss the progress dialog
          * **/
         protected void onPostExecute(String file_url) {
-            // dismiss the dialog once product deleted
+            // dismiss the dialog once item deleted
             pDialog.dismiss();
 
         }

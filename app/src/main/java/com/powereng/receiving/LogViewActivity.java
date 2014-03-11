@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -61,37 +60,40 @@ public class LogViewActivity extends ListActivity {
 
         // Loading packages in Background Thread
         new LoadAllProducts().execute();
-        View header = getLayoutInflater().inflate(R.layout.log_header, null);
+        //View header = View.inflate(this,R.layout.log_header, null);
+        //View footer = View.inflate(this,R.layout.log_footer, null);
 
         // Get listview
         ListView lv = getListView();
-        lv.addHeaderView(header);
 
         // on selecting single product
         // launching Edit Product Screen
+        lv.setLongClickable(true);
 
-        lv.setOnItemClickListener(new OnItemClickListener() {
+        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-                // getting values from selected ListItem
                 String tracking = ((TextView) view.findViewById(R.id.tracking)).getText()
                         .toString();
+                Intent in = new Intent(getApplicationContext(), LogEditActivity.class);
+                // sending tracking number to next activity
+                in.putExtra(TAG_TRACKING, tracking);
 
-                View view1 = (View) parent.getItemAtPosition(position);
-                if ((sigView.isClickable()) && (view1 == sigView)) {
-                    Intent in = new Intent(getApplicationContext(),
-                            CaptureSignature.class);
-                    // sending pid to next activity
-                    in.putExtra(TAG_TRACKING, tracking);
 
-                    // starting new activity and expecting some response back
-                    startActivityForResult(in, 100);
-                }
+                // starting new activity and expecting some response back
+                startActivityForResult(in, 100);
+
+                return false;
             }
         });
+
+    }
+
+    public void newItem(View view) {
+        Intent i = new Intent(getApplicationContext(), LogNewActivity.class);
+        startActivity(i);
 
     }
 

@@ -3,7 +3,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="50dp"
+    android:background="@android:color/holo_red_light"
+    android:divider="@android:drawable/title_bar">
 
 
     <TextView
@@ -18,7 +20,8 @@
         android:textStyle="bold"
         android:textAlignment="center"
         android:gravity="center"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        android:singleLine="false" />
 
     <TextView
         android:id="@+id/carrierhead"

@@ -22,19 +22,19 @@
         <!-- All Product Activity -->
         <activity
             android:name=".LogViewActivity"
-            android:label="All Products" >
+            android:label="@string/log_name" >
         </activity>
 
         <!-- Add Product Activity -->
         <activity
             android:name=".LogNewActivity"
-            android:label="Add New Product" >
+            android:label="@string/new_package" >
         </activity>
 
         <!-- Edit Product Activity -->
         <activity
             android:name=".LogEditActivity"
-            android:label="Edit Product" >
+            android:label="@string/edit_package" >
         </activity>
 
         <!-- CaptureSignature Activity -->

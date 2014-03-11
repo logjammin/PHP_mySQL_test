@@ -48,7 +48,7 @@ public class LogNewActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.log_edit);
+        setContentView(R.layout.activity_log_edit);
 
         inputDate = (TextView) findViewById(R.id.inputDate);
         final Calendar c = Calendar.getInstance();
@@ -101,7 +101,7 @@ public class LogNewActivity extends Activity {
             Intent intent = new Intent("com.google.zxing.client.android.SCAN");
             intent.putExtra("SCAN_MODE", "ALL_CODE_TYPES");
             startActivityForResult(intent, 0);
-        }
+            }
     };
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -194,4 +194,5 @@ public class LogNewActivity extends Activity {
         }
 
     }
+
 }
