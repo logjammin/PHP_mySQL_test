@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -32,7 +31,7 @@ public class LogViewActivity extends ListActivity {
     JSONParser jParser = new JSONParser();
 
     ArrayList<HashMap<String, String>> packagesList;
-    ImageView sigView;
+
     // url to get all packages list
     private static String url_all_packages = "http://boi40310ll.powereng.com/get_log_all.php";
 
@@ -54,7 +53,6 @@ public class LogViewActivity extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.log_view_all);
-        sigView = (ImageView) findViewById(R.id.signature);
         // Hashmap for ListView
         packagesList = new ArrayList<HashMap<String, String>>();
 
@@ -68,35 +66,33 @@ public class LogViewActivity extends ListActivity {
 
         // on selecting single product
         // launching Edit Product Screen
-        lv.setLongClickable(true);
-
-        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                // getting values from selected ListItem
                 String tracking = ((TextView) view.findViewById(R.id.tracking)).getText()
                         .toString();
-                Intent in = new Intent(getApplicationContext(), LogEditActivity.class);
-                // sending tracking number to next activity
-                in.putExtra(TAG_TRACKING, tracking);
 
+                // Starting new intent
+                Intent in = new Intent(getApplicationContext(),
+                       LogEditActivity.class);
+                // sending pid to next activity
+                in.putExtra(TAG_TRACKING, tracking);
 
                 // starting new activity and expecting some response back
                 startActivityForResult(in, 100);
-
-                return false;
             }
         });
-
     }
+
 
     public void newItem(View view) {
         Intent i = new Intent(getApplicationContext(), LogNewActivity.class);
         startActivity(i);
 
     }
-
 
     // Response from Edit Product Activity
     @Override
@@ -141,7 +137,7 @@ public class LogViewActivity extends ListActivity {
             // getting JSON string from URL
             JSONObject json = jParser.makeHttpRequest(url_all_packages, "GET", params);
 
-            // Check your log cat for JSON reponse
+            // Check your log cat for JSON response
             Log.d("All Packages: ", json.toString());
 
             try {
@@ -150,7 +146,7 @@ public class LogViewActivity extends ListActivity {
 
                 if (success == 1) {
                     // packages found
-                    // Getting Array of Products
+                    // Getting Array of packages
                     packages = json.getJSONArray(TAG_ENTRIES);
 
                     // looping through All Products

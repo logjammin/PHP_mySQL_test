@@ -25,6 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class LogEditActivity extends Activity {
@@ -41,12 +42,12 @@ public class LogEditActivity extends Activity {
     Button scanTracking;
 
     String tracking;
-
+    ArrayList<HashMap<String, String>> packagesList;
     // Progress Dialog
     private ProgressDialog pDialog;
 
     // JSON parser class
-    JSONParser jsonParser = new  JSONParser();
+    JSONParser jParser = new  JSONParser();
 
     // single product url
     private static final String url_item_detail = "http://boi40310ll.powereng.com/get_log_row.php";
@@ -59,14 +60,17 @@ public class LogEditActivity extends Activity {
 
     // JSON Node names
     private static final String TAG_SUCCESS = "success";
-    private static final String TAG_ITEM = "item";
+    private static final String TAG_ENTRIES = "receiving_log";
     private static final String TAG_DATE = "date_received";
     private static final String TAG_TRACKING = "tracking";
     private static final String TAG_CARRIER = "carrier";
-    private static final String TAG_NUMPACKAGES = "numpackages";
+    private static final String TAG_PCS = "numpackages";
     private static final String TAG_SENDER = "sender";
     private static final String TAG_RECIPIENT = "recipient";
-    private static final String TAG_PONUM = "po_num";
+    private static final String TAG_PO = "po_num";
+    //private static final String TAG_SIG = "sig";
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -169,66 +173,68 @@ public class LogEditActivity extends Activity {
         /**
          * Getting item detail in background thread
          * */
-        protected String doInBackground(String... params) {
+        protected String doInBackground(String... args) {
+
+            // Building Parameters
+           List<NameValuePair> params = new ArrayList<NameValuePair>();
+           params.add(new BasicNameValuePair("tracking", tracking));
+            // getting item detail by making HTTP request
+            // Note that item detail url will use GET request
+            JSONObject json = jParser.makeHttpRequest(url_item_detail, "GET", params);
+
+            // check your log for json response
+            Log.d("Single Item Detail", json.toString());
+
+            try {
+                int success;
+                // json success tag
+                success = json.getInt(TAG_SUCCESS);
+
+                if (success == 1) {
+                    // successfully received item details
+                    JSONArray itemObj = json.getJSONArray(TAG_ENTRIES); // JSON Array
+                    // get first item object from JSON Array
+                    JSONObject c = itemObj.getJSONObject(0);
+                    // Edit Text
+                    inputDate = (TextView) findViewById(R.id.inputDate);
+                    inputTracking = (EditText) findViewById(R.id.inputTracking);
+                    inputCarrier = (Spinner) findViewById(R.id.spinCarrier);
+                    inputPcs = (NumberPicker) findViewById(R.id.numberPicker);
+                    inputSender = (EditText) findViewById(R.id.inputSender);
+                    inputRecipient = (EditText) findViewById(R.id.inputRecipient);
+                    inputPoNum = (EditText) findViewById(R.id.inputPoNum);
+
+                    // Storing each json item in variable
+                    String date = c.getString(TAG_DATE);
+                    String tracking = c.getString(TAG_TRACKING);
+                    String carrier = c.getString(TAG_CARRIER);
+                    String pcs = c.getString(TAG_PCS);
+                    String sender = c.getString(TAG_SENDER);
+                    String recipient = c.getString(TAG_RECIPIENT);
+                    String ponum = c.getString(TAG_PO);
+                    //String sig = c.getString(TAG_SIG);
+
+                    // display item data in EditText
+                    inputDate.setText(date);
+                    inputTracking.setText(tracking);
+                    inputCarrier.setSelection(0);
+                    inputPcs.setValue(Integer.parseInt(String.valueOf(pcs)));
+                    inputSender.setText(sender);
+                    inputRecipient.setText(recipient);
+                    inputPoNum.setText(ponum);
+
+
+
+
+                }else{
+                    // item with tracking not found
+                }
 
             // updating UI from Background Thread
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    // Check for success tag
-                    int success;
-                    try {
-                        // Building Parameters
-                        List<NameValuePair> params = new ArrayList<NameValuePair>();
-                        params.add(new BasicNameValuePair("tracking", tracking));
 
-                        // getting product details by making HTTP request
-                        // Note that product details url will use GET request
-                        JSONObject json = jsonParser.makeHttpRequest(
-                                url_item_detail, "GET", params);
-
-                        // check your log for json response
-                        Log.d("Single Item Detail", json.toString());
-
-                        // json success tag
-                        success = json.getInt(TAG_SUCCESS);
-                        if (success == 1) {
-                            // successfully received item details
-                            //TODO:Change LogEdit php to create a json array named "item"
-                            JSONArray itemObj = json
-                                    .getJSONArray(TAG_ITEM); // JSON Array
-
-                            // get first item object from JSON Array
-                            JSONObject item = itemObj.getJSONObject(0);
-
-                            // item with this tracking found
-                            // Edit Text
-                            inputDate = (TextView) findViewById(R.id.inputDate);
-                            inputTracking = (EditText) findViewById(R.id.inputTracking);
-                            inputCarrier = (Spinner) findViewById(R.id.spinCarrier);
-                            inputPcs = (NumberPicker) findViewById(R.id.numberPicker);
-                            inputSender = (EditText) findViewById(R.id.inputSender);
-                            inputRecipient = (EditText) findViewById(R.id.inputRecipient);
-                            inputPoNum = (EditText) findViewById(R.id.inputPoNum);
-
-                            // display item data in EditText
-                            inputDate.setText(item.getString(TAG_DATE));
-                            inputTracking.setText(TAG_TRACKING);
-                            inputCarrier.setSelection(0);
-                            inputPcs.setValue(item.getInt(TAG_NUMPACKAGES));
-                            inputSender.setText(item.getString(TAG_SENDER));
-                            inputRecipient.setText(item.getString(TAG_RECIPIENT));
-                            inputPoNum.setText(item.getString(TAG_PONUM));
-                            //TODO: Deal with signature image
-
-                        }else{
-                            // item with tracking not found
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
+           } catch (JSONException e) {
+               e.printStackTrace();
+           }
             return null;
         }
 
@@ -238,8 +244,17 @@ public class LogEditActivity extends Activity {
         protected void onPostExecute(String file_url) {
             // dismiss the dialog once got all details
             pDialog.dismiss();
-        }
-    }
+
+/*            runOnUiThread(new Runnable() {
+                public void run() {
+
+
+
+
+                    //TODO: Deal with signature image
+                }
+            });*/
+    }}
 
     /**
      * Background Async Task to  Save product Details
@@ -278,14 +293,14 @@ public class LogEditActivity extends Activity {
             params.add(new BasicNameValuePair(TAG_DATE, date));
             params.add(new BasicNameValuePair(TAG_TRACKING, tracking));
             params.add(new BasicNameValuePair(TAG_CARRIER, carrier));
-            params.add(new BasicNameValuePair(TAG_NUMPACKAGES, numpackages));
+            params.add(new BasicNameValuePair(TAG_PCS, numpackages));
             params.add(new BasicNameValuePair(TAG_SENDER, sender));
             params.add(new BasicNameValuePair(TAG_RECIPIENT, recipient));
-            params.add(new BasicNameValuePair(TAG_PONUM, ponum));
+            params.add(new BasicNameValuePair(TAG_PO, ponum));
 
             // sending modified data through http request
             // Notice that update product url accepts POST method
-            JSONObject json = jsonParser.makeHttpRequest(url_update_item,
+            JSONObject json = jParser.makeHttpRequest(url_update_item,
                     "POST", params);
 
             // check json success tag
@@ -348,7 +363,7 @@ public class LogEditActivity extends Activity {
                 params.add(new BasicNameValuePair("tracking", tracking));
 
                 // getting item details by making HTTP request
-                JSONObject json = jsonParser.makeHttpRequest(
+                JSONObject json = jParser.makeHttpRequest(
                         url_delete_item, "POST", params);
 
                 // check your log for json response
