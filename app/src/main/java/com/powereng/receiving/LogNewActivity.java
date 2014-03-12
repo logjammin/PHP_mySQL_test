@@ -48,7 +48,7 @@ public class LogNewActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_log_edit);
+        setContentView(R.layout.fragment_edit_package);
 
         inputDate = (TextView) findViewById(R.id.inputDate);
         final Calendar c = Calendar.getInstance();

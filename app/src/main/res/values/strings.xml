@@ -28,6 +28,6 @@
     <string name="cancel">Cancel</string>
     <string name="new_package">Add New Package</string>
     <string name="edit_package">Edit Package</string>
-
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

@@ -33,7 +33,7 @@
 
         <!-- Edit Product Activity -->
         <activity
-            android:name=".LogEditActivity"
+            android:name=".PackageDetailActivity"
             android:label="@string/edit_package" >
         </activity>
 

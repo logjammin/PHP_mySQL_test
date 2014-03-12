@@ -77,7 +77,7 @@ public class LogViewActivity extends ListActivity {
 
                 // Starting new intent
                 Intent in = new Intent(getApplicationContext(),
-                       LogEditActivity.class);
+                       PackageDetailActivity.class);
                 // sending pid to next activity
                 in.putExtra(TAG_TRACKING, tracking);
 

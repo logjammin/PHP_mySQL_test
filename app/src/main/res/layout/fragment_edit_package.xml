@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:text="@string/scan"
             android:id="@+id/btnScan"
-            android:onClick="mScan2"
+            android:onClick="trackingScan"
             android:layout_gravity="right" />
 
     </LinearLayout>
@@ -57,7 +57,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/numberPicker"
             android:layout_gravity="center"
-            android:gravity="center" />
+            android:gravity="center"/>
 
     </LinearLayout>
     <!-- Input Sender -->
@@ -95,7 +95,7 @@
         <Button android:id="@+id/btn1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/save"
+            android:text="@string/delete"
             android:layout_weight="1"/>
 
         <!-- Button update -->

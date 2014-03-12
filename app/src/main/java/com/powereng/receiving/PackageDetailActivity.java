@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class LogEditActivity extends Activity {
+public class PackageDetailActivity extends Activity {
 
     TextView inputDate;
     EditText inputTracking;
@@ -38,25 +38,20 @@ public class LogEditActivity extends Activity {
     EditText inputRecipient;
     EditText inputPoNum;
     Button btnSave;
-    Button btnDelete;   
-    Button scanTracking;
+    Button btnDelete;
 
     String tracking;
-    ArrayList<HashMap<String, String>> packagesList;
+    HashMap<String, String> packagesList;
     // Progress Dialog
     private ProgressDialog pDialog;
 
     // JSON parser class
     JSONParser jParser = new  JSONParser();
 
-    // single product url
     private static final String url_item_detail = "http://boi40310ll.powereng.com/get_log_row.php";
-
-    // url to update product
     private static final String url_update_item = "http://boi40310ll.powereng.com/update_log_row.php";
-
-    // url to delete product
     private static final String url_delete_item = "http://boi40310ll.powereng.com/delete_log_row.php";
+    private static final String url_create_log_row = "http://boi40310ll.powereng.com/create_log_row.php";
 
     // JSON Node names
     private static final String TAG_SUCCESS = "success";
@@ -75,20 +70,19 @@ public class LogEditActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_log_edit);
+        setContentView(R.layout.fragment_edit_package);
 
-        // save button
-        btnSave = (Button) findViewById(R.id.btn1);
-        btnDelete = (Button) findViewById(R.id.btn2);
-        scanTracking = (Button) findViewById(R.id.btnScan);
         // getting product details from intent
         Intent i = getIntent();
 
-        // getting product id (tracking) from intent
+        // getting item id (tracking) from intent
         tracking = i.getStringExtra(TAG_TRACKING);
 
         // Getting complete product details in background thread
         new GetLogDetail().execute();
+
+        btnDelete = (Button) findViewById(R.id.btn1);
+        btnSave = (Button) findViewById(R.id.btn2);
 
         // save button click event
         btnSave.setOnClickListener(new View.OnClickListener() {
@@ -134,7 +128,7 @@ public class LogEditActivity extends Activity {
         return dialog;
     }
 
-    public void mScan2(View view) {
+    public void trackingScan(View view) {
         IntentIntegrator intentIntegrator = new IntentIntegrator(this); // where this is activity
         intentIntegrator.initiateScan(IntentIntegrator.ALL_CODE_TYPES); // or QR_CODE_TYPES if you need to scan QR
     }
@@ -151,7 +145,81 @@ public class LogEditActivity extends Activity {
         }
     }
 
+    class AddItemDetail extends AsyncTask<String, String, String> {
+        //TODO: po_num needs to be dealt with on server script before enabling.
+        /**
+         * Before starting background thread Show Progress Dialog
+         * */
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(PackageDetailActivity.this);
+            pDialog.setMessage("Creating Product..");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(true);
+            pDialog.show();
+        }
 
+        /**
+         * Creating product
+         * */
+        protected String doInBackground(String... args) {
+            String date = inputDate.getText().toString();
+            String tracking = inputTracking.getText().toString();
+            String carrier = inputCarrier.getSelectedItem().toString();
+            String numpackages = String.valueOf(inputPcs.getValue());
+            String sender = inputSender.getText().toString();
+            String recipient = inputRecipient.getText().toString();
+            //String ponum = inputPoNum.getText().toString();
+
+            // Building Parameters
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("date_received", date));
+            params.add(new BasicNameValuePair("tracking", tracking));
+            params.add(new BasicNameValuePair("carrier", carrier));
+            params.add(new BasicNameValuePair("numpackages", numpackages));
+            params.add(new BasicNameValuePair("sender", sender));
+            params.add(new BasicNameValuePair("recipient", recipient));
+            //params.add(new BasicNameValuePair("po_num", ponum));
+
+            // getting JSON Object
+            // Note that create product url accepts POST method
+            JSONObject json = jParser.makeHttpRequest(url_create_log_row,
+                    "POST", params);
+
+            // check log cat fro response
+            Log.d("Create Response", json.toString());
+
+            // check for success tag
+            try {
+                int success = json.getInt(TAG_SUCCESS);
+
+                if (success == 1) {
+                    // successfully created product
+                    Intent i = new Intent(getApplicationContext(), LogViewActivity.class);
+                    startActivity(i);
+
+                    // closing this screen
+                    finish();
+                } else {
+                    // failed to create product
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        /**
+         * After completing background task Dismiss the progress dialog
+         * **/
+        protected void onPostExecute(String file_url) {
+            // dismiss the dialog once done
+            pDialog.dismiss();
+        }
+
+    }
     /**
      * Background Async Task to Get complete product details
      * */
@@ -163,7 +231,7 @@ public class LogEditActivity extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(LogEditActivity.this);
+            pDialog = new ProgressDialog(PackageDetailActivity.this);
             pDialog.setMessage("Loading item detail. Please wait...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
@@ -195,14 +263,6 @@ public class LogEditActivity extends Activity {
                     JSONArray itemObj = json.getJSONArray(TAG_ENTRIES); // JSON Array
                     // get first item object from JSON Array
                     JSONObject c = itemObj.getJSONObject(0);
-                    // Edit Text
-                    inputDate = (TextView) findViewById(R.id.inputDate);
-                    inputTracking = (EditText) findViewById(R.id.inputTracking);
-                    inputCarrier = (Spinner) findViewById(R.id.spinCarrier);
-                    inputPcs = (NumberPicker) findViewById(R.id.numberPicker);
-                    inputSender = (EditText) findViewById(R.id.inputSender);
-                    inputRecipient = (EditText) findViewById(R.id.inputRecipient);
-                    inputPoNum = (EditText) findViewById(R.id.inputPoNum);
 
                     // Storing each json item in variable
                     String date = c.getString(TAG_DATE);
@@ -214,20 +274,19 @@ public class LogEditActivity extends Activity {
                     String ponum = c.getString(TAG_PO);
                     //String sig = c.getString(TAG_SIG);
 
-                    // display item data in EditText
-                    inputDate.setText(date);
-                    inputTracking.setText(tracking);
-                    inputCarrier.setSelection(0);
-                    inputPcs.setValue(Integer.parseInt(String.valueOf(pcs)));
-                    inputSender.setText(sender);
-                    inputRecipient.setText(recipient);
-                    inputPoNum.setText(ponum);
+                    packagesList = new HashMap<String, String>();
 
-
-
+                    packagesList.put(TAG_DATE, date);
+                    packagesList.put(TAG_TRACKING, tracking);
+                    packagesList.put(TAG_CARRIER, carrier);
+                    packagesList.put(TAG_SENDER, sender);
+                    packagesList.put(TAG_RECIPIENT, recipient);
+                    packagesList.put(TAG_PCS, pcs);
+                    packagesList.put(TAG_PO, ponum);
 
                 }else{
-                    // item with tracking not found
+
+                    Log.d("Success = ",""+ success);
                 }
 
             // updating UI from Background Thread
@@ -245,15 +304,30 @@ public class LogEditActivity extends Activity {
             // dismiss the dialog once got all details
             pDialog.dismiss();
 
-/*            runOnUiThread(new Runnable() {
+            runOnUiThread(new Runnable() {
                 public void run() {
+                    // Edit Text
+                    inputDate = (TextView) findViewById(R.id.inputDate);
+                    inputTracking = (EditText) findViewById(R.id.inputTracking);
+                    inputCarrier = (Spinner) findViewById(R.id.spinCarrier);
+                    inputPcs = (NumberPicker) findViewById(R.id.numberPicker);
+                    inputSender = (EditText) findViewById(R.id.inputSender);
+                    inputRecipient = (EditText) findViewById(R.id.inputRecipient);
+                    inputPoNum = (EditText) findViewById(R.id.inputPoNum);
 
-
+                    // display item data in EditText
+                    inputDate.setText(packagesList.get(TAG_DATE));
+                    inputTracking.setText(packagesList.get(TAG_TRACKING));
+                    inputCarrier.setSelection(0);
+                    inputPcs.setValue(Integer.parseInt(packagesList.get(TAG_PCS)));
+                    inputSender.setText(packagesList.get(TAG_SENDER));
+                    inputRecipient.setText(packagesList.get(TAG_RECIPIENT));
+                    inputPoNum.setText(packagesList.get(TAG_PO));
 
 
                     //TODO: Deal with signature image
                 }
-            });*/
+            });
     }}
 
     /**
@@ -267,7 +341,7 @@ public class LogEditActivity extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(LogEditActivity.this);
+            pDialog = new ProgressDialog(PackageDetailActivity.this);
             pDialog.setMessage("Saving Item ...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
@@ -343,7 +417,7 @@ public class LogEditActivity extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(LogEditActivity.this);
+            pDialog = new ProgressDialog(PackageDetailActivity.this);
             pDialog.setMessage("Deleting Item...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
