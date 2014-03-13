@@ -3,7 +3,6 @@ package com.powereng.receiving;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -71,7 +70,7 @@ public class PackageDetailActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_edit_package);
+        //setContentView(R.layout.fragment_edit_package);
 
         // getting product details from intent
         Intent i = getIntent();
@@ -314,8 +313,8 @@ public class PackageDetailActivity extends Activity {
                     // Edit Text
                     inputDate = (TextView) findViewById(R.id.inputDate);
                     inputTracking = (EditText) findViewById(R.id.inputTracking);
-                    inputCarrier = (Spinner) findViewById(R.id.spinCarrier);
-                    inputPcs = (NumberPicker) findViewById(R.id.numberPicker);
+                    inputCarrier = (Spinner) findViewById(R.id.inputCarrier);
+                    inputPcs = (NumberPicker) findViewById(R.id.inputPcs);
                     inputSender = (EditText) findViewById(R.id.inputSender);
                     inputRecipient = (EditText) findViewById(R.id.inputRecipient);
                     inputPoNum = (EditText) findViewById(R.id.inputPoNum);
@@ -334,7 +333,6 @@ public class PackageDetailActivity extends Activity {
                 }
             });
     }}
-
     /**
      * Background Async Task to  Save product Details
      * */
@@ -410,7 +408,6 @@ public class PackageDetailActivity extends Activity {
             pDialog.dismiss();
         }
     }
-
     /*****************************************************************
      * Background Async Task to Delete item
      * */
@@ -473,27 +470,6 @@ public class PackageDetailActivity extends Activity {
             pDialog.dismiss();
 
         }
-
-    }
-
-    public static class NewItemFragment extends Fragment {
-
-        OnItemAddedListener mListener;
-
-        public interface OnItemAddedListener {
-            public void OnItemAdded(Bundle args);
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            try {
-                mListener = (OnItemAddedListener) activity;
-            } catch (ClassCastException e) {
-                throw new ClassCastException(activity.toString() + " must implement OnItemAddedListener");
-            }
-        }
-
 
     }
 

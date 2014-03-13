@@ -29,5 +29,7 @@
     <string name="new_package">Add New Package</string>
     <string name="edit_package">Edit Package</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_package_list">Packages</string>
+    <string name="title_package_detail">Package Detail</string>
 
 </resources>

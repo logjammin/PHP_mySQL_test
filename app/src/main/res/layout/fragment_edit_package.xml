@@ -2,13 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
-    <TextView
+    <TextView android:id="@+id/inputDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/inputDate"
         android:layout_gravity="center"
         android:layout_marginBottom="5dp"
         android:layout_marginTop="5dp"/>
@@ -28,12 +27,10 @@
             android:layout_marginBottom="15dip"
             android:singleLine="true"/>
 
-        <Button
+        <Button android:id="@+id/btnScan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/scan"
-            android:id="@+id/btnScan"
-            android:onClick="trackingScan"
             android:layout_gravity="right" />
 
     </LinearLayout>
@@ -45,17 +42,15 @@
         android:gravity="center">
 
 
-        <Spinner
+        <Spinner android:id="@+id/inputCarrier"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/spinCarrier"
             android:entries="@array/carriers"
             android:layout_gravity="center" />
 
-        <NumberPicker
+        <NumberPicker android:id="@+id/inputPcs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/numberPicker"
             android:layout_gravity="center"
             android:gravity="center"/>
 
@@ -91,19 +86,19 @@
     <LinearLayout android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
         <!-- Button Create Product -->
         <Button android:id="@+id/btn1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/delete"
             android:layout_weight="1"/>
 
         <!-- Button update -->
         <Button android:id="@+id/btn2"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/update"
             android:layout_weight="1"/>
+
     </LinearLayout>
         <Button android:id="@+id/btn3"
             android:layout_width="wrap_content"

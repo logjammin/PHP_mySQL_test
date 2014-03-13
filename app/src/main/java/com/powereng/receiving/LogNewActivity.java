@@ -67,8 +67,8 @@ public class LogNewActivity extends Activity {
         //scanTracking.setOnClickListener(mScan);
         // Edit Text
         inputTracking = (EditText) findViewById(R.id.inputTracking);
-        inputCarrier = (Spinner) findViewById(R.id.spinCarrier);
-        inputPcs = (NumberPicker) findViewById(R.id.numberPicker);
+        inputCarrier = (Spinner) findViewById(R.id.inputCarrier);
+        inputPcs = (NumberPicker) findViewById(R.id.inputPcs);
         inputPcs.setMinValue(1);
         inputPcs.setMaxValue(20);
         inputPcs.setValue(1);
