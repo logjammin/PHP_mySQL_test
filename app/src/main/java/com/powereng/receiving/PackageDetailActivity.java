@@ -3,6 +3,7 @@ package com.powereng.receiving;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -74,9 +75,13 @@ public class PackageDetailActivity extends Activity {
 
         // getting product details from intent
         Intent i = getIntent();
+        Boolean turd = i.hasExtra(TAG_TRACKING);
+        if (!turd) {
+            // getting item id (tracking) from intent
 
-        // getting item id (tracking) from intent
-        tracking = i.getStringExtra(TAG_TRACKING);
+        } else {
+            tracking = i.getStringExtra(TAG_TRACKING);
+        }
 
         // Getting complete product details in background thread
         new GetLogDetail().execute();
@@ -470,4 +475,26 @@ public class PackageDetailActivity extends Activity {
         }
 
     }
+
+    public static class NewItemFragment extends Fragment {
+
+        OnItemAddedListener mListener;
+
+        public interface OnItemAddedListener {
+            public void OnItemAdded(Bundle args);
+        }
+
+        @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            try {
+                mListener = (OnItemAddedListener) activity;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(activity.toString() + " must implement OnItemAddedListener");
+            }
+        }
+
+
+    }
+
 }

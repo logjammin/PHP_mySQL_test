@@ -58,8 +58,6 @@ public class LogViewActivity extends ListActivity {
 
         // Loading packages in Background Thread
         new LoadAllProducts().execute();
-        //View header = View.inflate(this,R.layout.log_header, null);
-        //View footer = View.inflate(this,R.layout.log_footer, null);
 
         // Get listview
         ListView lv = getListView();
@@ -222,4 +220,6 @@ public class LogViewActivity extends ListActivity {
         }
 
     }
+
+
 }
