@@ -1,22 +1,24 @@
 package com.powereng.receiving;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -25,19 +27,24 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
-public class PackageDetailActivity extends Activity {
+/**
+ * Created by Logjammin on 3/15/14.
+ */
+public class EditItemFragment extends Fragment {
 
-    TextView inputDate;
+
+
     EditText inputTracking;
     Spinner inputCarrier;
     NumberPicker inputPcs;
     EditText inputSender;
     EditText inputRecipient;
     EditText inputPoNum;
-    Button btnSave;
+    Button btnUpdate;
     Button btnDelete;
 
     String tracking;
@@ -65,31 +72,31 @@ public class PackageDetailActivity extends Activity {
     private static final String TAG_PO = "po_num";
     //private static final String TAG_SIG = "sig";
 
+    public EditItemFragment() {
+
+    }
+
 
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        //setContentView(R.layout.fragment_edit_package);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        // getting product details from intent
-        Intent i = getIntent();
-        Boolean turd = i.hasExtra(TAG_TRACKING);
-        if (!turd) {
-            // getting item id (tracking) from intent
-
-        } else {
-            tracking = i.getStringExtra(TAG_TRACKING);
-        }
+        View rootView = inflater.inflate(R.layout.fragment_edit_package, container, false);
 
         // Getting complete product details in background thread
-        new GetLogDetail().execute();
 
-        btnDelete = (Button) findViewById(R.id.btn1);
-        btnSave = (Button) findViewById(R.id.btn2);
 
+        btnDelete = (Button) rootView.findViewById(R.id.btn1);
+        btnUpdate = (Button) rootView.findViewById(R.id.btn2);
+        inputTracking = (EditText) rootView.findViewById(R.id.inputTracking);
+        inputCarrier = (Spinner) rootView.findViewById(R.id.inputCarrier);
+        inputPcs = (NumberPicker) rootView.findViewById(R.id.inputPcs);
+        inputSender = (EditText) rootView.findViewById(R.id.inputSender);
+        inputRecipient = (EditText) rootView.findViewById(R.id.inputRecipient);
+        inputPoNum = (EditText) rootView.findViewById(R.id.inputPoNum);
         // save button click event
-        btnSave.setOnClickListener(new View.OnClickListener() {
+        btnUpdate.setText(R.string.update);
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
@@ -98,6 +105,7 @@ public class PackageDetailActivity extends Activity {
             }
         });
 
+        btnDelete.setText(R.string.delete);
         // Delete button click event
         btnDelete.setOnClickListener(new View.OnClickListener() {
 
@@ -107,11 +115,11 @@ public class PackageDetailActivity extends Activity {
                 deleteDialog();
             }
         });
-
+        return rootView;
     }
 
     public Dialog deleteDialog(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -132,98 +140,17 @@ public class PackageDetailActivity extends Activity {
         return dialog;
     }
 
-    public void trackingScan(View view) {
-        IntentIntegrator intentIntegrator = new IntentIntegrator(this); // where this is activity
-        intentIntegrator.initiateScan(IntentIntegrator.ALL_CODE_TYPES); // or QR_CODE_TYPES if you need to scan QR
-    }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (requestCode == 0) {
-            if (resultCode == RESULT_OK) {
-                String contents = intent.getStringExtra("SCAN_RESULT");
-                String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
-                inputTracking.setText(contents);
-            } else if (resultCode == RESULT_CANCELED) {
-                // Handle cancel
-            }
+        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+        if (scanResult != null) {
+            inputTracking.setText(scanResult.toString());
+
         }
+        // else continue with any other code you need in the method
     }
 
-    class AddItemDetail extends AsyncTask<String, String, String> {
-        //TODO: po_num needs to be dealt with on server script before enabling.
-        /**
-         * Before starting background thread Show Progress Dialog
-         * */
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pDialog = new ProgressDialog(PackageDetailActivity.this);
-            pDialog.setMessage("Creating Product..");
-            pDialog.setIndeterminate(false);
-            pDialog.setCancelable(true);
-            pDialog.show();
-        }
 
-        /**
-         * Creating product
-         * */
-        protected String doInBackground(String... args) {
-            String date = inputDate.getText().toString();
-            String tracking = inputTracking.getText().toString();
-            String carrier = inputCarrier.getSelectedItem().toString();
-            String numpackages = String.valueOf(inputPcs.getValue());
-            String sender = inputSender.getText().toString();
-            String recipient = inputRecipient.getText().toString();
-            //String ponum = inputPoNum.getText().toString();
-
-            // Building Parameters
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("date_received", date));
-            params.add(new BasicNameValuePair("tracking", tracking));
-            params.add(new BasicNameValuePair("carrier", carrier));
-            params.add(new BasicNameValuePair("numpackages", numpackages));
-            params.add(new BasicNameValuePair("sender", sender));
-            params.add(new BasicNameValuePair("recipient", recipient));
-            //params.add(new BasicNameValuePair("po_num", ponum));
-
-            // getting JSON Object
-            // Note that create product url accepts POST method
-            JSONObject json = jParser.makeHttpRequest(url_create_log_row,
-                    "POST", params);
-
-            // check log cat fro response
-            Log.d("Create Response", json.toString());
-
-            // check for success tag
-            try {
-                int success = json.getInt(TAG_SUCCESS);
-
-                if (success == 1) {
-                    // successfully created product
-                    Intent i = new Intent(getApplicationContext(), LogViewActivity.class);
-                    startActivity(i);
-
-                    // closing this screen
-                    finish();
-                } else {
-                    // failed to create product
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        /**
-         * After completing background task Dismiss the progress dialog
-         * **/
-        protected void onPostExecute(String file_url) {
-            // dismiss the dialog once done
-            pDialog.dismiss();
-        }
-
-    }
     /**
      * Background Async Task to Get complete product details
      * */
@@ -235,7 +162,7 @@ public class PackageDetailActivity extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(PackageDetailActivity.this);
+            pDialog = new ProgressDialog(getActivity());
             pDialog.setMessage("Loading item detail. Please wait...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
@@ -248,8 +175,8 @@ public class PackageDetailActivity extends Activity {
         protected String doInBackground(String... args) {
 
             // Building Parameters
-           List<NameValuePair> params = new ArrayList<NameValuePair>();
-           params.add(new BasicNameValuePair("tracking", tracking));
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("tracking", tracking));
             // getting item detail by making HTTP request
             // Note that item detail url will use GET request
             JSONObject json = jParser.makeHttpRequest(url_item_detail, "GET", params);
@@ -293,11 +220,11 @@ public class PackageDetailActivity extends Activity {
                     Log.d("Success = ",""+ success);
                 }
 
-            // updating UI from Background Thread
+                // updating UI from Background Thread
 
-           } catch (JSONException e) {
-               e.printStackTrace();
-           }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             return null;
         }
 
@@ -308,19 +235,11 @@ public class PackageDetailActivity extends Activity {
             // dismiss the dialog once got all details
             pDialog.dismiss();
 
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    // Edit Text
+                     // Edit Text
                     //inputDate = (TextView) findViewById(R.id.inputDate);
-                    inputTracking = (EditText) findViewById(R.id.inputTracking);
-                    inputCarrier = (Spinner) findViewById(R.id.inputCarrier);
-                    inputPcs = (NumberPicker) findViewById(R.id.inputPcs);
-                    inputSender = (EditText) findViewById(R.id.inputSender);
-                    inputRecipient = (EditText) findViewById(R.id.inputRecipient);
-                    inputPoNum = (EditText) findViewById(R.id.inputPoNum);
+
 
                     // display item data in EditText
-                    inputDate.setText(packagesList.get(TAG_DATE));
                     inputTracking.setText(packagesList.get(TAG_TRACKING));
                     inputCarrier.setSelection(0);
                     inputPcs.setValue(Integer.parseInt(packagesList.get(TAG_PCS)));
@@ -330,9 +249,9 @@ public class PackageDetailActivity extends Activity {
 
 
                     //TODO: Deal with signature image
-                }
-            });
-    }}
+
+
+        }}
     /**
      * Background Async Task to  Save product Details
      * */
@@ -344,7 +263,7 @@ public class PackageDetailActivity extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(PackageDetailActivity.this);
+            pDialog = new ProgressDialog(getActivity());
             pDialog.setMessage("Saving Item ...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
@@ -357,7 +276,8 @@ public class PackageDetailActivity extends Activity {
         protected String doInBackground(String... args) {
 
             // getting updated data from EditTexts
-            String date = inputDate.getText().toString();
+            final Calendar c = Calendar.getInstance();
+            String date = c.toString();
             String tracking = inputTracking.getText().toString();
             String carrier = inputCarrier.getSelectedItem().toString();
             String numpackages = String.valueOf(inputPcs.getValue());
@@ -386,10 +306,10 @@ public class PackageDetailActivity extends Activity {
 
                 if (success == 1) {
                     // successfully updated
-                    Intent i = getIntent();
+
                     // send result code 100 to notify about product update
-                    setResult(100, i);
-                    finish();
+
+
                 } else {
                     // failed to update product
                 }
@@ -419,7 +339,7 @@ public class PackageDetailActivity extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(PackageDetailActivity.this);
+            pDialog = new ProgressDialog(getActivity());
             pDialog.setMessage("Deleting Item...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
@@ -448,12 +368,7 @@ public class PackageDetailActivity extends Activity {
                 // json success tag
                 success = json.getInt(TAG_SUCCESS);
                 if (success == 1) {
-                    // item successfully deleted
-                    // notify previous activity by sending code 100
-                    Intent i = getIntent();
-                    // send result code 100 to notify about item deletion
-                    setResult(100, i);
-                    finish();
+
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -474,3 +389,4 @@ public class PackageDetailActivity extends Activity {
     }
 
 }
+

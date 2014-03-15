@@ -8,10 +8,10 @@
     <string name="carrier">Carrier</string>
     <string name="sender">Sender</string>
     <string name="recipient">Recipient</string>
-    <string name="pcs"># of pcs.</string>
+    <string name="pcs">pcs</string>
     <string name="signature">Signature</string>
     <string name="ponum">PO #</string>
-    <string name="scan">Scan tracking #</string>
+    <string name="scan">Scan</string>
     <string name="save">Save/Modify</string>
     <string name="delete">Delete</string>
     <string name="update">Update</string>
@@ -31,5 +31,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_package_list">Packages</string>
     <string name="title_package_detail">Package Detail</string>
+    <string name="additional">Additional Packages</string>
 
 </resources>

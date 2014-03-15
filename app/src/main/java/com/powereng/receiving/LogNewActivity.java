@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -33,7 +32,7 @@ public class LogNewActivity extends Activity {
     TextView inputDate;
     EditText inputTracking;
     Spinner inputCarrier;
-    NumberPicker inputPcs;
+    EditText inputPcs;
     EditText inputSender;
     EditText inputRecipient;
     EditText inputPoNum;
@@ -50,7 +49,7 @@ public class LogNewActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_edit_package);
 
-        inputDate = (TextView) findViewById(R.id.inputDate);
+        //inputDate = (TextView) findViewById(R.id.inputDate);
         final Calendar c = Calendar.getInstance();
         int yy = c.get(Calendar.YEAR);
         int mm = c.get(Calendar.MONTH);
@@ -68,10 +67,7 @@ public class LogNewActivity extends Activity {
         // Edit Text
         inputTracking = (EditText) findViewById(R.id.inputTracking);
         inputCarrier = (Spinner) findViewById(R.id.inputCarrier);
-        inputPcs = (NumberPicker) findViewById(R.id.inputPcs);
-        inputPcs.setMinValue(1);
-        inputPcs.setMaxValue(20);
-        inputPcs.setValue(1);
+
 
         inputSender = (EditText) findViewById(R.id.inputSender);
         inputRecipient = (EditText) findViewById(R.id.inputRecipient);
@@ -141,7 +137,7 @@ public class LogNewActivity extends Activity {
             String date = inputDate.getText().toString();
             String tracking = inputTracking.getText().toString();
             String carrier = inputCarrier.getSelectedItem().toString();
-            String numpackages = String.valueOf(inputPcs.getValue());
+            String numpackages = inputPcs.getText().toString();
             String sender = inputSender.getText().toString();
             String recipient = inputRecipient.getText().toString();
             //String ponum = inputPoNum.getText().toString();
