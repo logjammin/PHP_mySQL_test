@@ -24,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -567,6 +568,16 @@ public class LogViewActivity extends ListActivity {
             return rootView;
         }
 
+         public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+               IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+               if (scanResult != null) {
+                     inputTracking.setText(scanResult.toString());
+
+                   }
+               // else continue with any other code you need in the method
+
+
+         }
 
         class AddItem extends AsyncTask<String, String, String> {
             //TODO: po_num needs to be dealt with on server script before enabling.
