@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="fragment_edit_package" type="id">@layout/fragment_edit_package</item>
+</resources>

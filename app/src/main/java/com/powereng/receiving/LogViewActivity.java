@@ -35,8 +35,10 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
 
     ArrayList<HashMap<String, String>> packagesList;
     FragmentTransaction fragmentTransaction;
-
     FragmentManager fragmentManager;
+    ArrayList<String> itemDetails;
+    EditItemFragment editItemFragment;
+    NewItemFragment newItemFragment;
 
     // url to get all packages list
     private static final String url_all_packages = "http://boi40310ll.powereng.com/get_log_all.php";
@@ -81,24 +83,52 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 // getting values from selected ListItem
-                String tracking = ((TextView) view.findViewById(R.id.tracking)).getText()
-                        .toString();
+
+
+                itemDetails = new ArrayList<String>();
+
+                itemDetails.add(((TextView) view.findViewById(R.id.tracking)).getText()
+                        .toString());
+                itemDetails.add(((TextView) view.findViewById(R.id.numpack)).getText()
+                        .toString());
+                itemDetails.add(((TextView) view.findViewById(R.id.sender)).getText()
+                        .toString());
+                itemDetails.add(((TextView) view.findViewById(R.id.recipient)).getText()
+                        .toString());
+                itemDetails.add(((TextView) view.findViewById(R.id.ponum)).getText()
+                        .toString());
+                itemDetails.add(((TextView) view.findViewById(R.id.carrier)).getText()
+                        .toString());
+
+                updateItem();
 
             }
         });
     }
 
-    public void updateItem() {
-        fragmentTransaction = fragmentManager.beginTransaction();
-        EditItemFragment fragment = new EditItemFragment();
+    public ArrayList<String> getItemDetails() {
+        return itemDetails;
+    }
 
-        fragmentTransaction.replace(R.id.fragment_container, fragment);
-        fragmentTransaction.addToBackStack(null);
+    public void updateItem() {
+
+        Fragment container = fragmentManager.findFragmentById(R.id.fragment_container);
+        fragmentTransaction = fragmentManager.beginTransaction();
+        editItemFragment = new EditItemFragment(itemDetails);
+        //Is the fragment already there?
+        if (container != null) {
+            fragmentTransaction.replace(R.id.fragment_container, editItemFragment);
+            //fragmentTransaction.addToBackStack(null);
+        } else {
+            fragmentTransaction.add(R.id.fragment_container, editItemFragment);
+        }
+
         fragmentTransaction.commit();
+
     }
 
 
-
+    //start NewItemFragment
     public void newItem(View view) {
 
         Fragment container = fragmentManager.findFragmentById(R.id.fragment_container);
@@ -108,8 +138,8 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
             return;
         } else {
             fragmentTransaction = fragmentManager.beginTransaction();
-            NewItemFragment fragment = new NewItemFragment();
-            fragmentTransaction.add(R.id.fragment_container, fragment);
+            newItemFragment = new NewItemFragment();
+            fragmentTransaction.add(R.id.fragment_container, newItemFragment);
             fragmentTransaction.commit();
         }
 
@@ -136,19 +166,27 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
     //TODO: update log view to reflect the new data.
     @Override
     public void OnItemAdded() {
-
-        fragmentTransaction = fragmentManager.beginTransaction();
-        NewItemFragment fragment = new NewItemFragment();
-
-        fragmentTransaction.replace(R.id.fragment_container, fragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+        newItemFragment = (NewItemFragment) fragmentManager.findFragmentById(R.id.fragment_container);
+        List<NameValuePair> params = newItemFragment.getParams();
+        new AddItem(params).execute();
     }
 
-    /**
-     * Background Async Task to Load all product by making HTTP Request
-     * */
-    public class LoadAllProducts extends AsyncTask<String, String, String> {
+    @Override
+    public void OnItemUpdated() {
+        editItemFragment = (EditItemFragment) fragmentManager.findFragmentById(R.id.fragment_container);
+        List<NameValuePair> params = editItemFragment.getParams();
+        new SaveItemDetail(params).execute();
+    }
+
+    @Override
+    public void OnItemDeleted() {
+        editItemFragment = (EditItemFragment) fragmentManager.findFragmentById(R.id.fragment_container);
+        List<NameValuePair> params = editItemFragment.getParams();
+        new DeleteItem(params).execute();
+    }
+
+
+    class LoadAllProducts extends AsyncTask<String, String, String> {
 
         /**
          * Before starting background thread Show Progress Dialog
@@ -258,158 +296,106 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
 
     }
 
+    class AddItem extends AsyncTask<String, String, String> {
+        List<NameValuePair> params;
+        public AddItem(List<NameValuePair> nameValuePairList){
+            params = nameValuePairList;
+        }
 
-
-/*    *//**
-     * Background Async Task to Get complete product details
-     * *//*
-    class GetLogDetail extends AsyncTask<String, String, String> {
-
-        *//**
+        //TODO: po_num needs to be dealt with on server script before enabling.
+        /**
          * Before starting background thread Show Progress Dialog
-         * *//*
+         * */
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(PackageDetailActivity.this);
-            pDialog.setMessage("Loading item detail. Please wait...");
+            pDialog = new ProgressDialog(LogViewActivity.this);
+            pDialog.setMessage("Creating Product..");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
             pDialog.show();
         }
 
-        *//**
-         * Getting item detail in background thread
-         * *//*
+        /**
+         * Creating product
+         * */
         protected String doInBackground(String... args) {
 
-            // Building Parameters
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("tracking", tracking));
-            // getting item detail by making HTTP request
-            // Note that item detail url will use GET request
-            JSONObject json = jParser.makeHttpRequest(url_item_detail, "GET", params);
+            // getting JSON Object
+            // Note that create product url accepts POST method
+            JSONObject json = jParser.makeHttpRequest(url_create_log_row,
+                    "POST", params);
 
-            // check your log for json response
-            Log.d("Single Item Detail", json.toString());
+            // check log cat fro response
+            Log.d("Create Response", json.toString());
 
+            // check for success tag
             try {
-                int success;
-                // json success tag
-                success = json.getInt(TAG_SUCCESS);
+                int success = json.getInt(TAG_SUCCESS);
 
                 if (success == 1) {
-                    // successfully received item details
-                    JSONArray itemObj = json.getJSONArray(TAG_ENTRIES); // JSON Array
-                    // get first item object from JSON Array
-                    JSONObject c = itemObj.getJSONObject(0);
+                    // successfully created product
 
-                    // Storing each json item in variable
-                    String date = c.getString(TAG_DATE);
-                    String tracking = c.getString(TAG_TRACKING);
-                    String carrier = c.getString(TAG_CARRIER);
-                    String pcs = c.getString(TAG_PCS);
-                    String sender = c.getString(TAG_SENDER);
-                    String recipient = c.getString(TAG_RECIPIENT);
-                    String ponum = c.getString(TAG_PO);
-                    //String sig = c.getString(TAG_SIG);
 
-                    packagesList = new HashMap<String, String>();
+                    fragmentTransaction = fragmentManager.beginTransaction();
+                    NewItemFragment fragment = new NewItemFragment();
 
-                    packagesList.put(TAG_DATE, date);
-                    packagesList.put(TAG_TRACKING, tracking);
-                    packagesList.put(TAG_CARRIER, carrier);
-                    packagesList.put(TAG_SENDER, sender);
-                    packagesList.put(TAG_RECIPIENT, recipient);
-                    packagesList.put(TAG_PCS, pcs);
-                    packagesList.put(TAG_PO, ponum);
+                    fragmentTransaction.replace(R.id.fragment_container, fragment);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                    //TODO: show new package in log
 
-                }else{
-
-                    Log.d("Success = ",""+ success);
+                } else {
+                    // failed to create product
                 }
-
-                // updating UI from Background Thread
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
             return null;
         }
 
-        *//**
+        /**
          * After completing background task Dismiss the progress dialog
-         * **//*
+         * **/
         protected void onPostExecute(String file_url) {
-            // dismiss the dialog once got all details
+            // dismiss the dialog once done
+            /*Context context = getApplicationContext();
+                    CharSequence text = "Record inserted successfully!";
+                    int duration = Toast.LENGTH_SHORT;
+
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();*/
             pDialog.dismiss();
+        }
 
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    // Edit Text
-                    inputDate = (TextView) findViewById(R.id.inputDate);
-                    inputTracking = (EditText) findViewById(R.id.inputTracking);
-                    inputCarrier = (Spinner) findViewById(R.id.inputCarrier);
-                    inputPcs = (NumberPicker) findViewById(R.id.numberPicker);
-                    inputSender = (EditText) findViewById(R.id.inputSender);
-                    inputRecipient = (EditText) findViewById(R.id.inputRecipient);
-                    inputPoNum = (EditText) findViewById(R.id.inputPoNum);
+    }
 
-                    // display item data in EditText
-                    inputDate.setText(packagesList.get(TAG_DATE));
-                    inputTracking.setText(packagesList.get(TAG_TRACKING));
-                    inputCarrier.setSelection(0);
-                    inputPcs.setValue(Integer.parseInt(packagesList.get(TAG_PCS)));
-                    inputSender.setText(packagesList.get(TAG_SENDER));
-                    inputRecipient.setText(packagesList.get(TAG_RECIPIENT));
-                    inputPoNum.setText(packagesList.get(TAG_PO));
-
-
-                    //TODO: Deal with signature image
-                }
-            });
-        }}
-    *//**
-     * Background Async Task to  Save product Details
-     * *//*
     class SaveItemDetail extends AsyncTask<String, String, String> {
 
-        *//**
+        List<NameValuePair> params;
+        public SaveItemDetail(List<NameValuePair> nameValuePairList){
+            params = nameValuePairList;
+        }
+        /**
          * Before starting background thread Show Progress Dialog
-         * *//*
+         * */
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(PackageDetailActivity.this);
+            pDialog = new ProgressDialog(LogViewActivity.this);
             pDialog.setMessage("Saving Item ...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
             pDialog.show();
         }
 
-        *//**
+        /**
          * Saving product
-         * *//*
+         * */
         protected String doInBackground(String... args) {
 
-            // getting updated data from EditTexts
-            String date = inputDate.getText().toString();
-            String tracking = inputTracking.getText().toString();
-            String carrier = inputCarrier.getSelectedItem().toString();
-            String numpackages = String.valueOf(inputPcs.getValue());
-            String sender = inputSender.getText().toString();
-            String recipient = inputRecipient.getText().toString();
-            String ponum = inputPoNum.getText().toString();
 
-            // Building Parameters
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair(TAG_DATE, date));
-            params.add(new BasicNameValuePair(TAG_TRACKING, tracking));
-            params.add(new BasicNameValuePair(TAG_CARRIER, carrier));
-            params.add(new BasicNameValuePair(TAG_PCS, numpackages));
-            params.add(new BasicNameValuePair(TAG_SENDER, sender));
-            params.add(new BasicNameValuePair(TAG_RECIPIENT, recipient));
-            params.add(new BasicNameValuePair(TAG_PO, ponum));
 
             // sending modified data through http request
             // Notice that update product url accepts POST method
@@ -422,10 +408,13 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
 
                 if (success == 1) {
                     // successfully updated
-                    Intent i = getIntent();
-                    // send result code 100 to notify about product update
-                    setResult(100, i);
-                    finish();
+
+                    editItemFragment = (EditItemFragment)fragmentManager.findFragmentById(R.id.fragment_container);
+                    fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.remove(editItemFragment);
+
+
+
                 } else {
                     // failed to update product
                 }
@@ -436,43 +425,48 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
             return null;
         }
 
-        *//**
+        /**
          * After completing background task Dismiss the progress dialog
-         * **//*
+         * **/
         protected void onPostExecute(String file_url) {
             // dismiss the dialog once item updated
+            /*                    Context context = getApplicationContext();
+                    CharSequence text = "Record updated successfully!";
+                    int duration = Toast.LENGTH_SHORT;
+
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();*/
             pDialog.dismiss();
         }
     }
-    *//*****************************************************************
-     * Background Async Task to Delete item
-     * *//*
     class DeleteItem extends AsyncTask<String, String, String> {
 
-        *//**
+        List<NameValuePair> params;
+        public DeleteItem(List<NameValuePair> nameValuePairList){
+                params = nameValuePairList;
+            }
+        /**
          * Before starting background thread Show Progress Dialog
-         * *//*
+         * */
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(PackageDetailActivity.this);
+            pDialog = new ProgressDialog(LogViewActivity.this);
             pDialog.setMessage("Deleting Item...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
             pDialog.show();
         }
 
-        *//**
+        /**
          * Deleting product
-         * *//*
+         * */
         protected String doInBackground(String... args) {
 
             // Check for success tag
             int success;
             try {
-                // Building Parameters
-                List<NameValuePair> params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("tracking", tracking));
+
 
                 // getting item details by making HTTP request
                 JSONObject json = jParser.makeHttpRequest(
@@ -484,12 +478,11 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
                 // json success tag
                 success = json.getInt(TAG_SUCCESS);
                 if (success == 1) {
-                    // item successfully deleted
-                    // notify previous activity by sending code 100
-                    Intent i = getIntent();
-                    // send result code 100 to notify about item deletion
-                    setResult(100, i);
-                    finish();
+
+
+                    editItemFragment = (EditItemFragment)fragmentManager.findFragmentById(R.id.fragment_container);
+                    fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.remove(editItemFragment);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -498,21 +491,21 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
             return null;
         }
 
-        *//**
+        /**
          * After completing background task Dismiss the progress dialog
-         * **//*
+         * **/
         protected void onPostExecute(String file_url) {
             // dismiss the dialog once item deleted
+            /*                    Context context = getApplicationContext();
+                    CharSequence text = "Record deleted successfully!";
+                    int duration = Toast.LENGTH_SHORT;
+
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();*/
             pDialog.dismiss();
 
         }
 
-    }*/
-
-
-
-
-
-
+    }
 
 }
