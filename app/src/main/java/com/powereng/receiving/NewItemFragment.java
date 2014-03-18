@@ -1,6 +1,7 @@
 package com.powereng.receiving;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -40,8 +41,6 @@ class NewItemFragment extends Fragment {
     EditText inputPoNum;
     Button btnScan;
     Button btnAdd;
-    JSONParser jParser = new  JSONParser();
-    private static final String url_create_log_row = "http://boi40310ll.powereng.com/create_log_row.php";
     List<NameValuePair> params;
 
     public NewItemFragment () {
@@ -65,6 +64,7 @@ class NewItemFragment extends Fragment {
             @Override
             public void onClick(View v) {
                setParams();
+                mListener.OnItemAdded();
 
             }
         });
@@ -99,14 +99,14 @@ class NewItemFragment extends Fragment {
         params.add(new BasicNameValuePair("sender", sender));
         params.add(new BasicNameValuePair("recipient", recipient));
         //params.add(new BasicNameValuePair("po_num", ponum));
-        mListener.OnItemAdded();
+
     }
 
     public List<NameValuePair> getParams() {
         return params;
     }
 
-
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
         if (scanResult != null) {
@@ -118,8 +118,8 @@ class NewItemFragment extends Fragment {
     //interface for communicating with the activity
     public interface OnItemAddedListener {
         public void OnItemAdded();
-        public void OnItemUpdated();
-        public void OnItemDeleted();
+        public void OnItemUpdated(DialogFragment dialog);
+        public void OnItemDeleted(DialogFragment dialog);
     }
 
     @Override
@@ -131,9 +131,5 @@ class NewItemFragment extends Fragment {
             throw new ClassCastException(activity.toString() + " must implement OnItemAddedListener");
         }
     }
-
-
-
-
 
 }

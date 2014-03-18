@@ -3,14 +3,13 @@ package com.powereng.receiving;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.Fragment;
+import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -29,7 +28,7 @@ import java.util.List;
 /**
  * Created by Logjammin on 3/15/14.
  */
-public class EditItemFragment extends Fragment {
+public class EditItemFragment extends DialogFragment {
 
 
 
@@ -51,11 +50,6 @@ public class EditItemFragment extends Fragment {
     // JSON parser class
     JSONParser jParser = new  JSONParser();
 
-    private static final String url_item_detail = "http://boi40310ll.powereng.com/get_log_row.php";
-    private static final String url_update_item = "http://boi40310ll.powereng.com/update_log_row.php";
-    private static final String url_delete_item = "http://boi40310ll.powereng.com/delete_log_row.php";
-    private static final String url_create_log_row = "http://boi40310ll.powereng.com/create_log_row.php";
-
     String tracking;
     String numpackages;
     String sender;
@@ -64,10 +58,30 @@ public class EditItemFragment extends Fragment {
     String carrier;
     String date;
     ArrayList<String> detailsList;
+
     public EditItemFragment (ArrayList<String> list) {
        detailsList = list;
     }
 
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setView(myView());
+        builder.setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                setParams(which);
+            }
+        });
+        builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                setParams(which);
+            }
+        });
+
+        return builder.create();
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,15 +93,11 @@ public class EditItemFragment extends Fragment {
         carrier = detailsList.get(5);
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_edit_package, container, false);
+    public View myView() {
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View rootView = inflater.inflate(R.layout.fragment_edit_package, null);
 
-        // Getting complete product details in background thread
-
-        btnDelete = (Button) rootView.findViewById(R.id.btn1);
-        btnUpdate = (Button) rootView.findViewById(R.id.btn2);
         inputTracking = (EditText) rootView.findViewById(R.id.inputTracking);
         inputPcs = (EditText) rootView.findViewById(R.id.inputPcs);
         inputSender = (EditText) rootView.findViewById(R.id.inputSender);
@@ -102,7 +112,7 @@ public class EditItemFragment extends Fragment {
         inputPoNum.setText(ponum);
         inputCarrier.setSelection(getCarrierNumber(carrier));
 
-        // save button click event
+/*        // save button click event
         btnUpdate.setText(R.string.update);
         btnUpdate.setOnClickListener(new View.OnClickListener() {
 
@@ -119,7 +129,7 @@ public class EditItemFragment extends Fragment {
             public void onClick(View arg0) {
                 setParams(0);
             }
-        });
+        });*/
         return rootView;
     }
 
@@ -171,17 +181,18 @@ public class EditItemFragment extends Fragment {
             params.add(new BasicNameValuePair("recipient", recipient));
             //params.add(new BasicNameValuePair("po_num", ponum));
 
-            mListener.OnItemUpdated();
+            mListener.OnItemUpdated(EditItemFragment.this);
         } else {
             String tracking = inputTracking.getText().toString();
             params.add(new BasicNameValuePair("tracking", tracking));
-            mListener.OnItemDeleted();
+            mListener.OnItemDeleted(EditItemFragment.this);
         }
     }
 
     public List<NameValuePair> getParams() {
         return params;
     }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -191,27 +202,8 @@ public class EditItemFragment extends Fragment {
             throw new ClassCastException(activity.toString() + " must implement OnItemAddedListener");
         }
     }
-    public Dialog deleteDialog(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity().getApplicationContext());
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                setParams(0);
-            }
-        });
 
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
 
-            }
-        });
-        builder.setMessage(R.string.delete_message).setTitle(R.string.delete_title);
-
-        AlertDialog dialog = builder.create();
-
-        return dialog;
-    }
 
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {

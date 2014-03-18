@@ -41,6 +41,7 @@
 
         <!-- CaptureSignature Activity -->
         <activity
+            android:theme="@android:style/Theme.Holo.Dialog"
             android:name=".CaptureSignature"
             android:label="Capture Signature" >
         </activity>

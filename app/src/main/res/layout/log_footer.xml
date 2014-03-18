@@ -13,17 +13,14 @@
         android:id="@+id/button_refresh"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
-        android:layout_marginLeft="10dp"
-        android:shadowColor="@android:color/black" />
+        android:layout_marginLeft="10dp" />
 
-    <Button
+    <ToggleButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/add"
         android:id="@+id/button_add"
-        android:onClick="newItem"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="10dp"
-        android:shadowColor="@android:color/black" />
+        android:layout_marginRight="10dp" />
 </RelativeLayout>
