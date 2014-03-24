@@ -70,13 +70,13 @@ public class EditItemFragment extends DialogFragment {
         builder.setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                setParams(which);
+                setParams(1);
             }
         });
         builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                setParams(which);
+                setParams(0);
             }
         });
 
@@ -152,7 +152,7 @@ public class EditItemFragment extends DialogFragment {
         } else if (s.equals("PaperClips A\'Mor")) {
             carrierNumber = 4;
 
-        } else if (s.equals("Other...")) {
+        } else {
             carrierNumber = 5;
 
         }

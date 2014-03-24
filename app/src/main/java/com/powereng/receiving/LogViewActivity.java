@@ -467,6 +467,7 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
                     "POST", params);
 
             // check json success tag
+                Log.d("Update Item", json.toString());
 
                 success = json.getInt(TAG_SUCCESS);
                 message = json.getString(TAG_MESSAGE);
