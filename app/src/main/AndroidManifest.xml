@@ -3,10 +3,12 @@
     package="com.powereng.receiving" >
 
     <uses-sdk android:minSdkVersion="15" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
-        android:configChanges="keyboardHidden|orientation"
         android:allowBackup="true"
+        android:configChanges="keyboardHidden|orientation"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
@@ -21,32 +23,40 @@
         </activity>
         <!-- All Product Activity -->
         <activity
-            android:name=".LogViewActivity"
+            android:name="com.powereng.receiving.LogViewActivity"
             android:label="@string/log_name" >
         </activity>
 
         <!-- Add Product Activity -->
         <activity
-            android:name=".LogNewActivity"
+            android:name="com.powereng.receiving.LogNewActivity"
             android:label="@string/new_package" >
         </activity>
 
         <!-- Edit Product Activity -->
         <activity
-            android:name=".PackageDetailActivity"
+            android:name="com.powereng.receiving.PackageDetailActivity"
             android:label="@string/edit_package" >
         </activity>
 
         <!-- CaptureSignature Activity -->
 
+
         <!-- CaptureSignature Activity -->
         <activity
-            android:theme="@android:style/Theme.Holo.Dialog"
-            android:name=".CaptureSignature"
-            android:label="Capture Signature" >
+            android:name="com.powereng.receiving.CaptureSignature"
+            android:label="Capture Signature"
+            android:theme="@android:style/Theme.Holo.Dialog" >
         </activity>
+
+        <provider
+            android:name="com.powereng.receiving.contentprovider.ReceivingLogContentProvider"
+            android:authorities="powereng.receiving"
+            android:enabled="true"
+            android:exported="true" >
+        </provider>
     </application>
+
     <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>
-

@@ -70,7 +70,6 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
     private static final String TAG_SIG = "sig";
     // packages JSONArray
     JSONArray packages = null;
-    private LogDataSource logDataSource;
     public LogViewActivity(){}
 
     @Override

@@ -97,4 +97,23 @@ public class JSONParser {
         return jObj;
 
     }
+
+    //TODO: add steps from "do in background" from each of the four AsyncTask classes.
+
+
+
+
+    public static class Entry {
+        public final String id;
+        public final String title;
+        public final String link;
+        public final long published;
+
+        Entry(String id, String title, String link, long published) {
+            this.id = id;
+            this.title = title;
+            this.link = link;
+            this.published = published;
+        }
+    }
 }
