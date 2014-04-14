@@ -248,7 +248,7 @@ public class CaptureSignature extends Activity {
                 Log.v("log_tag","url: " + url);
                 //In case you want to delete the file
                 //boolean deleted = mypath.delete();
-                //Log.v("log_tag","deleted: " + mypath.toString() + deleted);
+                //ReceivingLog.v("log_tag","deleted: " + mypath.toString() + deleted);
                 //If you want to convert the image to string use base64 converter
 
             }

@@ -245,7 +245,7 @@ public class EditItemFragment extends DialogFragment {
             JSONObject json = jParser.makeHttpRequest(url_item_detail, "GET", params);
 
             // check your log for json response
-            Log.d("Single Item Detail", json.toString());
+            ReceivingLog.d("Single Item Detail", json.toString());
 
             try {
                 int success;
@@ -280,7 +280,7 @@ public class EditItemFragment extends DialogFragment {
 
                 }else{
 
-                    Log.d("Success = ",""+ success);
+                    ReceivingLog.d("Success = ",""+ success);
                 }
 
                 // updating UI from Background Thread

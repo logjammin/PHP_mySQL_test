@@ -6,6 +6,11 @@
 
     <!-- Product id (pid) - will be HIDDEN - used to pass to other activity -->
     <TextView
+        android:id="@+id/entry_id"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+    <TextView
         android:id="@+id/date"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
