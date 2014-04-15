@@ -14,7 +14,6 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.powereng.receiving.contentprovider.ReceivingLogContentProvider;
 import com.powereng.receiving.contentprovider.ReceivingLogContract;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -196,20 +195,22 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void updateLocalFeedData(final InputStream stream, final SyncResult syncResult)
             throws IOException, XmlPullParserException, RemoteException,
             OperationApplicationException, ParseException {
-        final FeedParser feedParser = new FeedParser();
+        final JSONParser jParser = new JSONParser();
         final ContentResolver contentResolver = getContext().getContentResolver();
 
         Log.i(TAG, "Parsing stream as Atom feed");
-        final List<FeedParser.Entry> entries = feedParser.parse(stream);
+
+
+        final List<JSONParser.Entry> entries = jParser.loadAllEntries();
         Log.i(TAG, "Parsing complete. Found " + entries.size() + " entries");
 
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
 
         // Build hash table of incoming entries
-        HashMap<String, FeedParser.Entry> entryMap = new HashMap<String, FeedParser.Entry>();
-        for (FeedParser.Entry e : entries) {
-            entryMap.put(e.id, e);
+        HashMap<String, JSONParser.Entry> entryMap = new HashMap<String, JSONParser.Entry>();
+        for (JSONParser.Entry e : entries) {
+            entryMap.put(e.date, e);
         }
 
         // Get list of all items
@@ -224,10 +225,10 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
         String date;
         String tracking;
         String carrier;
-        String numpackages;
+        String pcs;
         String sender;
         String recipient;
-        String po_num;
+        String ponum;
         String sig;
         while (c.moveToNext()) {
             syncResult.stats.numEntries++;
@@ -235,12 +236,12 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
             date = c.getString(COLUMN_DATE);
             tracking = c.getString(COLUMN_TRACKING);
             carrier = c.getString(COLUMN_CARRIER);
-            numpackages = c.getString(COLUMN_PCS);
+            pcs = c.getString(COLUMN_PCS);
             sender = c.getString(COLUMN_SENDER);
             recipient = c.getString(COLUMN_RECIPIENT);
-            po_num = c.getString(COLUMN_PO);
+            ponum = c.getString(COLUMN_PO);
             sig = c.getString(COLUMN_SIG);
-            FeedParser.Entry match = entryMap.get(date);
+            JSONParser.Entry match = entryMap.get(date);
             if (match != null) {
                 // Entry exists. Remove from entry map to prevent insert later.
                 entryMap.remove(date);
@@ -249,13 +250,21 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
                         .appendPath(Integer.toString(id)).build();
                 if ((match.tracking != null && !match.tracking.equals(tracking)) ||
                         (match.carrier != null && !match.carrier.equals(carrier)) ||
-                        (match.published != published)) {
+                        (match.pcs != null && !match.pcs.equals(pcs)) ||
+                        (match.sender != null && !match.sender.equals(sender)) ||
+                        (match.recipient != null && !match.recipient.equals(recipient)) ||
+                        (match.ponum != null && !match.ponum.equals(ponum)) ||
+                        (match.sig != null && !match.sig.equals(sig))) {
                     // Update existing record
                     Log.i(TAG, "Scheduling update: " + existingUri);
                     batch.add(ContentProviderOperation.newUpdate(existingUri)
-                            .withValue(ReceivingLogContract.Entry.COLUMN_NAME_TITLE, title)
-                            .withValue(ReceivingLogContract.Entry.COLUMN_NAME_LINK, link)
-                            .withValue(ReceivingLogContract.Entry.COLUMN_NAME_PUBLISHED, published)
+                            .withValue(ReceivingLogContract.Entry.COLUMN_NAME_TRACKING, tracking)
+                            .withValue(ReceivingLogContract.Entry.COLUMN_NAME_CARRIER, carrier)
+                            .withValue(ReceivingLogContract.Entry.COLUMN_NAME_PCS, pcs)
+                            .withValue(ReceivingLogContract.Entry.COLUMN_NAME_SENDER, sender)
+                            .withValue(ReceivingLogContract.Entry.COLUMN_NAME_RECIPIENT, recipient)
+                            .withValue(ReceivingLogContract.Entry.COLUMN_NAME_PO, ponum)
+                            .withValue(ReceivingLogContract.Entry.COLUMN_NAME_SIG, sig)
                             .build());
                     syncResult.stats.numUpdates++;
                 } else {
@@ -273,13 +282,17 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
         c.close();
 
         // Add new items
-        for (FeedParser.Entry e : entryMap.values()) {
-            Log.i(TAG, "Scheduling insert: entry_id=" + e.id);
+        for (JSONParser.Entry e : entryMap.values()) {
+            Log.i(TAG, "Scheduling insert: date=" + e.date);
             batch.add(ContentProviderOperation.newInsert(ReceivingLogContract.Entry.CONTENT_URI)
-                    .withValue(ReceivingLogContract.Entry.COLUMN_NAME_ENTRY_ID, e.id)
-                    .withValue(ReceivingLogContract.Entry.COLUMN_NAME_TITLE, e.title)
-                    .withValue(ReceivingLogContract.Entry.COLUMN_NAME_LINK, e.link)
-                    .withValue(ReceivingLogContract.Entry.COLUMN_NAME_PUBLISHED, e.published)
+                    .withValue(ReceivingLogContract.Entry.COLUMN_NAME_DATE, e.date)
+                    .withValue(ReceivingLogContract.Entry.COLUMN_NAME_TRACKING, e.tracking)
+                    .withValue(ReceivingLogContract.Entry.COLUMN_NAME_CARRIER, e.carrier)
+                    .withValue(ReceivingLogContract.Entry.COLUMN_NAME_PCS, e.pcs)
+                    .withValue(ReceivingLogContract.Entry.COLUMN_NAME_SENDER, e.sender)
+                    .withValue(ReceivingLogContract.Entry.COLUMN_NAME_RECIPIENT, e.recipient)
+                    .withValue(ReceivingLogContract.Entry.COLUMN_NAME_PO, e.ponum)
+                    .withValue(ReceivingLogContract.Entry.COLUMN_NAME_SIG, e.sig)
                     .build());
             syncResult.stats.numInserts++;
         }

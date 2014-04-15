@@ -11,6 +11,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class JSONParser {
@@ -26,6 +28,26 @@ public class JSONParser {
     static InputStream is = null;
     static JSONObject jObj = null;
     static String json = "";
+    JSONArray packages = null;
+
+    // url to get all packages list
+    private static final String url_all_packages = "http://boi40310ll.powereng.com/get_log_all.php";
+    private static final String url_update_item = "http://boi40310ll.powereng.com/update_log_row.php";
+    private static final String url_delete_item = "http://boi40310ll.powereng.com/delete_log_row.php";
+    private static final String url_create_log_row = "http://boi40310ll.powereng.com/create_log_row.php";
+
+    // JSON Node names
+    private static final String TAG_SUCCESS = "success";
+    private static final String TAG_MESSAGE = "message";
+    private static final String TAG_ENTRIES = "receiving_log";
+    private static final String TAG_TRACKING = "tracking";
+    private static final String TAG_DATE = "date_received";
+    private static final String TAG_CARRIER = "carrier";
+    private static final String TAG_SENDER = "sender";
+    private static final String TAG_RECIPIENT = "recipient";
+    private static final String TAG_PCS = "numpackages";
+    private static final String TAG_PO = "po_num";
+    private static final String TAG_SIG = "sig";
 
     // constructor
     public JSONParser() {
@@ -100,20 +122,77 @@ public class JSONParser {
 
     //TODO: add steps from "do in background" from each of the four AsyncTask classes.
 
+    public List<Entry> loadAllEntries() {
+        List<Entry> params = new ArrayList<Entry>();
+        // getting JSON string from URL
+        JSONObject json = this.makeHttpRequest(url_all_packages, "GET", null);
+
+        // Check your log cat for JSON response
+        Log.d("All Packages: ", json.toString());
+
+        try {
+            // Checking for SUCCESS TAG
+            int success = json.getInt(TAG_SUCCESS);
+
+            if (success == 1) {
+                // packages found
+                // Getting Array of packages
+                packages = json.getJSONArray(TAG_ENTRIES);
+
+                // looping through All Products
+                for (int i = 0; i < packages.length(); i++) {
+
+                    JSONObject c = packages.getJSONObject(i);
+
+                    // Storing each json item in variable
+                    String date = c.getString(TAG_DATE);
+                    String tracking = c.getString(TAG_TRACKING);
+                    String carrier = c.getString(TAG_CARRIER);
+                    String sender = c.getString(TAG_SENDER);
+                    String recipient = c.getString(TAG_RECIPIENT);
+                    String pcs = c.getString(TAG_PCS);
+                    String ponum = c.getString(TAG_PO);
+                    String sig = c.getString(TAG_SIG);
+
+                    Entry entry = new Entry(date, tracking, carrier,
+                            sender, recipient, pcs, ponum, sig);
+
+                    params.add(entry);
+                }
+            } else {
+                // no packages found
+                // make new toast
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return params;
+
+    }
 
 
 
     public static class Entry {
-        public final String id;
-        public final String title;
-        public final String link;
-        public final long published;
+        public final String date;
+        public final String tracking;
+        public final String carrier;
+        public final String sender;
+        public final String recipient;
+        public final String pcs;
+        public final String ponum;
+        public final String sig;
 
-        Entry(String id, String title, String link, long published) {
-            this.id = id;
-            this.title = title;
-            this.link = link;
-            this.published = published;
+        Entry(String date, String tracking, String carrier, String sender,
+              String recipient, String pcs, String ponum, String sig) {
+            this.date = date;
+            this.tracking = tracking;
+            this.carrier = carrier;
+            this.sender = sender;
+            this.recipient = recipient;
+            this.pcs = pcs;
+            this.ponum = ponum;
+            this.sig = sig;
         }
     }
 }
