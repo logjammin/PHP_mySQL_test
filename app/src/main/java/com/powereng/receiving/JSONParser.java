@@ -171,7 +171,9 @@ public class JSONParser {
 
     }
 
+    public void updateEntries(List<Entry> list) {
 
+    }
 
     public static class Entry {
         public final String date;
