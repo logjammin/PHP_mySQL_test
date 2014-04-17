@@ -35,7 +35,7 @@ public class JSONParser {
     private static final String url_update_item = "http://boi40310ll.powereng.com/update_log_row.php";
     private static final String url_delete_item = "http://boi40310ll.powereng.com/delete_log_row.php";
     private static final String url_create_log_row = "http://boi40310ll.powereng.com/create_log_row.php";
-
+    private static final String url_sync = "http://boi40310ll.powereng.com/android_sync.php";
     // JSON Node names
     private static final String TAG_SUCCESS = "success";
     private static final String TAG_MESSAGE = "message";
