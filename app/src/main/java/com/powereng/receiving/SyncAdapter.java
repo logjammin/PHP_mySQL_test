@@ -16,14 +16,15 @@ import android.util.Log;
 
 import com.powereng.receiving.contentprovider.ReceivingLogContract;
 
-import org.xmlpull.v1.XmlPullParserException;
+import org.json.JSONException;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +51,7 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
      * <p>This points to the Android Developers Blog. (Side note: We highly recommend reading the
      * Android Developer Blog to stay up to date on the latest Android platform developments!)
      */
-    private static final String FEED_URL = "http://android-developers.blogspot.com/atom.xml";
+    private static final String FEED_URL = "http://boi40310ll.powereng.com/android_sync.php";
 
     /**
      * Network connection timeout, in milliseconds.
@@ -129,47 +130,85 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority,
                               ContentProviderClient provider, SyncResult syncResult) {
         Log.i(TAG, "Beginning network synchronization");
-        try {
-            final URL location = new URL(FEED_URL);
-            InputStream stream = null;
+        //TODO: add output stream method using the extras param.
+        if (extras == null) {
 
             try {
-                Log.i(TAG, "Streaming data from network: " + location);
-                stream = downloadUrl(location);
-                updateLocalFeedData(stream, syncResult);
-                // Makes sure that the InputStream is closed after the app is
-                // finished using it.
-            } finally {
-                if (stream != null) {
-                    stream.close();
+                final URL location = new URL(FEED_URL);
+                InputStream stream = null;
+
+                try {
+                    Log.i(TAG, "Streaming data from network: " + location);
+                    stream = downloadUrl(location);
+                    updateLocalFeedData(stream, syncResult);
+                    // Makes sure that the InputStream is closed after the app is
+                    // finished using it.
+                } finally {
+                    if (stream != null) {
+                        stream.close();
+                    }
                 }
+            } catch (MalformedURLException e) {
+                Log.e(TAG, "Feed URL is malformed", e);
+                syncResult.stats.numParseExceptions++;
+                return;
+            } catch (IOException e) {
+                Log.e(TAG, "Error reading from network: " + e.toString());
+                syncResult.stats.numIoExceptions++;
+                return;
+            } catch (JSONException e) {
+                Log.e(TAG, "Error parsing feed: " + e.toString());
+                syncResult.stats.numParseExceptions++;
+                return;
+            } catch (RemoteException e) {
+                Log.e(TAG, "Error updating database: " + e.toString());
+                syncResult.databaseError = true;
+                return;
+            } catch (OperationApplicationException e) {
+                Log.e(TAG, "Error updating database: " + e.toString());
+                syncResult.databaseError = true;
+                return;
             }
-        } catch (MalformedURLException e) {
-            Log.e(TAG, "Feed URL is malformed", e);
-            syncResult.stats.numParseExceptions++;
-            return;
-        } catch (IOException e) {
-            Log.e(TAG, "Error reading from network: " + e.toString());
-            syncResult.stats.numIoExceptions++;
-            return;
-        } catch (XmlPullParserException e) {
-            Log.e(TAG, "Error parsing feed: " + e.toString());
-            syncResult.stats.numParseExceptions++;
-            return;
-        } catch (ParseException e) {
-            Log.e(TAG, "Error parsing feed: " + e.toString());
-            syncResult.stats.numParseExceptions++;
-            return;
-        } catch (RemoteException e) {
-            Log.e(TAG, "Error updating database: " + e.toString());
-            syncResult.databaseError = true;
-            return;
-        } catch (OperationApplicationException e) {
-            Log.e(TAG, "Error updating database: " + e.toString());
-            syncResult.databaseError = true;
-            return;
+            Log.i(TAG, "Network synchronization complete");
+
+        } else {
+
+            try {
+                final URL location = new URL(FEED_URL);
+                OutputStream stream = null;
+
+                try {
+                    Log.i(TAG, "Streaming data to network: " +location);
+                    stream = uploadUrl(location);
+                    updateServerData(stream, syncResult);
+                } finally {
+                    if (stream != null) {
+                        stream.close();
+                    }
+                }
+            } catch (MalformedURLException e) {
+                Log.e(TAG, "Feed URL is malformed", e);
+                syncResult.stats.numParseExceptions++;
+                return;
+            } catch (IOException e) {
+                Log.e(TAG, "Error reading from network: " + e.toString());
+                syncResult.stats.numIoExceptions++;
+                return;
+            } catch (JSONException e) {
+                Log.e(TAG, "Error parsing feed: " + e.toString());
+                syncResult.stats.numParseExceptions++;
+                return;
+            } catch (RemoteException e) {
+                Log.e(TAG, "Error updating database: " + e.toString());
+                syncResult.databaseError = true;
+                return;
+            } catch (OperationApplicationException e) {
+                Log.e(TAG, "Error updating database: " + e.toString());
+                syncResult.databaseError = true;
+                return;
+            }
+            Log.i(TAG, "Network synchronization complete");
         }
-        Log.i(TAG, "Network synchronization complete");
     }
 
     /**
@@ -193,8 +232,8 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
      * 3. For any items remaining in incoming list, ADD to database.
      */
     public void updateLocalFeedData(final InputStream stream, final SyncResult syncResult)
-            throws IOException, XmlPullParserException, RemoteException,
-            OperationApplicationException, ParseException {
+            throws IOException, JSONException, RemoteException,
+            OperationApplicationException {
         final JSONParser jParser = new JSONParser();
         final ContentResolver contentResolver = getContext().getContentResolver();
 
@@ -309,6 +348,13 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Given a string representation of a URL, sets up a connection and gets an input stream.
      */
+
+    public void updateServerData(final OutputStream stream, final SyncResult syncResult)
+            throws IOException,JSONException, RemoteException,
+            OperationApplicationException {
+
+    }
+
     private InputStream downloadUrl(final URL url) throws IOException {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setReadTimeout(NET_READ_TIMEOUT_MILLIS /* milliseconds */);
@@ -318,5 +364,18 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
         // Starts the query
         conn.connect();
         return conn.getInputStream();
+    }
+
+    private OutputStream uploadUrl(final URL url) throws IOException {
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setReadTimeout(NET_READ_TIMEOUT_MILLIS /* milliseconds */);
+        conn.setConnectTimeout(NET_CONNECT_TIMEOUT_MILLIS /* milliseconds */);
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setChunkedStreamingMode(0);
+
+        OutputStream out = new BufferedOutputStream(conn.getOutputStream());
+
+        return out;
     }
 }
