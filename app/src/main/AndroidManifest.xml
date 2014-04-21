@@ -34,10 +34,6 @@
         </activity>
 
         <!-- Edit Product Activity -->
-        <activity
-            android:name="com.powereng.receiving.PackageDetailActivity"
-            android:label="@string/edit_package" >
-        </activity>
 
         <!-- CaptureSignature Activity -->
         <activity
@@ -45,13 +41,6 @@
             android:label="Capture Signature"
             android:theme="@android:style/Theme.Holo.Dialog" >
         </activity>
-
-        <provider
-            android:name="com.powereng.receiving.contentprovider.ReceivingLogContentProvider"
-            android:authorities="powereng.receiving"
-            android:enabled="true"
-            android:exported="true" >
-        </provider>
 
         <service
             android:name="com.powereng.receiving.SyncService"
@@ -75,7 +64,6 @@
         </service>
     </application>
 
-    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>

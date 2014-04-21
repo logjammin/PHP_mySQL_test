@@ -14,7 +14,8 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.powereng.receiving.contentprovider.ReceivingLogContract;
+import com.powereng.receiving.net.JSONParser;
+import com.powereng.receiving.provider.ReceivingLogContract;
 
 import org.json.JSONException;
 
@@ -62,6 +63,10 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
      * Network read timeout, in milliseconds.
      */
     private static final int NET_READ_TIMEOUT_MILLIS = 10000;  // 10 seconds
+    private static final int QUERY =0;
+    private static final int INSERT =1;
+    private static final int UPDATE =2;
+    private static final int DELETE =3;
 
     /**
      * Content resolver, for performing database operations.
@@ -131,7 +136,12 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
                               ContentProviderClient provider, SyncResult syncResult) {
         Log.i(TAG, "Beginning network synchronization");
         //TODO: add output stream method using the extras param.
-        if (extras == null) {
+
+        int method = extras.getInt("method");
+        switch(method) {
+
+
+            case QUERY:
 
             try {
                 final URL location = new URL(FEED_URL);
@@ -170,15 +180,17 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
                 return;
             }
             Log.i(TAG, "Network synchronization complete");
+            break;
 
-        } else {
+            //TODO: get the info'z for this shit.
+            case INSERT:
 
             try {
                 final URL location = new URL(FEED_URL);
                 OutputStream stream = null;
 
                 try {
-                    Log.i(TAG, "Streaming data to network: " +location);
+                    Log.i(TAG, "Streaming data to network: " + location);
                     stream = uploadUrl(location);
                     updateServerData(stream, syncResult);
                 } finally {
@@ -208,6 +220,13 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
                 return;
             }
             Log.i(TAG, "Network synchronization complete");
+            break;
+
+            //TODO: figure this shit out too.
+            case UPDATE:
+                break;
+            case DELETE:
+                break;
         }
     }
 
@@ -237,9 +256,6 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
         final JSONParser jParser = new JSONParser();
         final ContentResolver contentResolver = getContext().getContentResolver();
 
-        Log.i(TAG, "Parsing stream as Atom feed");
-
-
         final List<JSONParser.Entry> entries = jParser.loadAllEntries();
         Log.i(TAG, "Parsing complete. Found " + entries.size() + " entries");
 
@@ -260,6 +276,7 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
         Log.i(TAG, "Found " + c.getCount() + " local entries. Computing merge solution...");
 
         // Find stale data
+        //TODO: use date and tracking to compare entries. Remove all other junk.
         int id;
         String date;
         String tracking;
@@ -280,10 +297,10 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
             recipient = c.getString(COLUMN_RECIPIENT);
             ponum = c.getString(COLUMN_PO);
             sig = c.getString(COLUMN_SIG);
-            JSONParser.Entry match = entryMap.get(date);
+            JSONParser.Entry match = entryMap.get(tracking);
             if (match != null) {
                 // Entry exists. Remove from entry map to prevent insert later.
-                entryMap.remove(date);
+                entryMap.remove(tracking);
                 // Check to see if the entry needs to be updated
                 Uri existingUri = ReceivingLogContract.Entry.CONTENT_URI.buildUpon()
                         .appendPath(Integer.toString(id)).build();

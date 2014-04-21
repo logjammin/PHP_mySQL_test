@@ -1,4 +1,4 @@
-package com.powereng.receiving;
+package com.powereng.receiving.net;
 
 import android.util.Log;
 
@@ -103,7 +103,7 @@ public class JSONParser {
                 sb.append(line + "\n");
             }
             is.close();
-            json = sb.toString();
+                        json = sb.toString();
         } catch (Exception e) {
             Log.e("Buffer Error", "Error converting result " + e.toString());
         }

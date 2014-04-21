@@ -1,4 +1,4 @@
-package com.powereng.receiving.contentprovider;
+package com.powereng.receiving.provider;
 /*
  * Copyright 2013 The Android Open Source Project
  *
@@ -20,10 +20,6 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 
-/**
- * Field and table name constants for
- * {@link com.example.android.network.sync.basicsyncadapter.provider.FeedProvider}.
- */
 public class ReceivingLogContract {
     private ReceivingLogContract() {
     }
@@ -51,12 +47,12 @@ public class ReceivingLogContract {
          * MIME type for lists of entries.
          */
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
-                + "/entries";
+                + "/vnd.receiving.entries";
         /**
          * MIME type for individual entries.
          */
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
-                + "/entry";
+                + "/vnd.receiving.entry";
 
         /**
          * Fully qualified URI for "entry" resources.
@@ -68,14 +64,13 @@ public class ReceivingLogContract {
          * Table name where records are stored for "entry" resources.
          */
         public static final String TABLE_NAME = "entry";
-
-        public static final String COLUMN_NAME_DATE = "date_received";
-        public static final String COLUMN_NAME_TRACKING = "tracking";
-        public static final String COLUMN_NAME_CARRIER = "carrier";
-        public static final String COLUMN_NAME_PCS = "numpackages";
-        public static final String COLUMN_NAME_SENDER = "sender";
-        public static final String COLUMN_NAME_RECIPIENT = "recipient";
-        public static final String COLUMN_NAME_PO = "po_num";
-        public static final String COLUMN_NAME_SIG = "sig";
+        public static final String COLUMN_DATE = "date_received";
+        public static final String COLUMN_TRACKING = "tracking";
+        public static final String COLUMN_CARRIER = "carrier";
+        public static final String COLUMN_PCS = "numpackages";
+        public static final String COLUMN_SENDER = "sender";
+        public static final String COLUMN_RECIPIENT = "recipient";
+        public static final String COLUMN_PO = "po_num";
+        public static final String COLUMN_SIG = "sig";
     }
 }

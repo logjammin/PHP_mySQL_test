@@ -8,9 +8,11 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +25,8 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
+import com.powereng.receiving.net.JSONParser;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -70,12 +74,30 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
     private static final String TAG_SIG = "sig";
     // packages JSONArray
     JSONArray packages = null;
+
+    // Content provider scheme
+    public static final String SCHEME = "content://";
+    // Content provider authority
+    public static final String AUTHORITY = "com.powereng.receiving";
+    // Path for the content provider table
+    public static final String TABLE_PATH = "data_table";
+    // Account
+    public static final String ACCOUNT = "default_account";
+    // Global variables
+    // A content URI for the content provider's data table
+    Uri mUri;
+    // A content resolver for accessing the provider
+    ContentResolver mResolver;
+
     public LogViewActivity(){}
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.log_view_all);
+
+        mResolver = getContentResolver();
         fragmentManager = getFragmentManager();
 
         // Hashmap for ListView
@@ -565,5 +587,6 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
         }
 
     }
+
 
 }

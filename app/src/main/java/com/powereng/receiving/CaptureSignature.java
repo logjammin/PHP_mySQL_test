@@ -145,6 +145,7 @@ public class CaptureSignature extends Activity {
         return error;
     }
 
+    //TODO: pass relevant information from package selection for image name.
     private String getTodaysDate() {
 
         final Calendar c = Calendar.getInstance();
@@ -167,7 +168,7 @@ public class CaptureSignature extends Activity {
 
     }
 
-
+    //TODO: write code for content provider/sync adapter to transfer signature image files.
     private boolean prepareDirectory()
     {
         try
