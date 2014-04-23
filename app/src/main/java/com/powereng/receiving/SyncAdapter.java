@@ -99,6 +99,7 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
     public static final int COLUMN_RECIPIENT = 6;
     public static final int COLUMN_PO_NUM = 7;
     public static final int COLUMN_SIG = 8;
+    public static final int COLUMN_FLAG = 9;
 
     /**
      * Constructor. Obtains handle to content resolver for later use.
@@ -137,58 +138,8 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority,
                               ContentProviderClient provider, SyncResult syncResult) {
         Log.i(TAG, "Beginning network synchronization");
-        //TODO: add output stream method using the extras param.
-        if (extras != null) {
-            int method = extras.getInt("method");
-            switch (method) {
 
-                //TODO: get the info'z for this shit.
-                case INSERT:
-
-                    try {
-                        final URL location = new URL(FEED_URL);
-                        OutputStream stream = null;
-
-                        try {
-                            Log.i(TAG, "Streaming data to network: " + location);
-                            stream = uploadUrl(location);
-                            updateServerData(stream, syncResult);
-                        } finally {
-                            if (stream != null) {
-                                stream.close();
-                            }
-                        }
-                    } catch (MalformedURLException e) {
-                        Log.e(TAG, "Feed URL is malformed", e);
-                        syncResult.stats.numParseExceptions++;
-                        return;
-                    } catch (IOException e) {
-                        Log.e(TAG, "Error reading from network: " + e.toString());
-                        syncResult.stats.numIoExceptions++;
-                        return;
-                    } catch (JSONException e) {
-                        Log.e(TAG, "Error parsing feed: " + e.toString());
-                        syncResult.stats.numParseExceptions++;
-                        return;
-                    } catch (RemoteException e) {
-                        Log.e(TAG, "Error updating database: " + e.toString());
-                        syncResult.databaseError = true;
-                        return;
-                    } catch (OperationApplicationException e) {
-                        Log.e(TAG, "Error updating database: " + e.toString());
-                        syncResult.databaseError = true;
-                        return;
-                    }
-                    Log.i(TAG, "Network synchronization complete");
-                    break;
-
-                //TODO: figure this shit out too.
-                case UPDATE:
-                    break;
-                case DELETE:
-                    break;
-            }
-        } else {
+        if (!extras.getBoolean("SYNC_EXTRAS_UPLOAD")) {
             try {
                 final URL location = new URL(FEED_URL);
                 InputStream stream = null;
@@ -225,7 +176,23 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
                 syncResult.databaseError = true;
                 return;
             }
+
+        } else {
+
+            //TODO: make REST request here.
+
         }
+
+        Log.i(TAG, "Network synchronization complete");
+    }
+
+    public void localChange(ContentProviderClient providerClient)
+                throws RemoteException {
+        //TODO: query to return the row that has a flag
+        Cursor cursor = providerClient.query(ReceivingLogContract.Entry.CONTENT_URI,
+                new String[] {ReceivingLogContract.Entry.COLUMN_NAME_FLAG}, null, null, null);
+
+
     }
 
     /**
@@ -248,6 +215,7 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
      * (At this point, incoming database only contains missing items.)<br/>
      * 3. For any items remaining in incoming list, ADD to database.
      */
+
     public void updateLocalFeedData(final InputStream stream, final SyncResult syncResult)
             throws IOException, JSONException, RemoteException,
             OperationApplicationException {
@@ -364,13 +332,10 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
         // syncToNetwork=false in the line above to prevent duplicate syncs.
     }
 
-    /**
-     * Given a string representation of a URL, sets up a connection and gets an input stream.
-     */
-
     public void updateServerData(final OutputStream stream, final SyncResult syncResult)
             throws IOException,JSONException, RemoteException,
             OperationApplicationException {
+
 
 
     }

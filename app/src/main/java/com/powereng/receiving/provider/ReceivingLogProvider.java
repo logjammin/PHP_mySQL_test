@@ -20,6 +20,7 @@ public class ReceivingLogProvider extends ContentProvider {
 	
     private static final int ROUTE_ENTRIES = 1;
     private static final int ROUTE_ENTRIES_ID = 2;
+    private static final int ROUTE_FLAG = 3;
 
     private static final int QUERY =0;
     private static final int INSERT =1;
@@ -30,6 +31,7 @@ public class ReceivingLogProvider extends ContentProvider {
     static {
         sUriMatcher.addURI(AUTHORITY, "entries", ROUTE_ENTRIES);
         sUriMatcher.addURI(AUTHORITY, "entries/*", ROUTE_ENTRIES_ID);
+        sUriMatcher.addURI(AUTHORITY, "entries/*/flag", ROUTE_FLAG);
     }
 
 
@@ -64,7 +66,7 @@ public class ReceivingLogProvider extends ContentProvider {
         SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
         SelectionBuilder builder = new SelectionBuilder();
 		int uriMatch = sUriMatcher.match(uri);
-        
+        Cursor c;
         switch (uriMatch) {
             case ROUTE_ENTRIES_ID:
                 // Return a single entry, by ID.
@@ -74,13 +76,19 @@ public class ReceivingLogProvider extends ContentProvider {
             // Return all known entries.
                 builder.table(ReceivingLogContract.Entry.TABLE_NAME)
                        .where(selection, selectionArgs);
-                Cursor c = builder.query(db, projection, sortOrder);
+                c = builder.query(db, projection, sortOrder);
                 // Note: Notification URI must be manually set here for loaders to correctly
                 // register ContentObservers.
                 Context ctx = getContext();
                 assert ctx != null;
                 c.setNotificationUri(ctx.getContentResolver(), uri);
                 return c;
+            case ROUTE_FLAG:
+                //TODO: make this return a key-value pair list and flag name.
+                builder.table(ReceivingLogContract.Entry.TABLE_NAME)
+                        .where(selection, selectionArgs);
+                c = builder.query(db, projection, sortOrder);
+
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -138,7 +146,6 @@ public class ReceivingLogProvider extends ContentProvider {
         Context ctx = getContext();
         assert ctx != null;
         ctx.getContentResolver().notifyChange(uri, null, false);
-
         return count;
     }
 
@@ -189,7 +196,8 @@ public class ReceivingLogProvider extends ContentProvider {
             + ReceivingLogContract.Entry.COLUMN_NAME_RECIPIENT + " text null, "
             + ReceivingLogContract.Entry.COLUMN_NAME_NUMPACKAGES + " int null, "
             + ReceivingLogContract.Entry.COLUMN_NAME_PO_NUM + " int null, "
-            + ReceivingLogContract.Entry.COLUMN_NAME_SIG + " text null);";
+            + ReceivingLogContract.Entry.COLUMN_NAME_SIG + " text null, "
+            + ReceivingLogContract.Entry.COLUMN_NAME_FLAG + " text null);";
 			
         public LogDatabase(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -200,6 +208,7 @@ public class ReceivingLogProvider extends ContentProvider {
             db.execSQL(DATABASE_CREATE);
         }
 
+        //TODO: Learn what this does.
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
                     Log.w(ReceivingLogTable.class.getName(),

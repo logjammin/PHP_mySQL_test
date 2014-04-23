@@ -38,25 +38,7 @@ public class SyncAdapterTest extends ServiceTestCase<SyncService> {
         super(SyncService.class);
     }
 
-    public class TableObserver extends ContentObserver {
 
-
-        public TableObserver(Handler handler) {
-            super(handler);
-        }
-
-        @Override
-        public void onChange(boolean selfChange) {
-            onChange(selfChange, null);
-        }
-
-        @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            Bundle extras = new Bundle();
-            extras.putString("uri", uri.toString());
-            ContentResolver.requestSync(GenericAccountService.GetAccount(), ReceivingLogContract.CONTENT_AUTHORITY, extras);
-        }
-    }
 
     public void testIncomingFeedParsed()
             throws IOException, JSONException, RemoteException,
@@ -65,6 +47,8 @@ public class SyncAdapterTest extends ServiceTestCase<SyncService> {
                 "\"tracking\":\"r75477\"," +
                 "\"carrier\":\"UPS\",\"sender\":\"Ford\",\"recipient\":\"Gerald\"," +
                 "\"numpackages\":\"1\",\"po_num\":null,\"sig\":null}],\"success\":1}";
+
+
 
         InputStream stream = new ByteArrayInputStream(sampleFeed.getBytes());
         SyncAdapter adapter = new SyncAdapter(getContext(), false);

@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+
 import com.powereng.receiving.accounts.GenericAccountService;
 import com.powereng.receiving.provider.ReceivingLogContract;
 
@@ -70,6 +71,15 @@ public class SyncUtils {
             PreferenceManager.getDefaultSharedPreferences(context).edit()
                     .putBoolean(PREF_SETUP_COMPLETE, true).commit();
         }
+    }
+
+    public void buildSync (String method, String[] syncItems) {
+        Bundle extras = new Bundle();
+        extras.putString("method", method);
+        for (int i = 0; i < syncItems.length; i++) {
+            extras.putString(String.valueOf(i),syncItems[i]);
+        }
+
     }
 
     /**

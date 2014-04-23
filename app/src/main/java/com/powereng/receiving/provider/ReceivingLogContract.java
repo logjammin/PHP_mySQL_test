@@ -72,5 +72,6 @@ public class ReceivingLogContract {
         public static final String COLUMN_NAME_RECIPIENT = "recipient";
         public static final String COLUMN_NAME_PO_NUM = "po_num";
         public static final String COLUMN_NAME_SIG = "sig";
+        public static final String COLUMN_NAME_FLAG = "flag";
     }
 }

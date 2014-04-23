@@ -256,7 +256,7 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
 
     }
 
-    //TODO: update log view to reflect the new data.
+
     @Override
     public void OnItemAdded() {
         newItemFragment = (NewItemFragment) fragmentManager.findFragmentById(R.id.fragment_container);
@@ -447,7 +447,7 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
                     fragmentTransaction.replace(R.id.fragment_container, fragment);
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
-                    //TODO: show new package in log
+
                 }
 
             } else {
