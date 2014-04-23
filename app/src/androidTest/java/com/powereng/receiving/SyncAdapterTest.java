@@ -4,11 +4,16 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.content.SyncResult;
+import android.database.ContentObserver;
 import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.RemoteException;
 import android.test.ServiceTestCase;
 import android.util.Log;
 
+import com.powereng.receiving.accounts.GenericAccountService;
 import com.powereng.receiving.provider.ReceivingLogContract;
 
 import org.json.JSONException;
@@ -23,8 +28,34 @@ import java.text.ParseException;
  */
 public class SyncAdapterTest extends ServiceTestCase<SyncService> {
     private static final String TAG = "SyncAdapterTest: ";
+    public static final String SCHEME = "content://";
+
+
+
+
+
     public SyncAdapterTest() {
         super(SyncService.class);
+    }
+
+    public class TableObserver extends ContentObserver {
+
+
+        public TableObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            onChange(selfChange, null);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            Bundle extras = new Bundle();
+            extras.putString("uri", uri.toString());
+            ContentResolver.requestSync(GenericAccountService.GetAccount(), ReceivingLogContract.CONTENT_AUTHORITY, extras);
+        }
     }
 
     public void testIncomingFeedParsed()
@@ -62,6 +93,7 @@ public class SyncAdapterTest extends ServiceTestCase<SyncService> {
         assertEquals(1, c.getCount());
         c.moveToFirst();
         String tracking = c.getString(0);
+
 
         //TODO: create a content resolver and test its functionality.
 

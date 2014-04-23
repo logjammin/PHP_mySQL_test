@@ -132,6 +132,7 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
      * <p>The syncResult argument allows you to pass information back to the method that triggered
      * the sync.
      */
+    //TODO: pass uri and "method" in extras.
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
                               ContentProviderClient provider, SyncResult syncResult) {
@@ -371,6 +372,7 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
             throws IOException,JSONException, RemoteException,
             OperationApplicationException {
 
+
     }
 
     private InputStream downloadUrl(final URL url) throws IOException {
@@ -384,7 +386,9 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
         return conn.getInputStream();
     }
 
-    private OutputStream uploadUrl(final URL url) throws IOException {
+    private void makeHttpRequest(final URL url, String method,
+                                 List<JSONParser.Entry> list) throws IOException {
+
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setReadTimeout(NET_READ_TIMEOUT_MILLIS /* milliseconds */);
         conn.setConnectTimeout(NET_CONNECT_TIMEOUT_MILLIS /* milliseconds */);
@@ -395,6 +399,8 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
 
         OutputStream out = new BufferedOutputStream(conn.getOutputStream());
 
-        return out;
+
     }
+
+
 }

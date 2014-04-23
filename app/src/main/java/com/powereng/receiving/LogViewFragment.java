@@ -17,15 +17,12 @@ package com.powereng.receiving;
  * limitations under the License.
  */
 
-import android.accounts.Account;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
-import android.content.SyncStatusObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -34,12 +31,10 @@ import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.powereng.receiving.accounts.GenericAccountService;
 import com.powereng.receiving.provider.ReceivingLogContract;
 
 /**
@@ -184,18 +179,18 @@ import com.powereng.receiving.provider.ReceivingLogContract;
         });
         setListAdapter(mAdapter);
         setEmptyText(getText(R.string.loading));
-        getLoaderManager().initLoader(0, null, this);
+        //getLoaderManager().initLoader(0, null, this);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mSyncStatusObserver.onStatusChanged(0);
+        //mSyncStatusObserver.onStatusChanged(0);
 
         // Watch for sync state changes
         final int mask = ContentResolver.SYNC_OBSERVER_TYPE_PENDING |
                 ContentResolver.SYNC_OBSERVER_TYPE_ACTIVE;
-        mSyncObserverHandle = ContentResolver.addStatusChangeListener(mask, mSyncStatusObserver);
+        //mSyncObserverHandle = ContentResolver.addStatusChangeListener(mask, mSyncStatusObserver);
     }
 
     @Override
@@ -254,13 +249,13 @@ import com.powereng.receiving.provider.ReceivingLogContract;
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         mOptionsMenu = menu;
-        inflater.inflate(R.menu.main, menu);
+        //inflater.inflate(R.menu.main, menu);
     }
 
     /**
      * Respond to user gestures on the ActionBar.
      */
-    @Override
+   /** @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             // If the user clicks the "Refresh" button.
@@ -269,7 +264,7 @@ import com.powereng.receiving.provider.ReceivingLogContract;
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
     /**
      * Load an article in the default browser when selected by the user.
@@ -303,7 +298,7 @@ import com.powereng.receiving.provider.ReceivingLogContract;
      * Otherwise, turn it off.
      *
      * @param refreshing True if an active sync is occuring, false otherwise
-     */
+
     public void setRefreshActionButtonState(boolean refreshing) {
         if (mOptionsMenu == null) {
             return;
@@ -325,38 +320,38 @@ import com.powereng.receiving.provider.ReceivingLogContract;
      * button. If a sync is active or pending, the Refresh button is replaced by an indeterminate
      * ProgressBar; otherwise, the button itself is displayed.
      */
-    private SyncStatusObserver mSyncStatusObserver = new SyncStatusObserver() {
-        /** Callback invoked with the sync adapter status changes. */
-        @Override
-        public void onStatusChanged(int which) {
-            getActivity().runOnUiThread(new Runnable() {
-                /**
-                 * The SyncAdapter runs on a background thread. To update the UI, onStatusChanged()
-                 * runs on the UI thread.
-                 */
-                @Override
-                public void run() {
-                    // Create a handle to the account that was created by
-                    // SyncService.CreateSyncAccount(). This will be used to query the system to
-                    // see how the sync status has changed.
-                    Account account = GenericAccountService.GetAccount();
-                    if (account == null) {
-                        // GetAccount() returned an invalid value. This shouldn't happen, but
-                        // we'll set the status to "not refreshing".
-                        setRefreshActionButtonState(false);
-                        return;
-                    }
-
-                    // Test the ContentResolver to see if the sync adapter is active or pending.
-                    // Set the state of the refresh button accordingly.
-                    boolean syncActive = ContentResolver.isSyncActive(
-                            account, ReceivingLogContract.CONTENT_AUTHORITY);
-                    boolean syncPending = ContentResolver.isSyncPending(
-                            account, ReceivingLogContract.CONTENT_AUTHORITY);
-                    setRefreshActionButtonState(syncActive || syncPending);
-                }
-            });
-        }
-    };
+//    private SyncStatusObserver mSyncStatusObserver = new SyncStatusObserver() {
+//        /** Callback invoked with the sync adapter status changes. */
+//        @Override
+//        public void onStatusChanged(int which) {
+//            getActivity().runOnUiThread(new Runnable() {
+//                /**
+//                 * The SyncAdapter runs on a background thread. To update the UI, onStatusChanged()
+//                 * runs on the UI thread.
+//                 */
+//                @Override
+//                public void run() {
+//                    // Create a handle to the account that was created by
+//                    // SyncService.CreateSyncAccount(). This will be used to query the system to
+//                    // see how the sync status has changed.
+//                    Account account = GenericAccountService.GetAccount();
+//                    if (account == null) {
+//                        // GetAccount() returned an invalid value. This shouldn't happen, but
+//                        // we'll set the status to "not refreshing".
+//                        setRefreshActionButtonState(false);
+//                        return;
+//                    }
+//
+//                    // Test the ContentResolver to see if the sync adapter is active or pending.
+//                    // Set the state of the refresh button accordingly.
+//                    boolean syncActive = ContentResolver.isSyncActive(
+//                            account, ReceivingLogContract.CONTENT_AUTHORITY);
+//                    boolean syncPending = ContentResolver.isSyncPending(
+//                            account, ReceivingLogContract.CONTENT_AUTHORITY);
+//                    setRefreshActionButtonState(syncActive || syncPending);
+//                }
+//            });
+//        }
+//    };
 
 }
