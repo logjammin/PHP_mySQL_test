@@ -32,5 +32,6 @@
     <string name="title_package_list">Packages</string>
     <string name="title_package_detail">Package Detail</string>
     <string name="additional">Additional Packages</string>
+    <string name="loading">Waiting for sync...</string>
 
 </resources>

@@ -27,13 +27,14 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.powereng.receiving.net.JSONParser;
+import com.powereng.receiving.provider.ReceivingLogContract;
 
 import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -158,9 +159,14 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
 
             TextView tv = (TextView) view.findViewById(R.id.tracking);
             String tracking = tv.getText().toString();
-            params.add(new BasicNameValuePair("tracking", tracking));
+            ContentResolver cr = getContentResolver();
+            cr.delete(
+                    ReceivingLogContract.Entry.CONTENT_URI.buildUpon().
+                            appendPath(String.valueOf(ReceivingLogContract.Entry._ID)).build(),
+                    null, null);
 
-            new DeleteItem(params).execute();
+            deleteDialog();
+            //new DeleteItem(params).execute();
             return false;
         }
     };
@@ -294,8 +300,8 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
             // Building Parameters
             List<NameValuePair> params = new ArrayList<NameValuePair>();
             // getting JSON string from URL
-            JSONObject json = jParser.makeHttpRequest(url_all_packages, "GET", params);
-
+            InputStream stream = jParser.makeHttpRequest(url_all_packages, "GET", params);
+            JSONObject json = jParser.parse(stream);
             // Check your log cat for JSON response
             Log.d("All Packages: ", json.toString());
 
@@ -410,9 +416,9 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
 
             // getting JSON Object
             // Note that create product url accepts POST method
-            JSONObject json = jParser.makeHttpRequest(url_create_log_row,
+            InputStream stream = jParser.makeHttpRequest(url_create_log_row,
                     "POST", params);
-
+            JSONObject json = jParser.parse(stream);
             // check log cat fro response
             Log.d("Create Response", json.toString());
 
@@ -484,9 +490,9 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
             // sending modified data through http request
             // Notice that update product url accepts POST method
             try {
-            JSONObject json = jParser.makeHttpRequest(url_update_item,
+            InputStream stream = jParser.makeHttpRequest(url_update_item,
                     "POST", params);
-
+            JSONObject json = jParser.parse(stream);
             // check json success tag
                 Log.d("Update Item", json.toString());
 
@@ -545,9 +551,9 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
 
             try {
                 // getting item details by making HTTP request
-                JSONObject json = jParser.makeHttpRequest(
+                InputStream stream = jParser.makeHttpRequest(
                         url_delete_item, "POST", params);
-
+                JSONObject json = jParser.parse(stream);
                 // check your log for json response
                 Log.d("Delete Item", json.toString());
 

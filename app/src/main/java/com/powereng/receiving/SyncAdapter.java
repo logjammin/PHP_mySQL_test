@@ -18,6 +18,7 @@ import com.powereng.receiving.net.JSONParser;
 import com.powereng.receiving.provider.ReceivingLogContract;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -81,10 +82,10 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
             ReceivingLogContract.Entry.COLUMN_NAME_DATE,
             ReceivingLogContract.Entry.COLUMN_NAME_TRACKING,
             ReceivingLogContract.Entry.COLUMN_NAME_CARRIER,
-            ReceivingLogContract.Entry.COLUMN_NAME_PCS,
+            ReceivingLogContract.Entry.COLUMN_NAME_NUMPACKAGES,
             ReceivingLogContract.Entry.COLUMN_NAME_SENDER,
             ReceivingLogContract.Entry.COLUMN_NAME_RECIPIENT,
-            ReceivingLogContract.Entry.COLUMN_NAME_PO,
+            ReceivingLogContract.Entry.COLUMN_NAME_PO_NUM,
             ReceivingLogContract.Entry.COLUMN_NAME_SIG
     };
 
@@ -93,10 +94,10 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
     public static final int COLUMN_DATE = 1;
     public static final int COLUMN_TRACKING = 2;
     public static final int COLUMN_CARRIER = 3;
-    public static final int COLUMN_PCS = 4;
+    public static final int COLUMN_NUMPACKAGES = 4;
     public static final int COLUMN_SENDER = 5;
     public static final int COLUMN_RECIPIENT = 6;
-    public static final int COLUMN_PO = 7;
+    public static final int COLUMN_PO_NUM = 7;
     public static final int COLUMN_SIG = 8;
 
     /**
@@ -136,13 +137,57 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
                               ContentProviderClient provider, SyncResult syncResult) {
         Log.i(TAG, "Beginning network synchronization");
         //TODO: add output stream method using the extras param.
+        if (extras != null) {
+            int method = extras.getInt("method");
+            switch (method) {
 
-        int method = extras.getInt("method");
-        switch(method) {
+                //TODO: get the info'z for this shit.
+                case INSERT:
 
+                    try {
+                        final URL location = new URL(FEED_URL);
+                        OutputStream stream = null;
 
-            case QUERY:
+                        try {
+                            Log.i(TAG, "Streaming data to network: " + location);
+                            stream = uploadUrl(location);
+                            updateServerData(stream, syncResult);
+                        } finally {
+                            if (stream != null) {
+                                stream.close();
+                            }
+                        }
+                    } catch (MalformedURLException e) {
+                        Log.e(TAG, "Feed URL is malformed", e);
+                        syncResult.stats.numParseExceptions++;
+                        return;
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error reading from network: " + e.toString());
+                        syncResult.stats.numIoExceptions++;
+                        return;
+                    } catch (JSONException e) {
+                        Log.e(TAG, "Error parsing feed: " + e.toString());
+                        syncResult.stats.numParseExceptions++;
+                        return;
+                    } catch (RemoteException e) {
+                        Log.e(TAG, "Error updating database: " + e.toString());
+                        syncResult.databaseError = true;
+                        return;
+                    } catch (OperationApplicationException e) {
+                        Log.e(TAG, "Error updating database: " + e.toString());
+                        syncResult.databaseError = true;
+                        return;
+                    }
+                    Log.i(TAG, "Network synchronization complete");
+                    break;
 
+                //TODO: figure this shit out too.
+                case UPDATE:
+                    break;
+                case DELETE:
+                    break;
+            }
+        } else {
             try {
                 final URL location = new URL(FEED_URL);
                 InputStream stream = null;
@@ -179,54 +224,6 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
                 syncResult.databaseError = true;
                 return;
             }
-            Log.i(TAG, "Network synchronization complete");
-            break;
-
-            //TODO: get the info'z for this shit.
-            case INSERT:
-
-            try {
-                final URL location = new URL(FEED_URL);
-                OutputStream stream = null;
-
-                try {
-                    Log.i(TAG, "Streaming data to network: " + location);
-                    stream = uploadUrl(location);
-                    updateServerData(stream, syncResult);
-                } finally {
-                    if (stream != null) {
-                        stream.close();
-                    }
-                }
-            } catch (MalformedURLException e) {
-                Log.e(TAG, "Feed URL is malformed", e);
-                syncResult.stats.numParseExceptions++;
-                return;
-            } catch (IOException e) {
-                Log.e(TAG, "Error reading from network: " + e.toString());
-                syncResult.stats.numIoExceptions++;
-                return;
-            } catch (JSONException e) {
-                Log.e(TAG, "Error parsing feed: " + e.toString());
-                syncResult.stats.numParseExceptions++;
-                return;
-            } catch (RemoteException e) {
-                Log.e(TAG, "Error updating database: " + e.toString());
-                syncResult.databaseError = true;
-                return;
-            } catch (OperationApplicationException e) {
-                Log.e(TAG, "Error updating database: " + e.toString());
-                syncResult.databaseError = true;
-                return;
-            }
-            Log.i(TAG, "Network synchronization complete");
-            break;
-
-            //TODO: figure this shit out too.
-            case UPDATE:
-                break;
-            case DELETE:
-                break;
         }
     }
 
@@ -255,8 +252,8 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
             OperationApplicationException {
         final JSONParser jParser = new JSONParser();
         final ContentResolver contentResolver = getContext().getContentResolver();
-
-        final List<JSONParser.Entry> entries = jParser.loadAllEntries();
+        final JSONObject jsonObject = jParser.parse(stream);
+        final List<JSONParser.Entry> entries = jParser.loadAllEntries(jsonObject);
         Log.i(TAG, "Parsing complete. Found " + entries.size() + " entries");
 
 
@@ -273,8 +270,11 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
         Uri uri = ReceivingLogContract.Entry.CONTENT_URI; // Get all entries
         Cursor c = contentResolver.query(uri, PROJECTION, null, null, null);
         assert c != null;
-        Log.i(TAG, "Found " + c.getCount() + " local entries. Computing merge solution...");
-
+        try {
+            Log.i(TAG, "Found " + c.getCount() + " local entries. Computing merge solution...");
+        } catch (NullPointerException e) {
+            Log.e(TAG, "threw " + e + " exception :(");
+        }
         // Find stale data
         //TODO: use date and tracking to compare entries. Remove all other junk.
         int id;
@@ -292,19 +292,20 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
             date = c.getString(COLUMN_DATE);
             tracking = c.getString(COLUMN_TRACKING);
             carrier = c.getString(COLUMN_CARRIER);
-            pcs = c.getString(COLUMN_PCS);
+            pcs = c.getString(COLUMN_NUMPACKAGES);
             sender = c.getString(COLUMN_SENDER);
             recipient = c.getString(COLUMN_RECIPIENT);
-            ponum = c.getString(COLUMN_PO);
+            ponum = c.getString(COLUMN_PO_NUM);
             sig = c.getString(COLUMN_SIG);
-            JSONParser.Entry match = entryMap.get(tracking);
+            JSONParser.Entry match = entryMap.get(date);
             if (match != null) {
                 // Entry exists. Remove from entry map to prevent insert later.
-                entryMap.remove(tracking);
+                entryMap.remove(date);
                 // Check to see if the entry needs to be updated
                 Uri existingUri = ReceivingLogContract.Entry.CONTENT_URI.buildUpon()
                         .appendPath(Integer.toString(id)).build();
-                if ((match.tracking != null && !match.tracking.equals(tracking)) ||
+                if ((match.date != null && !match.date.equals(date)) ||
+                        (match.tracking != null && !match.tracking.equals(tracking)) ||
                         (match.carrier != null && !match.carrier.equals(carrier)) ||
                         (match.pcs != null && !match.pcs.equals(pcs)) ||
                         (match.sender != null && !match.sender.equals(sender)) ||
@@ -316,10 +317,10 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
                     batch.add(ContentProviderOperation.newUpdate(existingUri)
                             .withValue(ReceivingLogContract.Entry.COLUMN_NAME_TRACKING, tracking)
                             .withValue(ReceivingLogContract.Entry.COLUMN_NAME_CARRIER, carrier)
-                            .withValue(ReceivingLogContract.Entry.COLUMN_NAME_PCS, pcs)
+                            .withValue(ReceivingLogContract.Entry.COLUMN_NAME_NUMPACKAGES, pcs)
                             .withValue(ReceivingLogContract.Entry.COLUMN_NAME_SENDER, sender)
                             .withValue(ReceivingLogContract.Entry.COLUMN_NAME_RECIPIENT, recipient)
-                            .withValue(ReceivingLogContract.Entry.COLUMN_NAME_PO, ponum)
+                            .withValue(ReceivingLogContract.Entry.COLUMN_NAME_PO_NUM, ponum)
                             .withValue(ReceivingLogContract.Entry.COLUMN_NAME_SIG, sig)
                             .build());
                     syncResult.stats.numUpdates++;
@@ -344,10 +345,10 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
                     .withValue(ReceivingLogContract.Entry.COLUMN_NAME_DATE, e.date)
                     .withValue(ReceivingLogContract.Entry.COLUMN_NAME_TRACKING, e.tracking)
                     .withValue(ReceivingLogContract.Entry.COLUMN_NAME_CARRIER, e.carrier)
-                    .withValue(ReceivingLogContract.Entry.COLUMN_NAME_PCS, e.pcs)
+                    .withValue(ReceivingLogContract.Entry.COLUMN_NAME_NUMPACKAGES, e.pcs)
                     .withValue(ReceivingLogContract.Entry.COLUMN_NAME_SENDER, e.sender)
                     .withValue(ReceivingLogContract.Entry.COLUMN_NAME_RECIPIENT, e.recipient)
-                    .withValue(ReceivingLogContract.Entry.COLUMN_NAME_PO, e.ponum)
+                    .withValue(ReceivingLogContract.Entry.COLUMN_NAME_PO_NUM, e.ponum)
                     .withValue(ReceivingLogContract.Entry.COLUMN_NAME_SIG, e.sig)
                     .build());
             syncResult.stats.numInserts++;
@@ -388,6 +389,7 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
         conn.setReadTimeout(NET_READ_TIMEOUT_MILLIS /* milliseconds */);
         conn.setConnectTimeout(NET_CONNECT_TIMEOUT_MILLIS /* milliseconds */);
         conn.setRequestMethod("POST");
+
         conn.setDoOutput(true);
         conn.setChunkedStreamingMode(0);
 

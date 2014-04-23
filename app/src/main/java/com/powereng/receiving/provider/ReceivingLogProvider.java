@@ -138,6 +138,7 @@ public class ReceivingLogProvider extends ContentProvider {
         Context ctx = getContext();
         assert ctx != null;
         ctx.getContentResolver().notifyChange(uri, null, false);
+
         return count;
     }
 
@@ -167,6 +168,7 @@ public class ReceivingLogProvider extends ContentProvider {
         Context ctx = getContext();
         assert ctx != null;
         ctx.getContentResolver().notifyChange(uri, null, false);
+
         return count;
     }
 
@@ -180,14 +182,14 @@ public class ReceivingLogProvider extends ContentProvider {
 	    private static final String DATABASE_CREATE = "create table "
             + ReceivingLogContract.Entry.TABLE_NAME + "("
             + ReceivingLogContract.Entry._ID + " integer primary key autoincrement, "
-            + ReceivingLogContract.Entry.COLUMN_TRACKING + " int null, "
-            + ReceivingLogContract.Entry.COLUMN_DATE + " text null, "
-            + ReceivingLogContract.Entry.COLUMN_CARRIER + " text null, "
-            + ReceivingLogContract.Entry.COLUMN_SENDER + " text null, "
-            + ReceivingLogContract.Entry.COLUMN_RECIPIENT + " text null, "
-            + ReceivingLogContract.Entry.COLUMN_PCS + " int null, "
-            + ReceivingLogContract.Entry.COLUMN_PO + " int null, "
-            + ReceivingLogContract.Entry.COLUMN_SIG + " text null);";
+            + ReceivingLogContract.Entry.COLUMN_NAME_DATE + " text null, "
+            + ReceivingLogContract.Entry.COLUMN_NAME_TRACKING + " int null, "
+            + ReceivingLogContract.Entry.COLUMN_NAME_CARRIER + " text null, "
+            + ReceivingLogContract.Entry.COLUMN_NAME_SENDER + " text null, "
+            + ReceivingLogContract.Entry.COLUMN_NAME_RECIPIENT + " text null, "
+            + ReceivingLogContract.Entry.COLUMN_NAME_NUMPACKAGES + " int null, "
+            + ReceivingLogContract.Entry.COLUMN_NAME_PO_NUM + " int null, "
+            + ReceivingLogContract.Entry.COLUMN_NAME_SIG + " text null);";
 			
         public LogDatabase(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -205,7 +207,7 @@ public class ReceivingLogProvider extends ContentProvider {
                                     + newVersion + ", which will destroy all old data"
                     );
 
-            //db.execSQL("DROP TABLE IF EXISTS " + TABLE_LOG);
+            db.execSQL("DROP TABLE IF EXISTS " + ReceivingLogContract.Entry.TABLE_NAME);
         }
 
     }

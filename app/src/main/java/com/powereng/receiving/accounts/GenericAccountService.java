@@ -16,7 +16,8 @@ import android.util.Log;
  */
 public class GenericAccountService extends Service {
     private static final String TAG = "GenericAccountService";
-    public static final String ACCOUNT_NAME = "Account";
+    private static final String ACCOUNT_TYPE = "com.powereng.receiving";
+    public static final String ACCOUNT_NAME = "sync";
     private Authenticator mAuthenticator;
 
     /**
@@ -32,7 +33,7 @@ public class GenericAccountService extends Service {
      * @return Handle to application's account (not guaranteed to resolve unless CreateSyncAccount()
      *         has been called)
      */
-    public static Account GetAccount(String accountType) {
+    public static Account GetAccount() {
         // Note: Normally the account name is set to the user's identity (username or email
         // address). However, since we aren't actually using any user accounts, it makes more sense
         // to use a generic string in this case.
@@ -40,7 +41,7 @@ public class GenericAccountService extends Service {
         // This string should *not* be localized. If the user switches locale, we would not be
         // able to locate the old account, and may erroneously register multiple accounts.
         final String accountName = ACCOUNT_NAME;
-        return new Account(accountName, accountType);
+        return new Account(accountName, ACCOUNT_TYPE);
     }
 
     @Override

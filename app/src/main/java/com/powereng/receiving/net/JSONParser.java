@@ -56,14 +56,14 @@ public class JSONParser {
 
     // function get json from url
     // by making HTTP POST or GET mehtod
-    public JSONObject makeHttpRequest(String url, String method,
+    public InputStream makeHttpRequest(String url, String method,
                                       List<NameValuePair> params) {
 
         // Making HTTP request
         try {
 
             // check for request method
-            if(method == "POST"){
+            if (method == "POST") {
                 // request method is POST
                 // defaultHttpClient
                 DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -74,7 +74,7 @@ public class JSONParser {
                 HttpEntity httpEntity = httpResponse.getEntity();
                 is = httpEntity.getContent();
 
-            }else if(method == "GET"){
+            } else if (method == "GET") {
                 // request method is GET
                 DefaultHttpClient httpClient = new DefaultHttpClient();
                 String paramString = URLEncodedUtils.format(params, "utf-8");
@@ -93,16 +93,19 @@ public class JSONParser {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return is;
+    }
 
+    public JSONObject parse(InputStream stream) {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    is, "iso-8859-1"), 8);
+                    stream, "iso-8859-1"), 8);
             StringBuilder sb = new StringBuilder();
             String line = null;
             while ((line = reader.readLine()) != null) {
                 sb.append(line + "\n");
             }
-            is.close();
+            stream.close();
                         json = sb.toString();
         } catch (Exception e) {
             Log.e("Buffer Error", "Error converting result " + e.toString());
@@ -122,10 +125,10 @@ public class JSONParser {
 
     //TODO: add steps from "do in background" from each of the four AsyncTask classes.
 
-    public List<Entry> loadAllEntries() {
+    public List<Entry> loadAllEntries(JSONObject json) {
         List<Entry> params = new ArrayList<Entry>();
         // getting JSON string from URL
-        JSONObject json = this.makeHttpRequest(url_all_packages, "GET", null);
+        //JSONObject json = this.makeHttpRequest(url_all_packages, "GET", null);
 
         // Check your log cat for JSON response
         Log.d("All Packages: ", json.toString());

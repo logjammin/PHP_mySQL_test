@@ -20,6 +20,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -155,9 +156,9 @@ public class LogNewActivity extends Activity {
 
             // getting JSON Object
             // Note that create product url accepts POST method
-            JSONObject json = jsonParser.makeHttpRequest(url_create_log_row,
+            InputStream stream = jsonParser.makeHttpRequest(url_create_log_row,
                     "POST", params);
-
+            JSONObject json = jsonParser.parse(stream);
             // check log cat fro response
             Log.d("Create Response", json.toString());
 

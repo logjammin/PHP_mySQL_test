@@ -21,10 +21,11 @@ import com.powereng.receiving.net.JSONParser;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Logjammin on 3/15/14.
@@ -163,8 +164,11 @@ public class EditItemFragment extends DialogFragment {
     public void setParams(int i){
         params = new ArrayList<NameValuePair>();
         if (i == 1) {
-            final Calendar c = Calendar.getInstance();
-            date = c.toString();
+            //DateFormat c = DateFormat.getDateTimeInstance();
+            //TODO: Add date format to all instances of date_received.
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
+
+            date = sdf.toString();
             carrier = inputCarrier.getSelectedItem().toString();
             tracking = inputTracking.getText().toString();
             numpackages = inputPcs.getText().toString();
