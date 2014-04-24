@@ -123,7 +123,7 @@ public class JSONParser {
 
     }
 
-    //TODO: add steps from "do in background" from each of the four AsyncTask classes.
+
 
     public List<Entry> loadAllEntries(JSONObject json) {
         List<Entry> params = new ArrayList<Entry>();
