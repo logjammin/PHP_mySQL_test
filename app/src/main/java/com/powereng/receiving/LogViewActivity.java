@@ -127,7 +127,7 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
             itemDetails = new ArrayList<String>();
             itemDetails.add(((TextView) view.findViewById(R.id.tracking)).getText()
                     .toString());
-            itemDetails.add(((TextView) view.findViewById(R.id.numpack)).getText()
+            itemDetails.add(((TextView) view.findViewById(R.id.numpackages)).getText()
                     .toString());
             itemDetails.add(((TextView) view.findViewById(R.id.sender)).getText()
                     .toString());
@@ -161,8 +161,8 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
             String tracking = tv.getText().toString();
             ContentResolver cr = getContentResolver();
             cr.delete(
-                    ReceivingLogContract.Entry.CONTENT_URI.buildUpon().
-                            appendPath(String.valueOf(ReceivingLogContract.Entry._ID)).build(),
+                    ReceivingLogContract.LogEntry.CONTENT_URI.buildUpon().
+                            appendPath(String.valueOf(ReceivingLogContract.LogEntry._ID)).build(),
                     null, null);
 
             deleteDialog();
@@ -377,10 +377,11 @@ public class LogViewActivity extends ListActivity implements NewItemFragment.OnI
                             R.layout.list_item, new String[] {TAG_DATE,TAG_TRACKING,
                             TAG_CARRIER,TAG_SENDER,TAG_RECIPIENT,TAG_PCS,TAG_PO,TAG_SIG},
                             new int[] { R.id.date, R.id.tracking, R.id.carrier, R.id.sender,
-                                    R.id.recipient, R.id.numpack, R.id.ponum, R.id.signature});
+                                    R.id.recipient, R.id.numpackages, R.id.ponum, R.id.signature});
 
                     // updating listview
                     setListAdapter(adapter);
+
                 }
             });
 

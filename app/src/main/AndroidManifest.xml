@@ -47,16 +47,6 @@
             android:theme="@android:style/Theme.Holo.Dialog" >
         </activity>
 
-        <service
-            android:name=".SyncService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter"/>
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter"
-                android:resource="@xml/syncadapter" />
-        </service>
-
         <provider
             android:name=".provider.ReceivingLogProvider"
             android:authorities="com.powereng.receiving"

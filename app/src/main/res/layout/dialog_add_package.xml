@@ -79,7 +79,7 @@
     </LinearLayout>
 
 
-<include layout="@layout/dialog_ok_cancel" />
+    <include layout="@layout/dialog_ok_cancel" />
 
 
 </LinearLayout>

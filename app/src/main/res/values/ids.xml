@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="fragment_edit_package" type="id">@layout/fragment_edit_package</item>
+    <item name="dialog_no" type="id">No</item>
+    <item name="dialog_yes" type="id">Yes</item>
 </resources>

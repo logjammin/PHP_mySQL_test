@@ -4,16 +4,11 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.content.SyncResult;
-import android.database.ContentObserver;
 import android.database.Cursor;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Handler;
 import android.os.RemoteException;
 import android.test.ServiceTestCase;
 import android.util.Log;
 
-import com.powereng.receiving.accounts.GenericAccountService;
 import com.powereng.receiving.provider.ReceivingLogContract;
 
 import org.json.JSONException;
@@ -61,17 +56,17 @@ public class SyncAdapterTest extends ServiceTestCase<SyncService> {
         assert ctx != null;
         ContentResolver cr = ctx.getContentResolver();
         final String[] projection = new String[] {
-                ReceivingLogContract.Entry._ID,
-                ReceivingLogContract.Entry.COLUMN_NAME_DATE,
-                ReceivingLogContract.Entry.COLUMN_NAME_TRACKING,
-                ReceivingLogContract.Entry.COLUMN_NAME_CARRIER,
-                ReceivingLogContract.Entry.COLUMN_NAME_NUMPACKAGES,
-                ReceivingLogContract.Entry.COLUMN_NAME_SENDER,
-                ReceivingLogContract.Entry.COLUMN_NAME_RECIPIENT,
-                ReceivingLogContract.Entry.COLUMN_NAME_PO_NUM,
-                ReceivingLogContract.Entry.COLUMN_NAME_SIG
+                ReceivingLogContract.LogEntry._ID,
+                ReceivingLogContract.LogEntry.COLUMN_NAME_DATE,
+                ReceivingLogContract.LogEntry.COLUMN_NAME_TRACKING,
+                ReceivingLogContract.LogEntry.COLUMN_NAME_CARRIER,
+                ReceivingLogContract.LogEntry.COLUMN_NAME_NUMPACKAGES,
+                ReceivingLogContract.LogEntry.COLUMN_NAME_SENDER,
+                ReceivingLogContract.LogEntry.COLUMN_NAME_RECIPIENT,
+                ReceivingLogContract.LogEntry.COLUMN_NAME_PO_NUM,
+                ReceivingLogContract.LogEntry.COLUMN_NAME_SIG
         };
-        Cursor c = cr.query(ReceivingLogContract.Entry.CONTENT_URI, projection, null, null, null);
+        Cursor c = cr.query(ReceivingLogContract.LogEntry.CONTENT_URI, projection, null, null, null);
 
         assert c != null;
         assertEquals(1, c.getCount());

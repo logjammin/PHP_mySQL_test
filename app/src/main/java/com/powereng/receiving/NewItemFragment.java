@@ -53,12 +53,13 @@ class NewItemFragment extends Fragment {
 
         inputTracking = (EditText) rootView.findViewById(R.id.inputTracking);
         inputCarrier = (Spinner) rootView.findViewById(R.id.inputCarrier);
-        inputPcs = (EditText) rootView.findViewById(R.id.inputPcs);
+        inputPcs = (EditText) rootView.findViewById(R.id.inputNumpackages);
         inputSender = (EditText) rootView.findViewById(R.id.inputSender);
         inputRecipient = (EditText) rootView.findViewById(R.id.inputRecipient);
         inputPoNum = (EditText) rootView.findViewById(R.id.inputPoNum);
         btnScan = (Button) rootView.findViewById(R.id.btnScan);
         btnAdd = (Button) rootView.findViewById(R.id.btn2);
+
         btnAdd.setText(R.string.add);
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,7 +89,7 @@ class NewItemFragment extends Fragment {
         String numpackages = inputPcs.getText().toString();
         String sender = inputSender.getText().toString();
         String recipient = inputRecipient.getText().toString();
-        //String ponum = inputPoNum.getText().toString();
+        String ponum = inputPoNum.getText().toString();
 
         // Building Parameters
         params = new ArrayList<NameValuePair>();

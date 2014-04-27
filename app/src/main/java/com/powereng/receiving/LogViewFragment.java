@@ -1,357 +1,253 @@
 package com.powereng.receiving;
 
-
-/*
- * Copyright 2013 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.Intent;
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.LoaderManager.LoaderCallbacks;
+import android.content.CursorLoader;
+import android.content.Loader;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.SimpleCursorAdapter;
-import android.text.format.Time;
-import android.util.Log;
+import android.preference.PreferenceManager;
+import android.view.ActionMode;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.MultiChoiceModeListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.CursorAdapter;
+import android.widget.ListAdapter;
+import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
-import com.powereng.receiving.provider.ReceivingLogContract;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.powereng.receiving.database.LogEntry;
+import com.powereng.receiving.sync.AccountDialog;
+import com.powereng.receiving.sync.GetTokenTask;
+import com.powereng.receiving.sync.SyncHelper;
+
+import java.util.Collection;
+import java.util.HashMap;
+
 
 /**
- * List fragment containing a list of Atom entry objects (articles) stored in the local database.
- *
- * <p>Database access is mediated by a content provider, specified in
- * {@link com.example.android.network.sync.basicsyncadapter.provider.FeedProvider}. This content
- * provider is
- * automatically populated by  {@link SyncService}.
- *
- * <p>Selecting an item from the displayed list displays the article in the default browser.
- *
- * <p>If the content provider doesn't return any data, then the first sync hasn't run yet. This sync
- * adapter assumes data exists in the provider once a sync has run. If your app doesn't work like
- * this, you should add a flag that notes if a sync has run, so you can differentiate between "no
- * available data" and "no initial sync", and display this in the UI.
- *
- * <p>The ActionBar displays a "Refresh" button. When the user clicks "Refresh", the sync adapter
- * runs immediately. An indeterminate ProgressBar element is displayed, showing that the sync is
- * occurring.
+ * A fragment representing a list of Items.
+ * <p />
+ * Large screen devices (such as tablets) are supported by replacing the
+ * ListView with a GridView.
+ * <p />
+ * Activities containing this fragment MUST implement the {@link Callbacks}
+ * interface.
  */
+public class LogViewFragment extends Fragment {
 
-    public class LogViewFragment extends android.app.ListFragment 
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+	/**
+	 * The fragment's ListView/GridView.
+	 */
+	private AbsListView mListView;
 
-    private static final String TAG = "EntryListFragment";
+	/**
+	 * The Adapter which will be used to populate the ListView/GridView with
+	 * Views.
+	 */
+	private CursorAdapter mAdapter;
 
-    /**
-     * Cursor adapter for controlling ListView results.
-     */
-    private SimpleCursorAdapter mAdapter;
+	/**
+	 * Mandatory empty constructor for the fragment manager to instantiate the
+	 * fragment (e.g. upon screen orientation changes).
+	 */
+	public LogViewFragment() {
+	}
 
-    /**
-     * Handle to a SyncObserver. The ProgressBar element is visible until the SyncObserver reports
-     * that the sync is complete.
-     *
-     * <p>This allows us to delete our SyncObserver once the application is no longer in the
-     * foreground.
-     */
-    private Object mSyncObserverHandle;
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
+		mAdapter = new SimpleCursorAdapter(getActivity(),
+				R.layout.list_item, null,
+				new String[] { LogEntry.COL_TIMESTAMP, LogEntry.COL_TRACKING, LogEntry.COL_CARRIER,
+                LogEntry.COL_SENDER, LogEntry.COL_RECIPIENT, LogEntry.COL_NUMPACKAGES,
+                LogEntry.COL_PONUM, LogEntry.COL_SIG},
+				new int[] { R.id.date, R.id.tracking, R.id.carrier, R.id.sender,
+                        R.id.recipient, R.id.numpackages, R.id.ponum, R.id.signature }, 0);
+	}
 
-    /**
-     * Options menu used to populate ActionBar.
-     */
-    private Menu mOptionsMenu;
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.log_fragment, menu);
+		super.onCreateOptionsMenu(menu, inflater);
+	}
 
-    /**
-     * Projection for querying the content provider.
-     */
-    private static final String[] PROJECTION = new String[] {
-            ReceivingLogContract.Entry._ID,
-            ReceivingLogContract.Entry.COLUMN_NAME_DATE,
-            ReceivingLogContract.Entry.COLUMN_NAME_TRACKING,
-            ReceivingLogContract.Entry.COLUMN_NAME_CARRIER,
-            ReceivingLogContract.Entry.COLUMN_NAME_NUMPACKAGES,
-            ReceivingLogContract.Entry.COLUMN_NAME_SENDER,
-            ReceivingLogContract.Entry.COLUMN_NAME_RECIPIENT,
-            ReceivingLogContract.Entry.COLUMN_NAME_PO_NUM,
-            ReceivingLogContract.Entry.COLUMN_NAME_SIG
-    };
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		View view = inflater.inflate(R.layout.fragment_log_list, container, false);
 
-    // Constants representing column positions from PROJECTION.
-    public static final int COLUMN_ID = 0;
-    public static final int COLUMN_DATE = 1;
-    public static final int COLUMN_TRACKING = 2;
-    public static final int COLUMN_CARRIER = 3;
-    public static final int COLUMN_NUMPACKAGES = 4;
-    public static final int COLUMN_SENDER = 5;
-    public static final int COLUMN_RECIPIENT = 6;
-    public static final int COLUMN_PO_NUM = 7;
-    public static final int COLUMN_SIG = 8;
+		// Set the adapter
+		mListView = (AbsListView) view.findViewById(android.R.id.list);
+		((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
 
-    /**
-     * List of Cursor columns to read from when preparing an adapter to populate the ListView.
-     */
-    private static final String[] FROM_COLUMNS = new String[]{
-            ReceivingLogContract.Entry.COLUMN_NAME_TRACKING,
-            ReceivingLogContract.Entry.COLUMN_NAME_DATE
-    };
+		mListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+		// Set OnItemClickListener so we can be notified on item clicks
+		mListView.setOnItemClickListener(new OnItemClickListener() {
 
-    /**
-     * List of Views which will be populated by Cursor data.
-     */
-    //TODO: UI Components
-    private static final int[] TO_FIELDS = new int[]{
-            android.R.id.text1,
-            android.R.id.text2};
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1,
+					int position, long id) {
+				final LogEntry logEntry = new LogEntry((Cursor) mAdapter
+						.getItem(position));
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
-    public LogViewFragment() {}
+                DialogFragment dialog = new DialogEditPackage(logEntry.getId());
+                dialog.show(getFragmentManager(), "edit_entry");
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
+			}
+		});
 
-    /**
-     * Create SyncAccount at launch, if needed.
-     *
-     * <p>This will create a new account with the system for our application, register our
-     * {@link SyncService} with it, and establish a sync schedule.
-     */
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+		mListView.setMultiChoiceModeListener(new MultiChoiceModeListener() {
 
-        // Create account, if needed
-        SyncUtils.CreateSyncAccount(activity);
-    }
+			HashMap<Long, LogEntry> entries = new HashMap<Long, LogEntry>();
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+			@Override
+			public void onItemCheckedStateChanged(ActionMode mode,
+					int position, long id, boolean checked) {
+				// Here you can do something when items are
+				// selected/de-selected,
+				// such as update the title in the CAB
+				if (checked) {
+					entries.put(id,
+                            new LogEntry((Cursor) mAdapter.getItem(position)));
+				}
+				else {
+					entries.remove(id);
+				}
+			}
 
-        mAdapter = new SimpleCursorAdapter(
-                getActivity(),       // Current context
-                android.R.layout.simple_list_item_activated_2,  // Layout for individual rows
-                null,                // Cursor
-                FROM_COLUMNS,        // Cursor columns to use
-                TO_FIELDS,           // Layout fields to use
-                0                    // No flags
-        );
-        mAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-            @Override
-            public boolean setViewValue(View view, Cursor cursor, int i) {
-                if (i == COLUMN_DATE) {
-                    // Convert timestamp to human-readable date
-                    //TODO: set date column on server to ATOM time.
-                    Time t = new Time();
-                    t.set(cursor.getLong(i));
-                    ((TextView) view).setText(t.format("%Y-%m-%d %H:%M"));
-                    return true;
-                } else {
-                    // Let SimpleCursorAdapter handle other fields automatically
-                    return false;
-                }
-            }
-        });
-        setListAdapter(mAdapter);
-        setEmptyText(getText(R.string.loading));
-        //getLoaderManager().initLoader(0, null, this);
-    }
+			@Override
+			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+				// Respond to clicks on the actions in the CAB
+				switch (item.getItemId()) {
+				case R.id.action_delete:
+					deleteItems(entries.values());
+					mode.finish(); // Action picked, so close the CAB
+					return true;
+				default:
+					return false;
+				}
+			}
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        //mSyncStatusObserver.onStatusChanged(0);
+			@Override
+			public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+				// Inflate the menu for the CAB
+				MenuInflater inflater = mode.getMenuInflater();
+				inflater.inflate(R.menu.log_fragment_context, menu);
+				return true;
+			}
 
-        // Watch for sync state changes
-        final int mask = ContentResolver.SYNC_OBSERVER_TYPE_PENDING |
-                ContentResolver.SYNC_OBSERVER_TYPE_ACTIVE;
-        //mSyncObserverHandle = ContentResolver.addStatusChangeListener(mask, mSyncStatusObserver);
-    }
+			@Override
+			public void onDestroyActionMode(ActionMode mode) {
+				// Here you can make any necessary updates to the activity when
+				// the CAB is removed. By default, selected items are
+				// deselected/unchecked.
+				entries.clear();
+			}
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (mSyncObserverHandle != null) {
-            ContentResolver.removeStatusChangeListener(mSyncObserverHandle);
-            mSyncObserverHandle = null;
-        }
-    }
+			@Override
+			public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+				// Here you can perform updates to the CAB due to
+				// an invalidate() request
+				return false;
+			}
+		});
 
-    /**
-     * Query the content provider for data.
-     *
-     * <p>Loaders do queries in a background thread. They also provide a ContentObserver that is
-     * triggered when data in the content provider changes. When the sync adapter updates the
-     * content provider, the ContentObserver responds by resetting the loader and then reloading
-     * it.
-     */
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        // We only have one loader, so we can ignore the value of i.
-        // (It'll be '0', as set in onCreate().)
-        return new CursorLoader(getActivity(),  // Context
-                ReceivingLogContract.Entry.CONTENT_URI, // URI
-                PROJECTION,                // Projection
-                null,                           // Selection
-                null,                           // Selection args
-                ReceivingLogContract.Entry.COLUMN_NAME_DATE + " desc"); // Sort
-    }
+		// Load content
+		getLoaderManager().initLoader(0, null, new LoaderCallbacks<Cursor>() {
 
-    /**
-     * Move the Cursor returned by the query into the ListView adapter. This refreshes the existing
-     * UI with the data in the Cursor.
-     */
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        mAdapter.changeCursor(cursor);
-    }
+			@Override
+			public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+				return new CursorLoader(getActivity(), LogEntry.URI(),
+						LogEntry.FIELDS, LogEntry.COL_DELETED + " IS 0", null,
+						LogEntry.COL_TIMESTAMP + " DESC");
+			}
 
-    /**
-     * Called when the ContentObserver defined for the content provider detects that data has
-     * changed. The ContentObserver resets the loader, and then re-runs the loader. In the adapter,
-     * set the Cursor value to null. This removes the reference to the Cursor, allowing it to be
-     * garbage-collected.
-     */
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-        mAdapter.changeCursor(null);
-    }
+			@Override
+			public void onLoadFinished(Loader<Cursor> arg0, Cursor c) {
+				mAdapter.swapCursor(c);
+			}
 
-    /**
-     * Create the ActionBar.
-     */
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        mOptionsMenu = menu;
-        //inflater.inflate(R.menu.main, menu);
-    }
+			@Override
+			public void onLoaderReset(Loader<Cursor> arg0) {
+				mAdapter.swapCursor(null);
+			}
+		});
 
-    /**
-     * Respond to user gestures on the ActionBar.
-     */
-   /** @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // If the user clicks the "Refresh" button.
-            case R.id.menu_refresh:
-                SyncUtils.TriggerRefresh();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }*/
+		return view;
+	}
 
-    /**
-     * Load an article in the default browser when selected by the user.
-     */
-    @Override
-    public void onListItemClick(ListView listView, View view, int position, long id) {
-        super.onListItemClick(listView, view, position, id);
+	void deleteItems(Collection<LogEntry> entries) {
+		for (LogEntry entry : entries) {
+			getActivity().getContentResolver().delete(entry.getUri(), null, null);
+		}
+	}
 
-        // Get a URI for the selected item, then start an Activity that displays the URI. Any
-        // Activity that filters for ACTION_VIEW and a URI can accept this. In most cases, this will
-        // be a browser.
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+	}
 
-        // Get the item at the selected position, in the form of a Cursor.
-        Cursor c = (Cursor) mAdapter.getItem(position);
-        // Get the link to the article represented by the item.
-        String trackingString = c.getString(COLUMN_TRACKING);
-        if (trackingString == null) {
-            Log.e(TAG, "Attempt to launch entry with null link");
-            return;
-        }
+	@Override
+	public void onDetach() {
+		super.onDetach();
+	}
 
-        Log.i(TAG, "Opening URL: " + trackingString);
-        // Get a Uri object for the URL string
-        Uri trackingNumber = Uri.parse(trackingString);
-        Intent i = new Intent(Intent.ACTION_VIEW, trackingNumber);
-        startActivity(i);
-    }
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		boolean result = false;
+		switch (item.getItemId()) {
+		case R.id.action_add:
+			showAddDialog();
+			break;
+		case R.id.action_sync:
+			final String email = PreferenceManager.getDefaultSharedPreferences(
+					getActivity()).getString(SyncHelper.KEY_ACCOUNT, null);
+			if (email != null) {
+				Toast.makeText(getActivity(), R.string.syncing_, Toast.LENGTH_SHORT).show();
+				SyncHelper.manualSync(getActivity());
+			}
+			else {
+				getFragmentManager().beginTransaction()
+						.add(R.id.mainContent, new LogViewFragment()).commit();
 
-    /**
-     * Set the state of the Refresh button. If a sync is active, turn on the ProgressBar widget.
-     * Otherwise, turn it off.
-     *
-     * @param refreshing True if an active sync is occuring, false otherwise
+				if (null == SyncHelper.getSavedAccountName(getActivity())) {
+					final Account[] accounts = AccountManager.get(getActivity())
+							.getAccountsByType(
+									GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
 
-    public void setRefreshActionButtonState(boolean refreshing) {
-        if (mOptionsMenu == null) {
-            return;
-        }
+					if (accounts.length == 1) {
+						new GetTokenTask((MainActivity) getActivity(), accounts[0].name,
+								SyncHelper.SCOPE).execute();
+					}
+					else if (accounts.length > 1) {
+						DialogFragment dialog = new AccountDialog();
+						dialog.show(getFragmentManager(), "account_dialog");
+					}
+				}
+			}
+			break;
+		}
+		return result;
+	}
 
-        final MenuItem refreshItem = mOptionsMenu.findItem(R.id.menu_refresh);
-        if (refreshItem != null) {
-            if (refreshing) {
-                refreshItem.setActionView(R.layout.actionbar_indeterminate_progress);
-            } else {
-                refreshItem.setActionView(null);
-            }
-        }
-    }
 
-    /**
-     * Crfate a new anonymous SyncStatusObserver. It's attached to the app's ContentResolver in
-     * onResume(), and removed in onPause(). If status changes, it sets the state of the Refresh
-     * button. If a sync is active or pending, the Refresh button is replaced by an indeterminate
-     * ProgressBar; otherwise, the button itself is displayed.
-     */
-//    private SyncStatusObserver mSyncStatusObserver = new SyncStatusObserver() {
-//        /** Callback invoked with the sync adapter status changes. */
-//        @Override
-//        public void onStatusChanged(int which) {
-//            getActivity().runOnUiThread(new Runnable() {
-//                /**
-//                 * The SyncAdapter runs on a background thread. To update the UI, onStatusChanged()
-//                 * runs on the UI thread.
-//                 */
-//                @Override
-//                public void run() {
-//                    // Create a handle to the account that was created by
-//                    // SyncService.CreateSyncAccount(). This will be used to query the system to
-//                    // see how the sync status has changed.
-//                    Account account = GenericAccountService.GetAccount();
-//                    if (account == null) {
-//                        // GetAccount() returned an invalid value. This shouldn't happen, but
-//                        // we'll set the status to "not refreshing".
-//                        setRefreshActionButtonState(false);
-//                        return;
-//                    }
-//
-//                    // Test the ContentResolver to see if the sync adapter is active or pending.
-//                    // Set the state of the refresh button accordingly.
-//                    boolean syncActive = ContentResolver.isSyncActive(
-//                            account, ReceivingLogContract.CONTENT_AUTHORITY);
-//                    boolean syncPending = ContentResolver.isSyncPending(
-//                            account, ReceivingLogContract.CONTENT_AUTHORITY);
-//                    setRefreshActionButtonState(syncActive || syncPending);
-//                }
-//            });
-//        }
-//    };
+	void showAddDialog() {
+		DialogFragment dialog = new DialogAddPackage();
+		dialog.show(getFragmentManager(), "add_entry");
+	}
 
 }

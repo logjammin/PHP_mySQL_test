@@ -101,7 +101,7 @@ public class EditItemFragment extends DialogFragment {
         View rootView = inflater.inflate(R.layout.fragment_edit_package, null);
 
         inputTracking = (EditText) rootView.findViewById(R.id.inputTracking);
-        inputPcs = (EditText) rootView.findViewById(R.id.inputPcs);
+        inputPcs = (EditText) rootView.findViewById(R.id.inputNumpackages);
         inputSender = (EditText) rootView.findViewById(R.id.inputSender);
         inputRecipient = (EditText) rootView.findViewById(R.id.inputRecipient);
         inputPoNum = (EditText) rootView.findViewById(R.id.inputPoNum);
@@ -165,7 +165,7 @@ public class EditItemFragment extends DialogFragment {
         params = new ArrayList<NameValuePair>();
         if (i == 1) {
             //DateFormat c = DateFormat.getDateTimeInstance();
-            //TODO: Add date format to all instances of date_received.
+            //TODO: Add timestamp format to all instances of date_received.
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
 
             date = sdf.toString();
@@ -264,7 +264,7 @@ public class EditItemFragment extends DialogFragment {
                     JSONObject c = itemObj.getJSONObject(0);
 
                     // Storing each json item in variable
-                    String date = c.getString(TAG_DATE);
+                    String timestamp = c.getString(TAG_DATE);
                     String tracking = c.getString(TAG_TRACKING);
                     String carrier = c.getString(TAG_CARRIER);
                     String numpackages = c.getString(TAG_PCS);
@@ -275,7 +275,7 @@ public class EditItemFragment extends DialogFragment {
 
                     packagesList = new HashMap<String, String>();
 
-                    packagesList.put(TAG_DATE, date);
+                    packagesList.put(TAG_DATE, timestamp);
                     packagesList.put(TAG_TRACKING, tracking);
                     packagesList.put(TAG_CARRIER, carrier);
                     packagesList.put(TAG_SENDER, sender);

@@ -56,7 +56,7 @@
         android:layout_gravity="center"
         android:gravity="center" />
     <TextView
-        android:id="@+id/numpack"
+        android:id="@+id/numpackages"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
