@@ -27,7 +27,7 @@ import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.powereng.receiving.MainActivity;
+import com.powereng.receiving.LogViewActivity;
 import com.powereng.receiving.database.LogProvider;
 
 import java.io.IOException;
@@ -44,9 +44,9 @@ public class GetTokenTask extends AsyncTask<Void, Void, String> {
 
 	protected String mScope;
 	protected String mEmail;
-	protected MainActivity mActivity;
+	protected LogViewActivity mActivity;
 
-	public GetTokenTask(MainActivity activity, String email, String scope) {
+	public GetTokenTask(LogViewActivity activity, String email, String scope) {
 		this.mActivity = activity;
 		this.mScope = scope;
 		this.mEmail = email;

@@ -112,8 +112,47 @@ public class LogProvider extends ContentProvider {
 	@Override
 	public int update(Uri uri, ContentValues values, String selection,
 			String[] selectionArgs) {
-		// TODO: Implement this to handle requests to update one or more rows.
-		throw new UnsupportedOperationException("Not yet implemented");
+        final String table;
+        final ArrayList<String> args = new ArrayList<String>();
+        if (selectionArgs != null) {
+            for (String arg : selectionArgs) {
+                args.add(arg);
+            }
+        }
+        final StringBuilder sb = new StringBuilder();
+        if (selection != null && !selection.isEmpty()) {
+            sb.append("(").append(selection).append(")");
+        }
+
+        // Configure table and args depending on uri
+        switch (sURIMatcher.match(uri)) {
+            case LogEntry.BASEITEMCODE:
+                table = LogEntry.TABLE_NAME;
+                if (selection != null && !selection.isEmpty()) {
+                    sb.append(" AND ");
+                }
+                sb.append(LogEntry.COL_ID + " IS ?");
+                args.add(uri.getLastPathSegment());
+                values.put(LogEntry.COL_SYNCED, 0);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown URI " + uri);
+        }
+
+        // Write to DB
+        final SQLiteDatabase db = DatabaseHandler.getInstance(getContext())
+                .getWritableDatabase();
+        final String[] argArray = new String[args.size()];
+        final int result = db.update(table, values, sb.toString(),
+                args.toArray(argArray));
+
+        if (result > 0) {
+            // Support upload sync
+            getContext().getContentResolver().notifyChange(uri, null, true);
+        }
+
+		//throw new UnsupportedOperationException("Not yet implemented");
+        return result;
 	}
 
 	@Override

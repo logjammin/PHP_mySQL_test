@@ -26,19 +26,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!-- All Product Activity -->
-        <activity
-            android:name="com.powereng.receiving.LogViewActivity"
-            android:label="@string/log_name" >
-        </activity>
-
-        <!-- Add Product Activity -->
-        <activity
-            android:name="com.powereng.receiving.LogNewActivity"
-            android:label="@string/new_package" >
-        </activity>
-
-        <!-- Edit Product Activity -->
 
         <!-- CaptureSignature Activity -->
         <activity
@@ -48,7 +35,7 @@
         </activity>
 
         <provider
-            android:name=".provider.ReceivingLogProvider"
+            android:name=".database.LogProvider"
             android:authorities="com.powereng.receiving"
             android:exported="true" />
 

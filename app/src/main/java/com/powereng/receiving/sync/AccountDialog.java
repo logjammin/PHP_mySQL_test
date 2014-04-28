@@ -9,7 +9,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
-import com.powereng.receiving.MainActivity;
+import com.powereng.receiving.LogViewActivity;
 import com.powereng.receiving.R;
 
 
@@ -51,7 +51,7 @@ public class AccountDialog extends DialogFragment {
 	public void accountSelected(Account account) {
 		if (account != null) {
 			//new TokenGetter().execute(account.name);
-			new GetTokenTask((MainActivity) getActivity(), account.name, SyncHelper.SCOPE).execute();
+			new GetTokenTask((LogViewActivity) getActivity(), account.name, SyncHelper.SCOPE).execute();
 		}
 	}
 }

@@ -40,7 +40,7 @@ public class MainScreenActivity extends Activity{
             @Override
             public void onClick(View view) {
                 // Launching create new product activity
-                Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                Intent i = new Intent(getApplicationContext(), LogViewActivity.class);
                 startActivity(i);
 
             }

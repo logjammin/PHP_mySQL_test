@@ -14,6 +14,8 @@ import android.widget.Spinner;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import java.util.ArrayList;
+
 /**
  * Simple confirm dialog fragment.
  * 
@@ -69,25 +71,28 @@ public class DialogAddPackage extends DialogFragment {
 					@Override
 					public void onClick(View v) {
 
-                        String tracking = inputTracking.getText().toString();
-                        String carrier = inputCarrier.getSelectedItem().toString();
-                        String numpackages = inputNumpackages.getText().toString();
-                        String sender = inputSender.getText().toString();
-                        String recipient = inputRecipient.getText().toString();
-                        String ponum = inputPoNum.getText().toString();
+                        ArrayList<String> list = new ArrayList<String>();
+                        list.add(inputTracking.getText().toString());
+                        list.add(inputCarrier.getSelectedItem().toString());
+                        list.add(inputNumpackages.getText().toString());
+                        list.add(inputSender.getText().toString());
+                        list.add(inputRecipient.getText().toString());
+                        list.add(inputPoNum.getText().toString());
 
                         Bundle params = new Bundle();
 
-                        params.putString("tracking", tracking);
-                        params.putString("carrier", carrier);
-                        params.putString("numpackages", numpackages);
-                        params.putString("sender", sender);
-                        params.putString("recipient", recipient);
-                        params.putString("ponum", ponum);
+//                        params.putString("tracking", tracking);
+//                        params.putString("carrier", carrier);
+//                        params.putString("numpackages", numpackages);
+//                        params.putString("sender", sender);
+//                        params.putString("recipient", recipient);
+//                        params.putString("ponum", ponum);
+
+                        params.putStringArrayList("values", list);
 
                         if (!params.isEmpty()) {
 							// Add in background
-							AddLogEntryService.updateEntry(getActivity(), params);
+							AddLogEntryService.addEntry(getActivity(), params);
 							getDialog().dismiss();
 						}
 					}

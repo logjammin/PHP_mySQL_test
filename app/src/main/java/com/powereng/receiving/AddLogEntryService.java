@@ -9,6 +9,8 @@ import android.os.Bundle;
 
 import com.powereng.receiving.database.LogEntry;
 
+import java.util.ArrayList;
+
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
@@ -47,7 +49,6 @@ public class AddLogEntryService extends IntentService {
 		if (intent != null) {
 			final String action = intent.getAction();
 			if (ACTION_ADD.equals(action)) {
-
                 addEntry(intent.getBundleExtra(EXTRA_PACKAGE));
 			} else if (ACTION_UPDATE.equals(action)) {
                 updateEntry(intent.getBundleExtra(EXTRA_PACKAGE));
@@ -59,15 +60,17 @@ public class AddLogEntryService extends IntentService {
         if (extras == null) {
             return;
         }
+        ArrayList<String> list = extras.getStringArrayList("values");
 
         final ContentValues values = new ContentValues();
-        values.put(LogEntry.COL_TRACKING, extras.getString("tracking"));
-        values.put(LogEntry.COL_CARRIER, extras.getString("carrier"));
-        values.put(LogEntry.COL_NUMPACKAGES, extras.getString("numpackages"));
-        values.put(LogEntry.COL_SENDER, extras.getString("sender"));
-        values.put(LogEntry.COL_RECIPIENT, extras.getString("recipient"));
-        values.put(LogEntry.COL_PONUM, extras.getString("ponum"));
-        //TODO: this shit needs updated.
+
+        values.put(LogEntry.COL_TRACKING, list.get(0));
+        values.put(LogEntry.COL_CARRIER, list.get(1));
+        values.put(LogEntry.COL_NUMPACKAGES, list.get(2));
+        values.put(LogEntry.COL_SENDER, list.get(3));
+        values.put(LogEntry.COL_RECIPIENT, list.get(4));
+        values.put(LogEntry.COL_PONUM, list.get(5));
+
         getContentResolver().update(LogEntry.URI(), values, null, null);
     }
 
@@ -77,13 +80,16 @@ public class AddLogEntryService extends IntentService {
 			return;
 		}
 
-		final ContentValues values = new ContentValues();
-		values.put(LogEntry.COL_TRACKING, extras.getString("tracking"));
-        values.put(LogEntry.COL_CARRIER, extras.getString("carrier"));
-        values.put(LogEntry.COL_NUMPACKAGES, extras.getString("numpackages"));
-        values.put(LogEntry.COL_SENDER, extras.getString("sender"));
-        values.put(LogEntry.COL_RECIPIENT, extras.getString("recipient"));
-        values.put(LogEntry.COL_PONUM, extras.getString("ponum"));
+        ArrayList<String> list = extras.getStringArrayList("values");
+
+        final ContentValues values = new ContentValues();
+
+        values.put(LogEntry.COL_TRACKING, list.get(0));
+        values.put(LogEntry.COL_CARRIER, list.get(1));
+        values.put(LogEntry.COL_NUMPACKAGES, list.get(2));
+        values.put(LogEntry.COL_SENDER, list.get(3));
+        values.put(LogEntry.COL_RECIPIENT, list.get(4));
+        values.put(LogEntry.COL_PONUM, list.get(5));
 
 		getContentResolver().insert(LogEntry.URI(), values);
 	}

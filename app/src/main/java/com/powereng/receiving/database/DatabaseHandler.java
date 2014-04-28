@@ -71,21 +71,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	// Convenience methods
-	public synchronized boolean putEntry(final LogEntry item) {
+	public synchronized boolean putEntry(final LogEntry entry) {
 		boolean success = false;
 		int result = 0;
 		final SQLiteDatabase db = this.getWritableDatabase();
-		final ContentValues values = item.getContent();
+		final ContentValues values = entry.getContent();
 
-		if (item.getId() > -1) {
-			result += db.update(item.getTableName(), values, DBItem.COL_ID
-					+ " IS ?", new String[] { String.valueOf(item.getId()) });
+		if (entry.getId() > -1) {
+			result += db.update(entry.getTableName(), values, DBItem.COL_ID
+					+ " IS ?", new String[] { String.valueOf(entry.getId()) });
 		}
 		// Update failed or wasn't possible, insert instead
 		else {
-			final long id = db.insert(item.getTableName(), null, values);
+			final long id = db.insert(entry.getTableName(), null, values);
 			if (id > 0) {
-				item.setId(id);
+				entry.setId(id);
 				result++;
 			}
 		}
@@ -94,7 +94,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			success = true;
 		}
 		if (success) {
-			item.notifyProvider(context);
+			entry.notifyProvider(context);
 		}
 		return success;
 	}

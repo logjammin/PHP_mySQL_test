@@ -92,7 +92,7 @@ public class LogViewFragment extends Fragment {
 
 		// Set the adapter
 		mListView = (AbsListView) view.findViewById(android.R.id.list);
-		((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
+		mListView.setAdapter(mAdapter);
 
 		mListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
 		// Set OnItemClickListener so we can be notified on item clicks
@@ -101,10 +101,10 @@ public class LogViewFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					int position, long id) {
-				final LogEntry logEntry = new LogEntry((Cursor) mAdapter
-						.getItem(position));
-
-                DialogFragment dialog = new DialogEditPackage(logEntry.getId());
+				 //final LogEntry logEntry = new LogEntry((Cursor) mAdapter
+				//		.getItem(position));
+                Cursor c = (Cursor)arg0.getItemAtPosition(position);
+                DialogFragment dialog = new DialogEditPackage(c);
                 dialog.show(getFragmentManager(), "edit_entry");
 
 			}
@@ -230,7 +230,7 @@ public class LogViewFragment extends Fragment {
 									GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
 
 					if (accounts.length == 1) {
-						new GetTokenTask((MainActivity) getActivity(), accounts[0].name,
+						new GetTokenTask((LogViewActivity) getActivity(), accounts[0].name,
 								SyncHelper.SCOPE).execute();
 					}
 					else if (accounts.length > 1) {
