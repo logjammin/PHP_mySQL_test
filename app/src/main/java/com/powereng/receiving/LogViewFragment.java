@@ -5,9 +5,6 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -23,7 +20,6 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CursorAdapter;
-import android.widget.ListAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
@@ -167,7 +163,7 @@ public class LogViewFragment extends Fragment {
 		});
 
 		// Load content
-		getLoaderManager().initLoader(0, null, new LoaderCallbacks<Cursor>() {
+		/*getLoaderManager().initLoader(0, null, new LoaderCallbacks<Cursor>() {
 
 			@Override
 			public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -185,7 +181,7 @@ public class LogViewFragment extends Fragment {
 			public void onLoaderReset(Loader<Cursor> arg0) {
 				mAdapter.swapCursor(null);
 			}
-		});
+		});*/
 
 		return view;
 	}

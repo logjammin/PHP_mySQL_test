@@ -234,7 +234,7 @@ public class CaptureSignature extends Activity {
             Log.v("log_tag", "Height: " + v.getHeight());
             if(mBitmap == null)
             {
-                mBitmap =  Bitmap.createBitmap (mContent.getWidth(), mContent.getHeight(), Bitmap.Config.RGB_565);;
+                mBitmap =  Bitmap.createBitmap (mContent.getWidth(), mContent.getHeight(), Bitmap.Config.RGB_565);
             }
             Canvas canvas = new Canvas(mBitmap);
             try
