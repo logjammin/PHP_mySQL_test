@@ -1,10 +1,14 @@
 package com.powereng.receiving;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.app.LoaderManager.LoaderCallbacks;
+import android.content.ContentResolver;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.content.SyncStatusObserver;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -23,11 +27,10 @@ import android.widget.CursorAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.GoogleAuthUtil;
+import com.powereng.receiving.accounts.GenericAccountService;
 import com.powereng.receiving.database.LogEntry;
-import com.powereng.receiving.sync.AccountDialog;
-import com.powereng.receiving.sync.GetTokenTask;
-import com.powereng.receiving.sync.SyncHelper;
+import com.powereng.receiving.database.LogProvider;
+import com.powereng.receiving.sync.SyncUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -54,7 +57,7 @@ public class LogViewFragment extends Fragment {
 	 * Views.
 	 */
 	private CursorAdapter mAdapter;
-
+    private Menu mOptionsMenu;
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
 	 * fragment (e.g. upon screen orientation changes).
@@ -163,7 +166,7 @@ public class LogViewFragment extends Fragment {
 		});
 
 		// Load content
-		/*getLoaderManager().initLoader(0, null, new LoaderCallbacks<Cursor>() {
+		getLoaderManager().initLoader(0, null, new LoaderCallbacks<Cursor>() {
 
 			@Override
 			public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -181,7 +184,7 @@ public class LogViewFragment extends Fragment {
 			public void onLoaderReset(Loader<Cursor> arg0) {
 				mAdapter.swapCursor(null);
 			}
-		});*/
+		});
 
 		return view;
 	}
@@ -195,6 +198,7 @@ public class LogViewFragment extends Fragment {
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
+        SyncUtils.CreateSyncAccount(activity);
 	}
 
 	@Override
@@ -210,35 +214,17 @@ public class LogViewFragment extends Fragment {
 			showAddDialog();
 			break;
 		case R.id.action_sync:
-			final String email = PreferenceManager.getDefaultSharedPreferences(
-					getActivity()).getString(SyncHelper.KEY_ACCOUNT, null);
-			if (email != null) {
+
+
 				Toast.makeText(getActivity(), R.string.syncing_, Toast.LENGTH_SHORT).show();
-				SyncHelper.manualSync(getActivity());
-			}
-			else {
-				getFragmentManager().beginTransaction()
-						.add(R.id.mainContent, new LogViewFragment()).commit();
+				SyncUtils.TriggerRefresh();
 
-				if (null == SyncHelper.getSavedAccountName(getActivity())) {
-					final Account[] accounts = AccountManager.get(getActivity())
-							.getAccountsByType(
-									GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
 
-					if (accounts.length == 1) {
-						new GetTokenTask((LogViewActivity) getActivity(), accounts[0].name,
-								SyncHelper.SCOPE).execute();
-					}
-					else if (accounts.length > 1) {
-						DialogFragment dialog = new AccountDialog();
-						dialog.show(getFragmentManager(), "account_dialog");
-					}
-				}
-			}
 			break;
 		}
 		return result;
 	}
+
 
 
 	void showAddDialog() {

@@ -12,7 +12,8 @@ import android.util.Log;
 
 import com.powereng.receiving.database.DatabaseHandler;
 import com.powereng.receiving.database.LogEntry;
-import com.powereng.receiving.gcm.GCMHelper;
+
+import java.text.SimpleDateFormat;
 
 import retrofit.RetrofitError;
 
@@ -35,8 +36,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 			ContentProviderClient provider, SyncResult syncResult) {
 		try {
 			// Need to get an access token first
-			final String token = SyncHelper.getAuthToken(getContext(),
-					account.name);
+			final String token = "70713aa1e2a83c38f514f5ed9ad34706";
 
 			if (token == null) {
 				Log.e(TAG, "Token was null. Aborting sync");
@@ -46,17 +46,15 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
 			// Just to make sure. Can happen if sync happens in background first
 			// time
-			if (null == SyncHelper.getSavedAccountName(getContext())) {
+			/*if (null == SyncHelper.getSavedAccountName(getContext())) {
 				PreferenceManager.getDefaultSharedPreferences(getContext())
 						.edit().putString(SyncHelper.KEY_ACCOUNT, account.name)
 						.commit();
-			}
+			}*/
 			// token should be good. Transmit
+
 			
-			// Register for GCM if we need to
-			GCMHelper.registerIfNotAlreadyDone(getContext());
-			
-			final LogServer server = SyncHelper.getRESTAdapter();
+			final LogServer server = SyncUtils.getRESTAdapter();
 			DatabaseHandler db = DatabaseHandler.getInstance(getContext());
 
 			// Upload stuff
@@ -64,12 +62,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 					+ " IS 0 OR " + LogEntry.COL_DELETED + " IS 1", null, null)) {
 				if (entry.deleted != 0) {
 					// Delete the item
-					server.deleteEntry(token, entry.tracking, GCMHelper.getSavedRegistrationId(getContext()));
+					server.deleteEntry(token, entry.tracking);
 					syncResult.stats.numDeletes++;
 					db.deleteEntry(entry);
 				}
 				else {
-					server.addEntry(token, new LogServer.LogMSG(entry), GCMHelper.getSavedRegistrationId(getContext()));
+					server.addEntry(token, new LogServer.LogMSG(entry));
 					syncResult.stats.numInserts++;
 					entry.synced = 1;
 					db.putEntry(entry);
@@ -85,10 +83,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
 				final LogServer.LogEntries entries;
 				if (lastSync != null && !lastSync.isEmpty()) {
-					entries = server.listEntries(token, "true", lastSync);
-				}
+
+					//entries = server.listEntries(token, "true", lastSync);
+                    entries = server.listEntries(token);
+                }
+
 				else {
-					entries = server.listEntries(token, "false", null);
+                    //entries = server.listEntries(token, "false", lastSync);
+					entries = server.listEntries(token);
 				}
 
 				if (entries != null && entries.entries != null) {
@@ -108,8 +110,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 				}
 
 				// Save sync timestamp
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				PreferenceManager.getDefaultSharedPreferences(getContext())
-						.edit().putString(KEY_LASTSYNC, entries.latestTimestamp)
+						.edit().putString(KEY_LASTSYNC, String.valueOf(sdf))
 						.commit();
 			}
 		}

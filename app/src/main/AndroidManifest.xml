@@ -27,6 +27,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".LogViewActivity"
+            android:label="@string/log_name" >
+        </activity>
+
         <!-- CaptureSignature Activity -->
         <activity
             android:name="com.powereng.receiving.CaptureSignature"
