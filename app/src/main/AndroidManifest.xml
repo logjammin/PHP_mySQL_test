@@ -39,12 +39,6 @@
             android:theme="@android:style/Theme.Holo.Dialog" >
         </activity>
 
-        <activity
-            android:name=".LogViewActivity"
-            android:label="Log View">
-
-        </activity>
-
 
         <provider
             android:name="com.powereng.receiving.database.LogProvider"
@@ -60,6 +54,13 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
+
+        <service android:name=".AddLogEntryService"
+            android:exported="false"
+            android:label="@string/add_package" >
+
+        </service>
+
         <service
             android:name="com.powereng.receiving.sync.SyncService"
             android:exported="true" >

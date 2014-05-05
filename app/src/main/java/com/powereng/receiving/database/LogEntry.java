@@ -10,7 +10,7 @@ import android.net.Uri;
  *
  */
 public class LogEntry extends DBItem {
-    public static final String TABLE_NAME = "ReceivingLog";
+    public static final String TABLE_NAME = "Entry";
 
     public static Uri URI() {
         return Uri.withAppendedPath(
@@ -26,8 +26,8 @@ public class LogEntry extends DBItem {
     public static final String COL_NUMPACKAGES = "numpackages";
     public static final String COL_SENDER = "sender";
     public static final String COL_RECIPIENT = "recipient";
-    public static final String COL_PONUM = "po_num";
-    public static final String COL_SIG = "sig";
+    public static final String COL_PONUM = "ponum";
+    public static final String COL_SIG = "signature";
     public static final String COL_DELETED = "deleted";
     public static final String COL_SYNCED = "synced";
 
@@ -88,7 +88,7 @@ public class LogEntry extends DBItem {
         values.put(COL_SENDER, sender);
         values.put(COL_RECIPIENT, recipient);
         values.put(COL_PONUM, ponum);
-        values.put(COL_SIG,sig);
+        values.put(COL_SIG, sig);
         values.put(COL_DELETED, deleted);
         values.put(COL_SYNCED, synced);
         return values;
@@ -111,7 +111,7 @@ public class LogEntry extends DBItem {
     }
 
     public static final String CREATE_TABLE =
-"CREATE TABLE entry"
+"CREATE TABLE " + TABLE_NAME
 +"  (_id INTEGER PRIMARY KEY,"
 +"  timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
 +"  tracking TEXT NOT NULL,"
@@ -125,5 +125,5 @@ public class LogEntry extends DBItem {
 +"  synced INTEGER NOT NULL DEFAULT 0,"
 +""
 +"  UNIQUE (tracking) ON CONFLICT IGNORE,"
-+"  UNIQUE (timestamp) ON CONFLICT IGNORE)";
++"  UNIQUE (timestamp) ON CONFLICT IGNORE);";
 }

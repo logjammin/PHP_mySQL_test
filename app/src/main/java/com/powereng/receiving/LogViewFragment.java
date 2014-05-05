@@ -1,17 +1,15 @@
 package com.powereng.receiving;
 
-import android.accounts.Account;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
-import android.app.LoaderManager.LoaderCallbacks;
+import android.app.LoaderManager;
 import android.content.ContentResolver;
 import android.content.CursorLoader;
 import android.content.Loader;
-import android.content.SyncStatusObserver;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,7 +25,6 @@ import android.widget.CursorAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
-import com.powereng.receiving.accounts.GenericAccountService;
 import com.powereng.receiving.database.LogEntry;
 import com.powereng.receiving.database.LogProvider;
 import com.powereng.receiving.sync.SyncUtils;
@@ -58,6 +55,7 @@ public class LogViewFragment extends Fragment {
 	 */
 	private CursorAdapter mAdapter;
     private Menu mOptionsMenu;
+
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
 	 * fragment (e.g. upon screen orientation changes).
@@ -68,7 +66,9 @@ public class LogViewFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
+		 setHasOptionsMenu(true);
+
+
 		mAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.list_item, null,
 				new String[] { LogEntry.COL_TIMESTAMP, LogEntry.COL_TRACKING, LogEntry.COL_CARRIER,
@@ -100,10 +100,10 @@ public class LogViewFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					int position, long id) {
-				 //final LogEntry logEntry = new LogEntry((Cursor) mAdapter
-				//		.getItem(position));
-                Cursor c = (Cursor)arg0.getItemAtPosition(position);
-                DialogFragment dialog = new DialogEditPackage(c);
+				 final LogEntry logEntry = new LogEntry((Cursor) mAdapter
+						.getItem(position));
+
+                DialogFragment dialog = new DialogEditPackage(logEntry);
                 dialog.show(getFragmentManager(), "edit_entry");
 
 			}
@@ -166,7 +166,7 @@ public class LogViewFragment extends Fragment {
 		});
 
 		// Load content
-		getLoaderManager().initLoader(0, null, new LoaderCallbacks<Cursor>() {
+		getLoaderManager().initLoader(0, null, new LoaderManager.LoaderCallbacks<Cursor>() {
 
 			@Override
 			public Loader<Cursor> onCreateLoader(int id, Bundle args) {

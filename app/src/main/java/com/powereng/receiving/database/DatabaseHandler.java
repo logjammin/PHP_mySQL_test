@@ -20,7 +20,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final int DATABASE_VERSION = 1;
 
 	// Database Name
-	private static final String DATABASE_NAME = "ReceivingLog";
+	private static final String DATABASE_NAME = "Entry";
 	private final Context context;
 
 	private static DatabaseHandler instance = null;
@@ -136,12 +136,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	public synchronized Cursor getAllLogEntriesCursor(final String selection,
                   final String[] args, final String sortOrder) {
-		final SQLiteDatabase db = this.getReadableDatabase();
 
-		final Cursor cursor = db.query(LogEntry.TABLE_NAME, LogEntry.FIELDS,
-				selection, args, null, null, sortOrder, null);
 
-		return cursor;
+        final SQLiteDatabase db = this.getWritableDatabase();
+        if (db == null) {
+
+        }
+        final Cursor cursor = db.query(LogEntry.TABLE_NAME, LogEntry.FIELDS,
+                    selection, args, null, null, sortOrder, null);
+
+        return cursor;
+
+
 	}
 
 	public synchronized List<LogEntry> getAllLogEntries(final String selection,

@@ -9,6 +9,7 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.powereng.receiving.database.DatabaseHandler;
 import com.powereng.receiving.database.LogEntry;
@@ -17,24 +18,27 @@ import java.text.SimpleDateFormat;
 
 import retrofit.RetrofitError;
 
-public class SyncAdapter extends AbstractThreadedSyncAdapter {
+public class MySyncAdapter extends AbstractThreadedSyncAdapter {
 
 	private static final String TAG = "LogSyncAdapter";
 	private static final String KEY_LASTSYNC = "key_lastsync";
-
-	public SyncAdapter(Context context, boolean autoInitialize) {
+    Context mContext;
+	public MySyncAdapter(Context context, boolean autoInitialize) {
 		super(context, autoInitialize);
+        mContext = context;
 	}
 
-	public SyncAdapter(Context context, boolean autoInitialize,
-			boolean allowParallelSyncs) {
+	public MySyncAdapter(Context context, boolean autoInitialize,
+                         boolean allowParallelSyncs) {
 		super(context, autoInitialize, allowParallelSyncs);
+        mContext = context;
 	}
 
 	@Override
 	public void onPerformSync(Account account, Bundle extras, String authority,
 			ContentProviderClient provider, SyncResult syncResult) {
-		try {
+        Toast.makeText(mContext, "ONPERFORMSYNC CALLED!", Toast.LENGTH_SHORT).show();
+        try {
 			// Need to get an access token first
 			final String token = "70713aa1e2a83c38f514f5ed9ad34706";
 

@@ -3,6 +3,7 @@ package com.powereng.receiving;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.Spinner;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.powereng.receiving.database.LogEntry;
 
 import java.util.ArrayList;
 
@@ -40,12 +42,17 @@ public class DialogEditPackage extends DialogFragment {
     String sender;
     String recipient;
     String ponum;
-
+    Long itemId;
     String date;
     Cursor mCursor;
+    LogEntry entry;
 
-    public DialogEditPackage(Cursor cursor) {
+/*    public DialogEditPackage(Cursor cursor) {
         this.mCursor = cursor;
+    }*/
+    public DialogEditPackage(LogEntry logEntry) {
+        //this.itemId = id;
+        this.entry = logEntry;
     }
 
     @Override
@@ -53,20 +60,23 @@ public class DialogEditPackage extends DialogFragment {
         super.onCreate(savedInstanceState);
         setStyle(DialogFragment.STYLE_NORMAL,
                 android.R.style.Theme_Holo_Light_Dialog);
-        tracking = mCursor.getString(0);
-        carrier = mCursor.getString(1);
-        numpackages = mCursor.getString(2);
-        sender = mCursor.getString(3);
-        recipient = mCursor.getString(4);
-        ponum = mCursor.getString(5);
 
+        //DatabaseHandler db = DatabaseHandler.getInstance(getActivity());
+        //LogEntry entry = db.getLogEntry(itemId);
+
+        tracking = entry.tracking;
+        carrier = entry.carrier;
+        numpackages = entry.numpackages;
+        sender = entry.sender;
+        recipient = entry.recipient;
+        ponum = entry.ponum;
 
     }
 
-    public static int getCarrierNumber(String carrier) {
-        int carrierNumber = 0;
+    public static int getCarrierNumber(String s) {
+        int carrierNumber;
 
-        String s = carrier;
+        //String s = carrier;
         if (s.equals("UPS")) {
             carrierNumber = 0;
 
@@ -104,12 +114,13 @@ public class DialogEditPackage extends DialogFragment {
         inputRecipient = (EditText) v.findViewById(R.id.inputRecipient);
         inputPoNum = (EditText) v.findViewById(R.id.inputPoNum);
 
-        inputTracking.setText(tracking);
         inputNumpackages.setText(numpackages);
+        inputTracking.setText(tracking);
+        inputCarrier.setSelection(getCarrierNumber(carrier));
         inputSender.setText(sender);
         inputRecipient.setText(recipient);
         inputPoNum.setText(ponum);
-        inputCarrier.setSelection(getCarrierNumber(carrier));
+
 
         btnScan = (Button) v.findViewById(R.id.btnScan);
 
@@ -137,6 +148,7 @@ public class DialogEditPackage extends DialogFragment {
                     @Override
                     public void onClick(View v) {
                         ArrayList<String> list = new ArrayList<String>();
+                        //list.add(entry.getUri());
                         list.add(inputTracking.getText().toString());
                         list.add(inputCarrier.getSelectedItem().toString());
                         list.add(inputNumpackages.getText().toString());
@@ -153,6 +165,10 @@ public class DialogEditPackage extends DialogFragment {
 //                        params.putString("recipient", recipient);
 //                        params.putString("ponum", ponum);
 
+
+                        Uri uri = entry.getUri();
+                        String entryUri = uri.toString();
+                        params.putString("uri", entryUri);
                         params.putStringArrayList("values", list);
                         if (!params.isEmpty()) {
                             // Add in background
@@ -160,9 +176,8 @@ public class DialogEditPackage extends DialogFragment {
                             getDialog().dismiss();
                         }
                     }
-                });
-
-
+                }
+        );
 
         return v;
     }

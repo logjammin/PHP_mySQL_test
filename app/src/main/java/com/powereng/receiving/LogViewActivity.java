@@ -7,10 +7,13 @@ import android.view.Menu;
 //TODO:create PoViewActivity
 public class LogViewActivity extends Activity {
 
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_log_view);
+
+
 
 		getFragmentManager().beginTransaction()
 				.add(R.id.mainContent, new LogViewFragment()).commit();

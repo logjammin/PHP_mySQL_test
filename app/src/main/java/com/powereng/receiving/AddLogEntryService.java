@@ -5,6 +5,7 @@ import android.app.IntentService;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.powereng.receiving.database.LogEntry;
@@ -60,6 +61,7 @@ public class AddLogEntryService extends IntentService {
         if (extras == null) {
             return;
         }
+        Uri uri = Uri.parse(extras.getString("uri"));
         ArrayList<String> list = extras.getStringArrayList("values");
 
         final ContentValues values = new ContentValues();
@@ -70,8 +72,9 @@ public class AddLogEntryService extends IntentService {
         values.put(LogEntry.COL_SENDER, list.get(3));
         values.put(LogEntry.COL_RECIPIENT, list.get(4));
         values.put(LogEntry.COL_PONUM, list.get(5));
+        values.put(LogEntry.COL_SYNCED, 0);
 
-        getContentResolver().update(LogEntry.URI(), values, null, null);
+        getContentResolver().update(uri, values, null, null);
     }
 
 
@@ -90,6 +93,7 @@ public class AddLogEntryService extends IntentService {
         values.put(LogEntry.COL_SENDER, list.get(3));
         values.put(LogEntry.COL_RECIPIENT, list.get(4));
         values.put(LogEntry.COL_PONUM, list.get(5));
+        values.put(LogEntry.COL_SYNCED, 0);
 
 		getContentResolver().insert(LogEntry.URI(), values);
 	}
