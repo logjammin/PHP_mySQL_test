@@ -4,11 +4,9 @@ import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.LoaderManager;
-import android.content.ContentResolver;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -26,22 +24,13 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import com.powereng.receiving.database.LogEntry;
-import com.powereng.receiving.database.LogProvider;
 import com.powereng.receiving.sync.SyncUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
 
 
-/**
- * A fragment representing a list of Items.
- * <p />
- * Large screen devices (such as tablets) are supported by replacing the
- * ListView with a GridView.
- * <p />
- * Activities containing this fragment MUST implement the {@link Callbacks}
- * interface.
- */
+
 public class LogViewFragment extends Fragment {
 
 	/**

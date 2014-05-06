@@ -3,12 +3,9 @@ package com.powereng.receiving.database;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-
-import com.powereng.receiving.sync.TableWatcher;
 
 import java.util.ArrayList;
 
@@ -102,9 +99,9 @@ public class LogProvider extends ContentProvider {
 		if (id > 0) {
 			item.setId(id);
 			result = item.getUri();
-            ContentObserver observer = new TableWatcher(null);
+            //ContentObserver observer = new TableWatcher(null);
 			// Support upload sync
-			getContext().getContentResolver().notifyChange(uri, observer, true);
+			getContext().getContentResolver().notifyChange(uri, null, true);
 		}
 		else {
 			result = null;

@@ -172,6 +172,7 @@ public class DialogEditPackage extends DialogFragment {
                         params.putStringArrayList("values", list);
                         if (!params.isEmpty()) {
                             // Add in background
+                            //TODO: check to see if anything changed. if not, no need to sync.
                             AddLogEntryService.updateEntry(getActivity(), params);
                             getDialog().dismiss();
                         }

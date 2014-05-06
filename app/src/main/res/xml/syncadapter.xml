@@ -3,8 +3,8 @@
 <sync-adapter
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:contentAuthority="com.powereng.receiving"
-    android:accountType="com.powereng.receiving.account"
+    android:accountType="com.powereng.receiving"
     android:userVisible="true"
     android:supportsUploading="true"
     android:allowParallelSyncs="false"
-    android:isAlwaysSyncable="true"/>
+    android:isAlwaysSyncable="false"/>

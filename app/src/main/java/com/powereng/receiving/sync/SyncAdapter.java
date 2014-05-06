@@ -9,27 +9,27 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.powereng.receiving.database.DatabaseHandler;
 import com.powereng.receiving.database.LogEntry;
 
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 
 import retrofit.RetrofitError;
 
-public class MySyncAdapter extends AbstractThreadedSyncAdapter {
+public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
 	private static final String TAG = "LogSyncAdapter";
 	private static final String KEY_LASTSYNC = "key_lastsync";
     Context mContext;
-	public MySyncAdapter(Context context, boolean autoInitialize) {
+	public SyncAdapter(Context context, boolean autoInitialize) {
 		super(context, autoInitialize);
         mContext = context;
 	}
 
-	public MySyncAdapter(Context context, boolean autoInitialize,
-                         boolean allowParallelSyncs) {
+	public SyncAdapter(Context context, boolean autoInitialize,
+                       boolean allowParallelSyncs) {
 		super(context, autoInitialize, allowParallelSyncs);
         mContext = context;
 	}
@@ -37,7 +37,6 @@ public class MySyncAdapter extends AbstractThreadedSyncAdapter {
 	@Override
 	public void onPerformSync(Account account, Bundle extras, String authority,
 			ContentProviderClient provider, SyncResult syncResult) {
-        Toast.makeText(mContext, "ONPERFORMSYNC CALLED!", Toast.LENGTH_SHORT).show();
         try {
 			// Need to get an access token first
 			final String token = "70713aa1e2a83c38f514f5ed9ad34706";
@@ -71,7 +70,18 @@ public class MySyncAdapter extends AbstractThreadedSyncAdapter {
 					db.deleteEntry(entry);
 				}
 				else {
-					server.addEntry(token, new LogServer.LogMSG(entry));
+					//server.addEntry(token, new LogServer.LogMSG(entry));
+
+                    HashMap entryMap = new HashMap();
+                    entryMap.put("tracking", entry.tracking);
+                    entryMap.put("carrier", entry.carrier);
+                    entryMap.put("numpackages", entry.numpackages);
+                    entryMap.put("sender", entry.sender);
+                    entryMap.put("recipient", entry.recipient);
+                    entryMap.put("ponum", entry.ponum);
+                    entryMap.put("sig", entry.sig);
+                    //TODO: change server to read from request body.
+                    server.addEntry(token, entryMap);
 					syncResult.stats.numInserts++;
 					entry.synced = 1;
 					db.putEntry(entry);
@@ -101,15 +111,15 @@ public class MySyncAdapter extends AbstractThreadedSyncAdapter {
 					for (LogServer.LogMSG msg : entries.entries) {
 						Log.d(TAG, "got tracking:" + msg.tracking);
 						final LogEntry entry = msg.toDBItem();
-						if (msg.deleted) {
-							Log.d(TAG, "Deleting:" + msg.tracking);
-							db.deleteEntry(entry);
-						}
-						else {
+						//if (msg.deleted) {
+						//	Log.d(TAG, "Deleting:" + msg.tracking);
+						//	db.deleteEntry(entry);
+						//}
+						//else {
 							Log.d(TAG, "Adding tracking:" + entry.tracking);
 							entry.synced = 1;
 							db.putEntry(entry);
-						}
+						//}
 					}
 				}
 

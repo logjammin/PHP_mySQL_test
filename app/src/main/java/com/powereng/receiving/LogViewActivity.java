@@ -13,10 +13,9 @@ public class LogViewActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_log_view);
 
-
-
 		getFragmentManager().beginTransaction()
 				.add(R.id.mainContent, new LogViewFragment()).commit();
+
 	}
 
 

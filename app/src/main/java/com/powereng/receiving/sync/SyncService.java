@@ -10,7 +10,7 @@ import android.os.IBinder;
  */
 public class SyncService extends Service {
 	// Storage for an instance of the sync adapter
-	private static MySyncAdapter sSyncAdapter = null;
+	private static SyncAdapter sSyncAdapter = null;
 	// Object to use as a thread-safe lock
 	private static final Object sSyncAdapterLock = new Object();
 
@@ -27,11 +27,11 @@ public class SyncService extends Service {
 		 * Create the sync adapter as a singleton. Set the sync adapter as
 		 * syncable Disallow parallel syncs
 		 */
-		//synchronized (sSyncAdapterLock) {
-		//	if (sSyncAdapter == null) {
-				sSyncAdapter = new MySyncAdapter(getApplicationContext(), true);
-		//	}
-		//}
+		synchronized (sSyncAdapterLock) {
+			if (sSyncAdapter == null) {
+				sSyncAdapter = new SyncAdapter(getApplicationContext(), true);
+			}
+		}
 	}
 
 	/**
