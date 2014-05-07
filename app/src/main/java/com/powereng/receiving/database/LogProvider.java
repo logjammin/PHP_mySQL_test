@@ -49,7 +49,7 @@ public class LogProvider extends ContentProvider {
 			}
 			sb.append(LogEntry.COL_ID + " IS ?");
 			args.add(uri.getLastPathSegment());
-			values.put(LogEntry.COL_DELETED, 1);
+			values.put(LogEntry.COL_SYNC_STATUS, 3);
 			break;
 		default:
 			throw new IllegalArgumentException("Unknown URI " + uri);
@@ -94,6 +94,7 @@ public class LogProvider extends ContentProvider {
 		// Write to DB
 		final SQLiteDatabase db = DatabaseHandler.getInstance(getContext())
 				.getWritableDatabase();
+        values.put(LogEntry.COL_SYNC_STATUS, 1);
 		final long id = db.insert(table, null, values);
 
 		if (id > 0) {
@@ -134,7 +135,7 @@ public class LogProvider extends ContentProvider {
                 }
                 sb.append(LogEntry.COL_ID + " IS ?");
                 args.add(uri.getLastPathSegment());
-                values.put(LogEntry.COL_SYNCED, 0);
+                values.put(LogEntry.COL_SYNC_STATUS, 2);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);

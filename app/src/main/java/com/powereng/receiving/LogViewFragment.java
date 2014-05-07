@@ -60,10 +60,10 @@ public class LogViewFragment extends Fragment {
 
 		mAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.list_item, null,
-				new String[] { LogEntry.COL_TIMESTAMP, LogEntry.COL_TRACKING, LogEntry.COL_CARRIER,
+				new String[] {LogEntry.COL_TRACKING, LogEntry.COL_CARRIER,
                 LogEntry.COL_SENDER, LogEntry.COL_RECIPIENT, LogEntry.COL_NUMPACKAGES,
-                LogEntry.COL_PONUM, LogEntry.COL_SIG},
-				new int[] { R.id.date, R.id.tracking, R.id.carrier, R.id.sender,
+                LogEntry.COL_PONUM, LogEntry.COL_SIG, LogEntry.COL_TIMESTAMP},
+				new int[] { R.id.tracking, R.id.carrier, R.id.sender,
                         R.id.recipient, R.id.numpackages, R.id.ponum, R.id.signature }, 0);
 	}
 
@@ -160,7 +160,7 @@ public class LogViewFragment extends Fragment {
 			@Override
 			public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 				return new CursorLoader(getActivity(), LogEntry.URI(),
-						LogEntry.FIELDS, LogEntry.COL_DELETED + " IS 0", null,
+						LogEntry.FIELDS, LogEntry.COL_SYNC_STATUS + " IS NOT 3", null,
 						LogEntry.COL_TIMESTAMP + " DESC");
 			}
 

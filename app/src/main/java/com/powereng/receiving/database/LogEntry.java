@@ -28,16 +28,14 @@ public class LogEntry extends DBItem {
     public static final String COL_RECIPIENT = "recipient";
     public static final String COL_PONUM = "ponum";
     public static final String COL_SIG = "signature";
-    public static final String COL_DELETED = "deleted";
-    public static final String COL_SYNCED = "synced";
+    public static final String COL_SYNC_STATUS = "sync_status";
 
     // For database projection so order is consistent
-    public static final String[] FIELDS = { COL__ID, COL_TIMESTAMP, COL_TRACKING,
+    public static final String[] FIELDS = { COL__ID, COL_TRACKING,
             COL_CARRIER, COL_NUMPACKAGES, COL_SENDER, COL_RECIPIENT,
-            COL_PONUM, COL_SIG, COL_DELETED, COL_SYNCED };
+            COL_PONUM, COL_SIG, COL_TIMESTAMP, COL_SYNC_STATUS};
 
     public long _id = -1;
-    public String timestamp = null;
     public String tracking;
     public String carrier;
     public String numpackages;
@@ -45,8 +43,8 @@ public class LogEntry extends DBItem {
     public String recipient;
     public String ponum;
     public String sig;
-    public long deleted = 0;
-    public long synced = 0;
+    public String timestamp = null;
+    public int sync_status = 0;
 
     public static final int BASEURICODE = 0x3b109c7;
     public static final int BASEITEMCODE = 0x87a22b7;
@@ -67,21 +65,20 @@ public class LogEntry extends DBItem {
         super();
         // Projection expected to match FIELDS array
         this._id = cursor.getLong(0);
-        this.timestamp = cursor.getString(1);
-        this.tracking = cursor.getString(2);
-        this.carrier = cursor.getString(3);
-        this.numpackages = cursor.getString(4);
-        this.sender = cursor.getString(5);
-        this.recipient = cursor.getString(6);
-        this.ponum = cursor.getString(7);
-        this.sig = cursor.getString(8);
-        this.deleted = cursor.getLong(9);
-        this.synced = cursor.getLong(10);
+        this.tracking = cursor.getString(1);
+        this.carrier = cursor.getString(2);
+        this.numpackages = cursor.getString(3);
+        this.sender = cursor.getString(4);
+        this.recipient = cursor.getString(5);
+        this.ponum = cursor.getString(6);
+        this.sig = cursor.getString(7);
+        this.timestamp = cursor.getString(8);
+        this.sync_status = cursor.getInt(9);
     }
 
     public ContentValues getContent() {
         ContentValues values = new ContentValues();
-        if (timestamp != null) values.put(COL_TIMESTAMP, timestamp);
+        if (tracking != null)
         values.put(COL_TRACKING, tracking);
         values.put(COL_CARRIER, carrier);
         values.put(COL_NUMPACKAGES, numpackages);
@@ -89,8 +86,8 @@ public class LogEntry extends DBItem {
         values.put(COL_RECIPIENT, recipient);
         values.put(COL_PONUM, ponum);
         values.put(COL_SIG, sig);
-        values.put(COL_DELETED, deleted);
-        values.put(COL_SYNCED, synced);
+        values.put(COL_TIMESTAMP, timestamp);
+        values.put(COL_SYNC_STATUS, sync_status);
         return values;
     }
 
@@ -113,7 +110,6 @@ public class LogEntry extends DBItem {
     public static final String CREATE_TABLE =
 "CREATE TABLE " + TABLE_NAME
 +"  (_id INTEGER PRIMARY KEY,"
-+"  timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
 +"  tracking TEXT NOT NULL,"
 +"  carrier TEXT NULL,"
 +"  numpackages TEXT NULL,"
@@ -121,8 +117,8 @@ public class LogEntry extends DBItem {
 +"  recipient TEXT NULL,"
 +"  ponum TEXT NULL,"
 +"  signature TEXT NULL,"
-+"  deleted INTEGER NOT NULL DEFAULT 0,"
-+"  synced INTEGER NOT NULL DEFAULT 0,"
++"  timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
++"  sync_status INTEGER NOT NULL DEFAULT 1,"
 +""
 +"  UNIQUE (tracking) ON CONFLICT IGNORE,"
 +"  UNIQUE (timestamp) ON CONFLICT IGNORE);";

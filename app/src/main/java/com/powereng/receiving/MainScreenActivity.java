@@ -41,6 +41,7 @@ public class MainScreenActivity extends Activity{
 
             @Override
             public void onClick(View view) {
+
                 SyncUtils.TriggerRefresh();
 
             }

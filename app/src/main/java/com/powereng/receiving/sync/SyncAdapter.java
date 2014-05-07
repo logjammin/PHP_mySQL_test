@@ -13,15 +13,18 @@ import android.util.Log;
 import com.powereng.receiving.database.DatabaseHandler;
 import com.powereng.receiving.database.LogEntry;
 
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-
 import retrofit.RetrofitError;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
 	private static final String TAG = "LogSyncAdapter";
 	private static final String KEY_LASTSYNC = "key_lastsync";
+    private static final int SYNCED = 0;
+    private static final int INSERT = 1;
+    private static final int UPDATE = 2;
+    private static final int DELETE = 3;
+
+
     Context mContext;
 	public SyncAdapter(Context context, boolean autoInitialize) {
 		super(context, autoInitialize);
@@ -61,31 +64,35 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 			DatabaseHandler db = DatabaseHandler.getInstance(getContext());
 
 			// Upload stuff
-			for (LogEntry entry : db.getAllLogEntries(LogEntry.COL_SYNCED
-					+ " IS 0 OR " + LogEntry.COL_DELETED + " IS 1", null, null)) {
-				if (entry.deleted != 0) {
-					// Delete the item
-					server.deleteEntry(token, entry.tracking);
-					syncResult.stats.numDeletes++;
-					db.deleteEntry(entry);
-				}
-				else {
-					//server.addEntry(token, new LogServer.LogMSG(entry));
+			for (LogEntry entry : db.getAllLogEntries(LogEntry.COL_SYNC_STATUS
+					+ " IS NOT " + SYNCED, null, null)) {
 
-                    HashMap entryMap = new HashMap();
-                    entryMap.put("tracking", entry.tracking);
-                    entryMap.put("carrier", entry.carrier);
-                    entryMap.put("numpackages", entry.numpackages);
-                    entryMap.put("sender", entry.sender);
-                    entryMap.put("recipient", entry.recipient);
-                    entryMap.put("ponum", entry.ponum);
-                    entryMap.put("sig", entry.sig);
-                    //TODO: change server to read from request body.
-                    server.addEntry(token, entryMap);
-					syncResult.stats.numInserts++;
-					entry.synced = 1;
-					db.putEntry(entry);
-				}
+                switch(entry.sync_status) {
+
+                    case DELETE:
+                        server.deleteEntry(token, entry.tracking);
+                        db.deleteEntry(entry);
+                        break;
+
+                    case INSERT:
+                        server.addEntry(token, new LogServer.LogMSG(entry));
+                        //TODO: needs some kind of error checking
+                        syncResult.stats.numInserts++;
+                        //flag entry as "synced" in local db
+                        entry.sync_status = SYNCED;
+                        db.putEntry(entry);
+
+                        break;
+
+                    case UPDATE:
+                        server.updateEntry(token, entry.tracking, new LogServer.LogMSG(entry));
+                        syncResult.stats.numUpdates++;
+                        //flag entry as "synced" in local db
+                        entry.sync_status = SYNCED;
+                        db.putEntry(entry);
+                        break;
+                }
+
 			}
 
 			// Download stuff - but only if this is not an upload-only sync
@@ -94,17 +101,18 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 				final String lastSync = PreferenceManager
 						.getDefaultSharedPreferences(getContext()).getString(
 								KEY_LASTSYNC, null);
+                //final String lastSync = "2014-04-30 12:24:40.0";
 
 				final LogServer.LogEntries entries;
 				if (lastSync != null && !lastSync.isEmpty()) {
 
-					//entries = server.listEntries(token, "true", lastSync);
-                    entries = server.listEntries(token);
+					entries = server.listEntries(token, lastSync);
+                    //entries = server.listEntries(token);
                 }
 
 				else {
-                    //entries = server.listEntries(token, "false", lastSync);
-					entries = server.listEntries(token);
+                    entries = server.listEntries(token, lastSync);
+					//entries = server.listEntries(token);
 				}
 
 				if (entries != null && entries.entries != null) {
@@ -117,16 +125,16 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 						//}
 						//else {
 							Log.d(TAG, "Adding tracking:" + entry.tracking);
-							entry.synced = 1;
+							entry.sync_status = SYNCED;
 							db.putEntry(entry);
 						//}
 					}
 				}
 
 				// Save sync timestamp
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				PreferenceManager.getDefaultSharedPreferences(getContext())
-						.edit().putString(KEY_LASTSYNC, String.valueOf(sdf))
+						.edit().putString(KEY_LASTSYNC, entries.latestTimestamp)
 						.commit();
 			}
 		}

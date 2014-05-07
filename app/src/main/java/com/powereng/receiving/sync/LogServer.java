@@ -3,31 +3,31 @@ package com.powereng.receiving.sync;
 import com.powereng.receiving.database.LogEntry;
 
 import java.util.List;
-import java.util.Map;
 
 import retrofit.client.Response;
+import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
 import retrofit.http.Header;
 import retrofit.http.POST;
+import retrofit.http.PUT;
 import retrofit.http.Path;
-import retrofit.http.QueryMap;
+import retrofit.http.Query;
 
 /**
 * Created by qgallup on 5/2/2014.
 */
 public interface LogServer {
 
-    public static final String API_URL = "http://10.102.5.229";
+    public static final String API_URL = "http://boi40310ll.powereng.com";
 
     public static class LogEntries {
-        //String latestTimestamp;
+        String latestTimestamp;
         List<LogMSG> entries;
     }
 
 
     public static class LogMSG {
-        String timestamp;
         String tracking;
         String carrier;
         String numpackages;
@@ -35,7 +35,8 @@ public interface LogServer {
         String recipient;
         String ponum;
         String sig;
-        //boolean deleted;
+        String timestamp;
+        int sync_status;
 
 
         public LogMSG(LogEntry entry) {
@@ -46,12 +47,13 @@ public interface LogServer {
             recipient = entry.recipient;
             ponum = entry.ponum;
             sig = entry.sig;
-            //deleted = (entry.deleted == 1);
+            timestamp = entry.timestamp;
+            sync_status = entry.sync_status;
         }
 
         public LogEntry toDBItem() {
             final LogEntry entry = new LogEntry();
-            //entry.timestamp = timestamp;
+
             entry.tracking = tracking;
             entry.carrier = carrier;
             entry.numpackages = numpackages;
@@ -59,10 +61,8 @@ public interface LogServer {
             entry.recipient = recipient;
             entry.ponum = ponum;
             entry.sig = sig;
-
-            /*if (deleted) {
-                entry.deleted = 1;
-            }*/
+            entry.timestamp = timestamp;
+            entry.sync_status = sync_status;
             return entry;
         }
     }
@@ -73,22 +73,20 @@ public interface LogServer {
     }
 
     @GET("/receiving/v1/packages")
-    LogEntries listEntries(@Header("Authorization") String token);
+    LogEntries listEntries(@Header("Authorization") String token,
                            //@Query("showDeleted") String showDeleted,
-                           //@Query("timestampMin") String timestampMin);
+                           @Query("timestampMin") String timestampMin);
 
     @GET("/receiving/v1/packages/{tracking}")
     LogMSG getEntry(@Header("Authorization") String token, @Path("tracking") String tracking);
 
+    @PUT("/receiving/v1/packages/{tracking}")
+    Response updateEntry(@Header("Authorization") String token, @Path("tracking") String tracking, @Body LogMSG item);
 
     @DELETE("/receiving/v1/packages/{tracking}")
-    Dummy deleteEntry(@Header("Authorization") String token, @Path("tracking") String tracking);
-
+    Response deleteEntry(@Header("Authorization") String token, @Path("tracking") String tracking);
 
     @POST("/receiving/v1/packages")
-    Response addEntry(@Header("Authorization") String token, @QueryMap Map params);
-
-    /*    @POST("/receiving/v1/packages")
-    LogMSG addEntry(@Header("Authorization") String token, @Body LogMSG item);*/
+    Response addEntry(@Header("Authorization") String token, @Body LogMSG item);
 
 }

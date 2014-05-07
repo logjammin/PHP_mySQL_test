@@ -72,7 +72,7 @@ public class AddLogEntryService extends IntentService {
         values.put(LogEntry.COL_SENDER, list.get(3));
         values.put(LogEntry.COL_RECIPIENT, list.get(4));
         values.put(LogEntry.COL_PONUM, list.get(5));
-        values.put(LogEntry.COL_SYNCED, 0);
+        values.put(LogEntry.COL_SYNC_STATUS, 2);
 
         getContentResolver().update(uri, values, null, null);
     }
@@ -93,7 +93,7 @@ public class AddLogEntryService extends IntentService {
         values.put(LogEntry.COL_SENDER, list.get(3));
         values.put(LogEntry.COL_RECIPIENT, list.get(4));
         values.put(LogEntry.COL_PONUM, list.get(5));
-        values.put(LogEntry.COL_SYNCED, 0);
+        values.put(LogEntry.COL_SYNC_STATUS, 1);
 
 		getContentResolver().insert(LogEntry.URI(), values);
 	}

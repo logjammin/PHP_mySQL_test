@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.powereng.receiving.accounts.GenericAccountService;
 import com.powereng.receiving.database.LogProvider;
@@ -20,7 +21,7 @@ public class SyncUtils {
     private static final long SYNC_FREQUENCY = 60 * 60;  // 1 hour (in seconds)
     private static final String CONTENT_AUTHORITY = LogProvider.AUTHORITY;
     private static final String PREF_SETUP_COMPLETE = "setup_complete";
-
+    private static final String TAG = "Powereng Receiving";
 
     public static void CreateSyncAccount(Context context) {
         boolean newAccount = false;
@@ -76,8 +77,16 @@ public class SyncUtils {
     }
 
     public static LogServer getRESTAdapter() {
-        RestAdapter restAdapter = new RestAdapter.Builder().setServer(
-                LogServer.API_URL).build();
+        RestAdapter restAdapter = (new RestAdapter.Builder()).
+                setEndpoint(LogServer.API_URL).
+                setLogLevel(RestAdapter.LogLevel.FULL).
+                setLog(new RestAdapter.Log() {
+                    @Override
+                    public void log(String msg) {
+                        Log.i(TAG, msg);
+                    }
+                }).
+                build();
         return restAdapter.create(LogServer.class);
     }
 
