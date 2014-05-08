@@ -32,12 +32,12 @@
             android:label="@string/log_name" >
         </activity>
 
-        <!-- CaptureSignature Activity -->
+        <!-- CaptureSignature Activity
         <activity
             android:name="com.powereng.receiving.CaptureSignature"
             android:label="Capture Signature"
             android:theme="@android:style/Theme.Holo.Dialog" >
-        </activity>
+        </activity> -->
 
 
         <provider

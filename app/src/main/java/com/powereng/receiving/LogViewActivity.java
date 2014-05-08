@@ -3,6 +3,7 @@ package com.powereng.receiving;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.Window;
 
 //TODO:create PoViewActivity
 public class LogViewActivity extends Activity {
@@ -11,7 +12,9 @@ public class LogViewActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_log_view);
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.activity_log_view);
 
 		getFragmentManager().beginTransaction()
 				.add(R.id.mainContent, new LogViewFragment()).commit();

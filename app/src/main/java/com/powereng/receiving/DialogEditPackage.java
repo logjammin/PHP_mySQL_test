@@ -1,8 +1,9 @@
 package com.powereng.receiving;
 
 import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -30,6 +31,7 @@ public class DialogEditPackage extends DialogFragment {
 
     EditText inputTracking;
     Button btnScan;
+    Button btnSig;
     Spinner inputCarrier;
     EditText inputNumpackages;
     EditText inputSender;
@@ -42,9 +44,7 @@ public class DialogEditPackage extends DialogFragment {
     String sender;
     String recipient;
     String ponum;
-    Long itemId;
-    String date;
-    Cursor mCursor;
+
     LogEntry entry;
 
 /*    public DialogEditPackage(Cursor cursor) {
@@ -104,7 +104,7 @@ public class DialogEditPackage extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         getDialog().setTitle(R.string.edit_package);
-        final View v = inflater.inflate(R.layout.dialog_add_package, container,
+        final View v = inflater.inflate(R.layout.dialog_edit_package, container,
                 false);
 
         inputTracking = (EditText) v.findViewById(R.id.inputTracking);
@@ -121,7 +121,7 @@ public class DialogEditPackage extends DialogFragment {
         inputRecipient.setText(recipient);
         inputPoNum.setText(ponum);
 
-
+        btnSig = (Button) v.findViewById(R.id.btnGetSignature);
         btnScan = (Button) v.findViewById(R.id.btnScan);
 
         btnScan.setOnClickListener(new View.OnClickListener() {
@@ -158,14 +158,6 @@ public class DialogEditPackage extends DialogFragment {
 
                         Bundle params = new Bundle();
 
-//                        params.putString("tracking", tracking);
-//                        params.putString("carrier", carrier);
-//                        params.putString("numpackages", numpackages);
-//                        params.putString("sender", sender);
-//                        params.putString("recipient", recipient);
-//                        params.putString("ponum", ponum);
-
-
                         Uri uri = entry.getUri();
                         String entryUri = uri.toString();
                         params.putString("uri", entryUri);
@@ -180,7 +172,33 @@ public class DialogEditPackage extends DialogFragment {
                 }
         );
 
+        btnSig.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getSignature();
+            }
+        });
+
         return v;
+    }
+
+    public void getSignature() {
+        Fragment signatureFragment = new CaptureSignature();
+
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+
+        Fragment sig = getChildFragmentManager().findFragmentByTag("signature");
+
+        if (sig != null) {
+            transaction.remove(sig);
+            btnSig.setEnabled(true);
+        } else {
+            transaction.add(R.id.fragment_container, signatureFragment, "signature").commit();
+            btnSig.setEnabled(false);
+        }
+
+
+
     }
 
     @Override

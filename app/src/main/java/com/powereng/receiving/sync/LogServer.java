@@ -19,7 +19,7 @@ import retrofit.http.Query;
 */
 public interface LogServer {
 
-    public static final String API_URL = "http://boi40310ll.powereng.com";
+    public static final String API_URL = "http://10.102.5.229";
 
     public static class LogEntries {
         String latestTimestamp;
