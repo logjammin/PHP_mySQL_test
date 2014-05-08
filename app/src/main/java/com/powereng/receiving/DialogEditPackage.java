@@ -154,8 +154,8 @@ public class DialogEditPackage extends DialogFragment {
 
                     @Override
                     public void onClick(View v) {
-                        mView.setDrawingCacheEnabled(true);
-                        save(mView);
+                        paintView.setDrawingCacheEnabled(true);
+                        save(paintView);
                         ArrayList<String> list = new ArrayList<String>();
                         //list.add(entry.getUri());
                         list.add(inputTracking.getText().toString());
