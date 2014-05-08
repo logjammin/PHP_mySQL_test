@@ -1,23 +1,29 @@
 package com.powereng.receiving;
 
 import android.app.DialogFragment;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Spinner;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.powereng.receiving.database.LogEntry;
 
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 /**
@@ -37,14 +43,15 @@ public class DialogEditPackage extends DialogFragment {
     EditText inputSender;
     EditText inputRecipient;
     EditText inputPoNum;
-
+    FingerPaintView paintView;
+    View mView;
     String tracking;
     String carrier;
     String numpackages;
     String sender;
     String recipient;
     String ponum;
-
+    FrameLayout mSignature;
     LogEntry entry;
 
 /*    public DialogEditPackage(Cursor cursor) {
@@ -113,14 +120,14 @@ public class DialogEditPackage extends DialogFragment {
         inputSender = (EditText) v.findViewById(R.id.inputSender);
         inputRecipient = (EditText) v.findViewById(R.id.inputRecipient);
         inputPoNum = (EditText) v.findViewById(R.id.inputPoNum);
-
+        paintView = (FingerPaintView) v.findViewById(R.id.myPaintView);
         inputNumpackages.setText(numpackages);
         inputTracking.setText(tracking);
         inputCarrier.setSelection(getCarrierNumber(carrier));
         inputSender.setText(sender);
         inputRecipient.setText(recipient);
         inputPoNum.setText(ponum);
-
+        mSignature = (FrameLayout) v.findViewById(R.id.signatureFrame);
         btnSig = (Button) v.findViewById(R.id.btnGetSignature);
         btnScan = (Button) v.findViewById(R.id.btnScan);
 
@@ -147,6 +154,8 @@ public class DialogEditPackage extends DialogFragment {
 
                     @Override
                     public void onClick(View v) {
+                        mView.setDrawingCacheEnabled(true);
+                        save(mView);
                         ArrayList<String> list = new ArrayList<String>();
                         //list.add(entry.getUri());
                         list.add(inputTracking.getText().toString());
@@ -175,32 +184,87 @@ public class DialogEditPackage extends DialogFragment {
         btnSig.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                getSignature();
+                //getSignature();
+                int vis = mSignature.getVisibility();
+                if(vis != 0) {
+                    mSignature.setVisibility(View.VISIBLE);
+                } else {
+                    mSignature.invalidate();
+                    mSignature.setVisibility(View.GONE);
+                }
+
             }
         });
 
         return v;
     }
 
-    public void getSignature() {
+
+/*    public void getSignature() {
         Fragment signatureFragment = new CaptureSignature();
-
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-
         Fragment sig = getChildFragmentManager().findFragmentByTag("signature");
 
         if (sig != null) {
             transaction.remove(sig);
-            btnSig.setEnabled(true);
         } else {
             transaction.add(R.id.fragment_container, signatureFragment, "signature").commit();
-            btnSig.setEnabled(false);
+
         }
 
 
 
+    }*/
+    public void save(View view) {
+        //Log.v("log_tag", "Width: " + v.getWidth());
+        //Log.v("log_tag", "Height: " + v.getHeight());
+
+
+        Bitmap mBitmap = getBitmapFromView(view);
+
+
+        try {
+            String fileName = "img" + Math.random() + ".png";
+            FileOutputStream mFileOutStream;
+            mFileOutStream = getActivity().openFileOutput(fileName, Context.MODE_PRIVATE);
+
+            mBitmap.compress(Bitmap.CompressFormat.PNG, 90, mFileOutStream);
+
+            mFileOutStream.flush();
+            mFileOutStream.close();
+            //String url = MediaStore.Images.Media.insertImage(this.getContentResolver(), mBitmap, "title", null);
+            //Log.v("log_tag","url: " + url);
+            //In case you want to delete the file
+            //boolean deleted = mypath.delete();
+            //ReceivingLog.v("log_tag","deleted: " + mypath.toString() + deleted);
+            //If you want to convert the image to string use base64 converter
+
+        }
+        catch(Exception e) {
+            Log.v("log_tag", e.toString());
+        }
     }
 
+    public static Bitmap getBitmapFromView(View view) {
+
+        //Define a bitmap with the same size as the view
+        Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(),
+                view.getHeight(),Bitmap.Config.RGB_565);
+        //Bind a canvas to it
+        Canvas canvas = new Canvas(returnedBitmap);
+        //Get the view's background
+        Drawable bgDrawable =view.getBackground();
+        if (bgDrawable!=null)
+            //has background drawable, then draw it on the canvas
+            bgDrawable.draw(canvas);
+        else
+            //does not have background drawable, then draw white background on the canvas
+            canvas.drawColor(Color.WHITE);
+        // draw the view on the canvas
+        view.draw(canvas);
+        //return the bitmap
+        return returnedBitmap;
+    }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);

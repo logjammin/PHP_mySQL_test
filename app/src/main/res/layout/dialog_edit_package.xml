@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fragment_new_item"
+    android:id="@+id/fragment_edit_item"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -83,11 +83,69 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"/>
-
     <FrameLayout
-        android:id="@+id/fragment_container"
+        android:id="@+id/signatureFrame"
+        android:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent">
+        <TableLayout
+            android:layout_height="wrap_content"
+            android:id="@+id/tableLayout1"
+            android:layout_width="match_parent">
+
+            <TableRow android:id="@+id/tableRow1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView3"
+                    android:text="Your Name"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:layout_width="wrap_content"
+                    android:paddingLeft="10sp"
+                    android:layout_gravity="right" />
+
+                <AutoCompleteTextView
+                    android:layout_height="wrap_content"
+                    android:id="@+id/yourName"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:maxLength="30">
+                </AutoCompleteTextView>
+
+            </TableRow>
+
+            <TableRow
+                android:id="@+id/tableRow3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView4"
+                    android:text=""
+                    android:maxLength="30"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:layout_width="wrap_content" />
+
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView2"
+                    android:text="Please Sign below ..."
+                    android:maxLength="30"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:layout_width="wrap_content" />
+            </TableRow>
+
+        </TableLayout>
+        <view
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            class="com.powereng.receiving.FingerPaintView"
+            android:id="@+id/myPaintView" />
+    </FrameLayout>
+
 
     <include layout="@layout/dialog_ok_cancel" />
 

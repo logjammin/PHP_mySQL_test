@@ -2,14 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.powereng.receiving" >
 
-
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <application
         android:allowBackup="true"
@@ -26,19 +24,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name=".LogViewActivity"
+            android:name="com.powereng.receiving.LogViewActivity"
             android:label="@string/log_name" >
         </activity>
 
-        <!-- CaptureSignature Activity
+        <!--
+        CaptureSignature Activity
         <activity
             android:name="com.powereng.receiving.CaptureSignature"
             android:label="Capture Signature"
             android:theme="@android:style/Theme.Holo.Dialog" >
-        </activity> -->
-
+        </activity>
+        -->
 
         <provider
             android:name="com.powereng.receiving.database.LogProvider"
@@ -54,13 +52,11 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
-
-        <service android:name=".AddLogEntryService"
+        <service
+            android:name="com.powereng.receiving.AddLogEntryService"
             android:exported="false"
             android:label="@string/add_package" >
-
         </service>
-
         <service
             android:name="com.powereng.receiving.sync.SyncService"
             android:exported="true" >
@@ -72,6 +68,12 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/syncadapter" />
         </service>
+
+        <activity
+            android:name="com.powereng.receiving.FingerPaint"
+            android:label="@string/title_activity_finger_paint"
+            android:theme="@android:style/Theme.Holo.Dialog" >
+        </activity>
     </application>
 
 </manifest>

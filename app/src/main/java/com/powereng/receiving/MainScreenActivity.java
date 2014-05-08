@@ -50,7 +50,7 @@ public class MainScreenActivity extends Activity{
         btnSignature.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(),CaptureSignature.class);
+                Intent i = new Intent(getApplicationContext(),FingerPaint.class);
                 startActivity(i);
             }
         });

@@ -22,7 +22,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -71,10 +70,10 @@ public class CaptureSignature extends Fragment {
         mypath= new File(directory,current);
         final View v = inflater.inflate(R.layout.signature, container,
                 false);
-        mContent = (LinearLayout) v.findViewById(R.id.linearLayout);
-        mSignature = new signature(getActivity(), null);
-        mSignature.setBackgroundColor(Color.WHITE);
-        mContent.addView(mSignature, LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+        //mContent = (LinearLayout) v.findViewById(R.id.linearLayout);
+        //mSignature = new signature(getActivity(), null);
+       // mSignature.setBackgroundColor(Color.WHITE);
+        //mContent.addView(mSignature, LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
         mClear = (Button)v.findViewById(R.id.clear);
         mGetSign = (Button)v.findViewById(R.id.getsign);
         mGetSign.setEnabled(false);
@@ -205,8 +204,7 @@ public class CaptureSignature extends Fragment {
         }
     }
 
-    private boolean makedirs()
-    {
+    private boolean makedirs() {
         File tempdir = new File(tempDir);
         if (!tempdir.exists())
             tempdir.mkdirs();
