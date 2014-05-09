@@ -40,6 +40,7 @@ public class FingerPaint extends Activity{
     //Bitmap mBitmap;
     EditText yourName;
     View mView;
+    Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,7 @@ public class FingerPaint extends Activity{
         mClear = (Button)findViewById(R.id.clear);
         mGetSign = (Button)findViewById(R.id.getsign);
         mCancel = (Button)findViewById(R.id.cancel);
+
         mView = paintView;
         mClear.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -110,12 +112,10 @@ public class FingerPaint extends Activity{
 
             mFileOutStream.flush();
             mFileOutStream.close();
-            //String url = MediaStore.Images.Media.insertImage(this.getContentResolver(), mBitmap, "title", null);
-            //Log.v("log_tag","url: " + url);
-            //In case you want to delete the file
-            //boolean deleted = mypath.delete();
-            //ReceivingLog.v("log_tag","deleted: " + mypath.toString() + deleted);
-            //If you want to convert the image to string use base64 converter
+
+            Bundle bundle = new Bundle();
+            bundle.putString("fname", fileName);
+            AddLogEntryService.addSignature(this, bundle);
 
         }
         catch(Exception e)

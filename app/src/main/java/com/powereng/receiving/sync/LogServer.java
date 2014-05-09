@@ -9,10 +9,13 @@ import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
 import retrofit.http.Header;
+import retrofit.http.Multipart;
 import retrofit.http.POST;
 import retrofit.http.PUT;
+import retrofit.http.Part;
 import retrofit.http.Path;
 import retrofit.http.Query;
+import retrofit.mime.TypedFile;
 
 /**
 * Created by qgallup on 5/2/2014.
@@ -82,6 +85,11 @@ public interface LogServer {
 
     @PUT("/receiving/v1/packages/{tracking}")
     Response updateEntry(@Header("Authorization") String token, @Path("tracking") String tracking, @Body LogMSG item);
+
+    //update with signature
+    @Multipart
+    @POST("/receiving/v1/signature")
+    Response addSignature(@Header("Authorization") String token, @Part("signature")TypedFile signature);
 
     @DELETE("/receiving/v1/packages/{tracking}")
     Response deleteEntry(@Header("Authorization") String token, @Path("tracking") String tracking);

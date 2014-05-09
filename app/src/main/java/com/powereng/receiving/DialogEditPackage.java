@@ -26,19 +26,14 @@ import com.powereng.receiving.database.LogEntry;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 
-/**
- * Simple confirm dialog fragment.
- *
- */
 
 public class DialogEditPackage extends DialogFragment {
 
 
-
-    EditText inputTracking;
     Button btnScan;
     Button btnSig;
     Spinner inputCarrier;
+    EditText inputTracking;
     EditText inputNumpackages;
     EditText inputSender;
     EditText inputRecipient;
@@ -51,12 +46,13 @@ public class DialogEditPackage extends DialogFragment {
     String sender;
     String recipient;
     String ponum;
+    String sigName = "";
     FrameLayout mSignature;
     LogEntry entry;
+    Context mContext;
+    EditText yourName;
 
-/*    public DialogEditPackage(Cursor cursor) {
-        this.mCursor = cursor;
-    }*/
+
     public DialogEditPackage(LogEntry logEntry) {
         //this.itemId = id;
         this.entry = logEntry;
@@ -70,14 +66,13 @@ public class DialogEditPackage extends DialogFragment {
 
         //DatabaseHandler db = DatabaseHandler.getInstance(getActivity());
         //LogEntry entry = db.getLogEntry(itemId);
-
+        mContext = getActivity().getApplicationContext();
         tracking = entry.tracking;
         carrier = entry.carrier;
         numpackages = entry.numpackages;
         sender = entry.sender;
         recipient = entry.recipient;
         ponum = entry.ponum;
-
     }
 
     public static int getCarrierNumber(String s) {
@@ -101,7 +96,6 @@ public class DialogEditPackage extends DialogFragment {
 
         } else {
             carrierNumber = 5;
-
         }
         return carrierNumber;
     }
@@ -127,6 +121,8 @@ public class DialogEditPackage extends DialogFragment {
         inputSender.setText(sender);
         inputRecipient.setText(recipient);
         inputPoNum.setText(ponum);
+        yourName = (EditText) v.findViewById(R.id.yourName);
+
         mSignature = (FrameLayout) v.findViewById(R.id.signatureFrame);
         btnSig = (Button) v.findViewById(R.id.btnGetSignature);
         btnScan = (Button) v.findViewById(R.id.btnScan);
@@ -170,13 +166,21 @@ public class DialogEditPackage extends DialogFragment {
                         Uri uri = entry.getUri();
                         String entryUri = uri.toString();
                         params.putString("uri", entryUri);
-                        params.putStringArrayList("values", list);
-                        if (!params.isEmpty()) {
-                            // Add in background
-                            //TODO: check to see if anything changed. if not, no need to sync.
-                            AddLogEntryService.updateEntry(getActivity(), params);
-                            getDialog().dismiss();
+
+                        // Add in background
+                        int vis = mSignature.getVisibility();
+                        if(vis != 0) {
+                            params.putBoolean("signed", false);
+                        } else {
+                            sigName = tracking + yourName;
+                            if (save(paintView)) {
+                                params.putBoolean("signed", true);
+                                list.add(sigName);
+                            }
                         }
+                        params.putStringArrayList("values", list);
+                        AddLogEntryService.updateEntry(getActivity(), params);
+                        getDialog().dismiss();
                     }
                 }
         );
@@ -185,10 +189,13 @@ public class DialogEditPackage extends DialogFragment {
             @Override
             public void onClick(View v) {
                 //getSignature();
+
                 int vis = mSignature.getVisibility();
                 if(vis != 0) {
+                    yourName.setText(recipient);
                     mSignature.setVisibility(View.VISIBLE);
                 } else {
+                    yourName.setText("");
                     mSignature.invalidate();
                     mSignature.setVisibility(View.GONE);
                 }
@@ -211,38 +218,29 @@ public class DialogEditPackage extends DialogFragment {
             transaction.add(R.id.fragment_container, signatureFragment, "signature").commit();
 
         }
-
-
-
     }*/
-    public void save(View view) {
+
+    public Boolean save(View view) {
         //Log.v("log_tag", "Width: " + v.getWidth());
         //Log.v("log_tag", "Height: " + v.getHeight());
 
-
         Bitmap mBitmap = getBitmapFromView(view);
-
+        String fileName = null;
 
         try {
-            String fileName = "img" + Math.random() + ".png";
+            fileName = sigName + ".png";
+
             FileOutputStream mFileOutStream;
             mFileOutStream = getActivity().openFileOutput(fileName, Context.MODE_PRIVATE);
-
             mBitmap.compress(Bitmap.CompressFormat.PNG, 90, mFileOutStream);
-
             mFileOutStream.flush();
             mFileOutStream.close();
-            //String url = MediaStore.Images.Media.insertImage(this.getContentResolver(), mBitmap, "title", null);
-            //Log.v("log_tag","url: " + url);
-            //In case you want to delete the file
-            //boolean deleted = mypath.delete();
-            //ReceivingLog.v("log_tag","deleted: " + mypath.toString() + deleted);
-            //If you want to convert the image to string use base64 converter
-
-        }
-        catch(Exception e) {
+            return true;
+        } catch (Exception e) {
             Log.v("log_tag", e.toString());
+            return false;
         }
+
     }
 
     public static Bitmap getBitmapFromView(View view) {

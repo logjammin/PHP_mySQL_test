@@ -13,7 +13,10 @@ import android.util.Log;
 import com.powereng.receiving.database.DatabaseHandler;
 import com.powereng.receiving.database.LogEntry;
 
+import java.io.File;
+
 import retrofit.RetrofitError;
+import retrofit.mime.TypedFile;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
@@ -23,7 +26,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int INSERT = 1;
     private static final int UPDATE = 2;
     private static final int DELETE = 3;
-
+    private static final int SIGNED = 4;
 
     Context mContext;
 	public SyncAdapter(Context context, boolean autoInitialize) {
@@ -91,9 +94,22 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                         entry.sync_status = SYNCED;
                         db.putEntry(entry);
                         break;
-                }
 
+                    case SIGNED:
+                        String fileName = entry.sig + ".png";
+                        File file = new File(mContext.getFilesDir(), fileName);
+                        TypedFile outFile = new TypedFile("image/png", file);
+                        server.addSignature(token, outFile);
+                        server.updateEntry(token, entry.tracking, new LogServer.LogMSG(entry));
+                        syncResult.stats.numUpdates++;
+                        //flag entry as "synced" in local db
+                        entry.sync_status = SYNCED;
+                        db.putEntry(entry);
+                        break;
+                }
 			}
+
+
 
 			// Download stuff - but only if this is not an upload-only sync
 			if (!extras.getBoolean(ContentResolver.SYNC_EXTRAS_UPLOAD, false)) {
