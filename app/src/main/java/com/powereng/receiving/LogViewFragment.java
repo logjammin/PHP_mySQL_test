@@ -67,9 +67,16 @@ public class LogViewFragment extends Fragment {
                         R.id.recipient, R.id.numpackages, R.id.ponum, R.id.signature }, 0);
 	}
 
-	@Override
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+       // menu.clear();
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.log_fragment, menu);
+        menu.clear();
+        inflater.inflate(R.menu.log_fragment, menu);
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 

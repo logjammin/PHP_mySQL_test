@@ -19,6 +19,7 @@ package com.powereng.receiving;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
@@ -58,7 +59,7 @@ public class FingerPaintView extends View{
 
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
-        mPaint.setColor(0xFFFF0000);
+        mPaint.setColor(Color.BLACK);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
@@ -82,7 +83,7 @@ public class FingerPaintView extends View{
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawColor(0xFFAAAAAA);
+        canvas.drawColor(Color.WHITE);
 
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
 

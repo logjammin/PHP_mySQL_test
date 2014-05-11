@@ -20,7 +20,8 @@
             android:layout_margin="5dip"
             android:layout_marginBottom="15dip"
             android:ems="10"
-            android:gravity="center" />
+            android:gravity="center"
+            android:enabled="false" />
 
         <EditText android:id="@+id/inputTracking"
             android:layout_width="0dp"
@@ -29,7 +30,8 @@
             android:hint="@string/tracking"
             android:layout_margin="5dip"
             android:layout_marginBottom="15dip"
-            android:singleLine="true"/>
+            android:singleLine="true"
+            android:enabled="false" />
 
         <Button android:id="@+id/btnScan"
             android:layout_width="wrap_content"
@@ -51,22 +53,24 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
 
-        <EditText android:id="@+id/inputSender"
+        <AutoCompleteTextView android:id="@+id/inputSender"
             android:hint="@string/sender"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_margin="5dip"
-            android:singleLine="true"/>
+            android:singleLine="true"
+            android:enabled="false" />
 
-        <EditText android:id="@+id/inputRecipient"
+        <AutoCompleteTextView android:id="@+id/inputRecipient"
             android:hint="@string/recipient"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_margin="5dip"
             android:layout_marginBottom="15dip"
-            android:singleLine="true"/>
+            android:singleLine="true"
+            android:enabled="false" />
 
         <EditText android:id="@+id/inputPoNum"
             android:hint="@string/ponum"
@@ -75,7 +79,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dip"
             android:singleLine="true"
-            android:inputType="number"/>
+            android:inputType="number"
+            android:enabled="false" />
     </LinearLayout>
 
     <Button android:id="@+id/btnGetSignature"
@@ -83,16 +88,41 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"/>
-    <FrameLayout
-        android:id="@+id/signatureFrame"
-
+    <View
+        android:id="@+id/divider2"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <include layout="@layout/view_signature"/>
-        </FrameLayout>
-    <include layout="@layout/dialog_ok_cancel"
-        android:layout_weight="1"
-        android:layout_height="0dp"/>
+        android:layout_height="1dp"
+        android:background="?android:attr/dividerHorizontal" />
+
+    <LinearLayout
+        android:id="@+id/signatureFrame"
+        android:layout_width="match_parent"
+
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:layout_height="wrap_content">
+
+        <AutoCompleteTextView
+            android:layout_height="wrap_content"
+            android:id="@+id/yourName"
+            android:layout_width="274dp"
+            android:maxLength="30"
+            android:autoText="false"
+            android:hint="@string/recipient">
+        </AutoCompleteTextView>
+
+        <view
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/sig_box_height"
+        class="com.powereng.receiving.FingerPaintView"
+        android:id="@+id/myPaintView" />
+
+    </LinearLayout>
+
+
+
+    <include layout="@layout/dialog_ok_cancel"/>
+
 
 
 </LinearLayout>

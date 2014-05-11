@@ -16,7 +16,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -47,7 +47,7 @@ public class DialogEditPackage extends DialogFragment {
     String recipient;
     String ponum;
     String sigName = "";
-    FrameLayout mSignature;
+    LinearLayout mSignature;
     LogEntry entry;
     Context mContext;
     EditText yourName;
@@ -57,6 +57,7 @@ public class DialogEditPackage extends DialogFragment {
         //this.itemId = id;
         this.entry = logEntry;
     }
+    public DialogEditPackage(){}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -123,7 +124,7 @@ public class DialogEditPackage extends DialogFragment {
         inputPoNum.setText(ponum);
         yourName = (EditText) v.findViewById(R.id.yourName);
 
-        mSignature = (FrameLayout) v.findViewById(R.id.signatureFrame);
+        mSignature = (LinearLayout) v.findViewById(R.id.signatureFrame);
         btnSig = (Button) v.findViewById(R.id.btnGetSignature);
         btnScan = (Button) v.findViewById(R.id.btnScan);
 
@@ -151,7 +152,7 @@ public class DialogEditPackage extends DialogFragment {
                     @Override
                     public void onClick(View v) {
                         paintView.setDrawingCacheEnabled(true);
-                        save(paintView);
+
                         ArrayList<String> list = new ArrayList<String>();
                         //list.add(entry.getUri());
                         list.add(inputTracking.getText().toString());
@@ -172,6 +173,7 @@ public class DialogEditPackage extends DialogFragment {
                         if(vis != 0) {
                             params.putBoolean("signed", false);
                         } else {
+                            save(paintView);
                             sigName = tracking + yourName;
                             if (save(paintView)) {
                                 params.putBoolean("signed", true);
@@ -206,19 +208,6 @@ public class DialogEditPackage extends DialogFragment {
         return v;
     }
 
-
-/*    public void getSignature() {
-        Fragment signatureFragment = new CaptureSignature();
-        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        Fragment sig = getChildFragmentManager().findFragmentByTag("signature");
-
-        if (sig != null) {
-            transaction.remove(sig);
-        } else {
-            transaction.add(R.id.fragment_container, signatureFragment, "signature").commit();
-
-        }
-    }*/
 
     public Boolean save(View view) {
         //Log.v("log_tag", "Width: " + v.getWidth());
@@ -263,6 +252,7 @@ public class DialogEditPackage extends DialogFragment {
         //return the bitmap
         return returnedBitmap;
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
