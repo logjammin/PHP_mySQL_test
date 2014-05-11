@@ -12,7 +12,6 @@ public class LogViewActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-        //requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_log_view);
 
 		getFragmentManager().beginTransaction()

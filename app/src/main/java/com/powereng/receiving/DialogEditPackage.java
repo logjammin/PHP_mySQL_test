@@ -65,8 +65,7 @@ public class DialogEditPackage extends DialogFragment {
         setStyle(DialogFragment.STYLE_NORMAL,
                 android.R.style.Theme_Holo_Light_Dialog);
 
-        //DatabaseHandler db = DatabaseHandler.getInstance(getActivity());
-        //LogEntry entry = db.getLogEntry(itemId);
+        
         mContext = getActivity().getApplicationContext();
         tracking = entry.tracking;
         carrier = entry.carrier;
@@ -174,7 +173,7 @@ public class DialogEditPackage extends DialogFragment {
                             params.putBoolean("signed", false);
                         } else {
                             save(paintView);
-                            sigName = tracking + yourName;
+                            sigName = tracking + yourName.getText();
                             if (save(paintView)) {
                                 params.putBoolean("signed", true);
                                 list.add(sigName);
@@ -215,6 +214,7 @@ public class DialogEditPackage extends DialogFragment {
 
         Bitmap mBitmap = getBitmapFromView(view);
         String fileName = null;
+
 
         try {
             fileName = sigName + ".png";

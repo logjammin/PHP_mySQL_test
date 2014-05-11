@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -42,9 +43,11 @@ public class DialogAddPackage extends DialogFragment {
 		final EditText inputTracking = (EditText) v.findViewById(R.id.inputTracking);
         final Spinner inputCarrier = (Spinner) v.findViewById(R.id.inputCarrier);
         final EditText inputNumpackages = (EditText) v.findViewById(R.id.inputNumpackages);
-        final EditText inputSender = (EditText) v.findViewById(R.id.inputSender);
-        final EditText inputRecipient = (EditText) v.findViewById(R.id.inputRecipient);
+        final AutoCompleteTextView inputSender = (AutoCompleteTextView) v.findViewById(R.id.inputSender);
+        final AutoCompleteTextView inputRecipient = (AutoCompleteTextView) v.findViewById(R.id.inputRecipient);
         final EditText inputPoNum = (EditText) v.findViewById(R.id.inputPoNum);
+
+
 
         final Button btnScan = (Button) v.findViewById(R.id.btnScan);
 

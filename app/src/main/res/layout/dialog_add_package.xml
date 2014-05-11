@@ -51,7 +51,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
 
-        <EditText android:id="@+id/inputSender"
+        <AutoCompleteTextView android:id="@+id/inputSender"
             android:hint="@string/sender"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -59,7 +59,7 @@
             android:layout_margin="5dip"
             android:singleLine="true"/>
 
-        <EditText android:id="@+id/inputRecipient"
+        <AutoCompleteTextView android:id="@+id/inputRecipient"
             android:hint="@string/recipient"
             android:layout_width="0dp"
             android:layout_weight="1"
