@@ -48,15 +48,15 @@ public class DialogEditPackage extends DialogFragment {
     String ponum;
     String sigName = "";
     LinearLayout mSignature;
-    LogEntry entry;
+    private LogEntry entry;
     Context mContext;
     EditText yourName;
 
 
-    public DialogEditPackage(LogEntry logEntry) {
+    /*public DialogEditPackage(LogEntry logEntry) {
         //this.itemId = id;
         this.entry = logEntry;
-    }
+    }*/
     public DialogEditPackage(){}
 
     @Override
@@ -64,15 +64,16 @@ public class DialogEditPackage extends DialogFragment {
         super.onCreate(savedInstanceState);
         setStyle(DialogFragment.STYLE_NORMAL,
                 android.R.style.Theme_Holo_Light_Dialog);
-
-        
         mContext = getActivity().getApplicationContext();
+
         tracking = entry.tracking;
         carrier = entry.carrier;
         numpackages = entry.numpackages;
         sender = entry.sender;
         recipient = entry.recipient;
         ponum = entry.ponum;
+        setRetainInstance(true);
+
     }
 
     public static int getCarrierNumber(String s) {
@@ -172,9 +173,8 @@ public class DialogEditPackage extends DialogFragment {
                         if(vis != 0) {
                             params.putBoolean("signed", false);
                         } else {
-                            save(paintView);
-                            sigName = tracking + yourName.getText();
-                            if (save(paintView)) {
+                            sigName += yourName.getText();
+                            if (save(paintView, sigName)) {
                                 params.putBoolean("signed", true);
                                 list.add(sigName);
                             }
@@ -207,17 +207,22 @@ public class DialogEditPackage extends DialogFragment {
         return v;
     }
 
+    public void setLogEntry(LogEntry entry) {
+        this.entry = entry;
+    }
 
-    public Boolean save(View view) {
+    public LogEntry getEntry() {
+        return entry;
+    }
+
+    public Boolean save(View view, String name) {
         //Log.v("log_tag", "Width: " + v.getWidth());
         //Log.v("log_tag", "Height: " + v.getHeight());
 
         Bitmap mBitmap = getBitmapFromView(view);
-        String fileName = null;
-
+        String fileName = tracking + "_" + name + ".png";
 
         try {
-            fileName = sigName + ".png";
 
             FileOutputStream mFileOutStream;
             mFileOutStream = getActivity().openFileOutput(fileName, Context.MODE_PRIVATE);
@@ -252,6 +257,8 @@ public class DialogEditPackage extends DialogFragment {
         //return the bitmap
         return returnedBitmap;
     }
+
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {

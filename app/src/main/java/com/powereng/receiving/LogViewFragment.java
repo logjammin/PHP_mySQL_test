@@ -100,8 +100,8 @@ public class LogViewFragment extends Fragment {
 				 final LogEntry logEntry = new LogEntry((Cursor) mAdapter
 						.getItem(position));
 
-                DialogFragment dialog = new DialogEditPackage(logEntry);
-                dialog.show(getFragmentManager(), "edit_entry");
+                //DialogFragment dialog = new DialogEditPackage();
+                //dialog.show(getFragmentManager(), "edit_entry");
 
 			}
 		});

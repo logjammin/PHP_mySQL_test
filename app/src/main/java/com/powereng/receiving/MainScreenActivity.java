@@ -3,11 +3,13 @@ package com.powereng.receiving;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,7 +30,8 @@ import java.util.HashMap;
 public class MainScreenActivity extends Activity{
 
     private AbsListView mListView;
-
+    private DialogEditPackage editPackageFragment;
+    private LogEntry logEntry;
     /**
      * The Adapter which will be used to populate the ListView/GridView with
      * Views.
@@ -39,8 +42,24 @@ public class MainScreenActivity extends Activity{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            Log.i("MAINSCREENACTIVITY", " savedInstanceState not null.");
+        }
+
         setContentView(R.layout.fragment_log_list);
         SyncUtils.CreateSyncAccount(this);
+        //setting up the edit fragment to retain data on configuration change
+
+
+
+        FragmentManager fm = getFragmentManager();
+        editPackageFragment = (DialogEditPackage) fm.findFragmentByTag("editPackage");
+
+        if (editPackageFragment != null) {
+            logEntry = editPackageFragment.getEntry();
+            showEditDialog(fm, logEntry, true);
+        }
+
         mActionBar = getActionBar();
         mAdapter = new SimpleCursorAdapter(this,
                 R.layout.list_item, null,
@@ -61,12 +80,9 @@ public class MainScreenActivity extends Activity{
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1,
                                     int position, long id) {
-                final LogEntry logEntry = new LogEntry((Cursor) mAdapter
+                logEntry = new LogEntry((Cursor) mAdapter
                         .getItem(position));
-
-                DialogEditPackage dialog = new DialogEditPackage(logEntry);
-                dialog.show(getFragmentManager(), "edit_entry");
-
+                showEditDialog(fm, logEntry, false);
 
             }
         });
@@ -149,7 +165,35 @@ public class MainScreenActivity extends Activity{
         });
     }
 
+    @Override
+    protected void onDestroy() {
 
+        Log.i("MAIN SCREEN ACTIVITY", " called onDestroy");
+
+        super.onDestroy();
+    }
+
+    public void dialogEditPackage(FragmentManager fm, LogEntry entry, boolean active ) {
+
+
+        if (!active) {
+
+            logEntry = editPackageFragment.getEntry();
+            editPackageFragment.dismissAllowingStateLoss();
+            editPackageFragment = new DialogEditPackage();
+            editPackageFragment.show(fm,"editPackage");
+
+
+
+
+            //editPackageFragment.setLogEntry(logEntry);
+        } else {
+            editPackageFragment = new DialogEditPackage();
+            editPackageFragment.setLogEntry(logEntry);
+            editPackageFragment.show(fm, "editPackage");
+        }
+        editPackageFragment.show(fm, "editPackage");
+    }
 
     void deleteItems(Collection<LogEntry> entries) {
         for (LogEntry entry : entries) {
