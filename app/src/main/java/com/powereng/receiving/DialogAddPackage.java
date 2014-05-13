@@ -24,9 +24,10 @@ import java.util.ArrayList;
 
 public class DialogAddPackage extends DialogFragment {
 
-	public DialogAddPackage() {
-	}
+	public DialogAddPackage() {}
+
     EditText inputTracking;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -73,7 +74,7 @@ public class DialogAddPackage extends DialogFragment {
 
 					@Override
 					public void onClick(View v) {
-
+                        //make sure tracking number is set
                         if (inputTracking.getText() != null) {
                             ArrayList<String> list = new ArrayList<String>();
                             list.add(inputTracking.getText().toString());
@@ -91,6 +92,7 @@ public class DialogAddPackage extends DialogFragment {
                                 AddLogEntryService.addEntry(getActivity(), params);
                                 getDialog().dismiss();
                             }
+                          //notify user that tracking number can't be empty
                         } else Toast.makeText(getActivity(),"Tracking cannot be empty!", Toast.LENGTH_SHORT).show();
 					}
 				});

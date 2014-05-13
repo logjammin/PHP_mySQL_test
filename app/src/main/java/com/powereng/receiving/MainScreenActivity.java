@@ -25,14 +25,27 @@ import android.widget.Toast;
 import com.powereng.receiving.database.LogEntry;
 import com.powereng.receiving.sync.SyncUtils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 
-public class MainScreenActivity extends Activity implements DialogInterface {
+public class MainScreenActivity extends Activity implements DialogInterface, ActionBar.OnNavigationListener {
 
     private AbsListView mListView;
     private DialogEditPackage editPackageFragment;
     private static String TAG = "MainScreenActivity";
+    private String mSelection = "";
+    public static final int DAY = 2;
+    public static final int WEEK = 3;
+    public static final int MONTH = 4;
+    private LogViewAdapter mActionBarMenuSpinnerAdapter;
+    private static final int BUTTON_DAY_INDEX = 0;
+    private static final int BUTTON_WEEK_INDEX = 1;
+    private static final int BUTTON_MONTH_INDEX = 2;
+    private boolean mIsTabletConfig = true;
     /**
      * The Adapter which will be used to populate the ListView/GridView with
      * Views.
@@ -43,16 +56,14 @@ public class MainScreenActivity extends Activity implements DialogInterface {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
-            Log.i("MAINSCREENACTIVITY", " savedInstanceState not null.");
-        }
-
         setContentView(R.layout.fragment_log_list);
+
         SyncUtils.CreateSyncAccount(this);
+
+        mActionBar = getActionBar();
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+
         //setting up the edit fragment to retain data on configuration change
-
-
-
         FragmentManager fm = getFragmentManager();
         editPackageFragment = (DialogEditPackage) fm.findFragmentByTag("editPackage");
 
@@ -63,7 +74,10 @@ public class MainScreenActivity extends Activity implements DialogInterface {
 
         }
 
-        mActionBar = getActionBar();
+        //SpinnerAdapter yodawg = ArrayAdapter.createFromResource(this, R.array.buttons_list,
+         //       android.R.layout.simple_spinner_dropdown_item);
+        //mActionBar.setListNavigationCallbacks(yodawg, mListener);
+        configureActionBar(DAY);
         mAdapter = new SimpleCursorAdapter(this,
                 R.layout.list_item, null,
                 new String[] {LogEntry.COL_TRACKING, LogEntry.COL_CARRIER,
@@ -157,7 +171,7 @@ public class MainScreenActivity extends Activity implements DialogInterface {
             @Override
             public Loader<Cursor> onCreateLoader(int id, Bundle args) {
                 return new CursorLoader(getApplicationContext(), LogEntry.URI(),
-                        LogEntry.FIELDS, LogEntry.COL_SYNC_STATUS + " IS NOT 3", null,
+                        LogEntry.FIELDS, mSelection + LogEntry.COL_SYNC_STATUS + " IS NOT 3", null,
                         LogEntry.COL_TIMESTAMP + " DESC");
             }
 
@@ -171,6 +185,61 @@ public class MainScreenActivity extends Activity implements DialogInterface {
                 mAdapter.swapCursor(null);
             }
         });
+    }
+
+
+
+    private void configureActionBar(int viewType) {
+        createButtonsSpinner(viewType);
+       // if (mIsMultipane) {
+        //    mActionBar.setDisplayOptions(
+         //           ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
+       // } else {
+            mActionBar.setDisplayOptions(0);
+       // }
+    }
+
+    private void createButtonsSpinner(int viewType) {
+        // If tablet configuration , show spinner with no dates
+        mActionBarMenuSpinnerAdapter = new LogViewAdapter (this, viewType, true);
+        mActionBar = getActionBar();
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        mActionBar.setListNavigationCallbacks(mActionBarMenuSpinnerAdapter, this);
+        switch (viewType) {
+            case DAY:
+                mActionBar.setSelectedNavigationItem(BUTTON_DAY_INDEX);
+                break;
+            case WEEK:
+                mActionBar.setSelectedNavigationItem(BUTTON_WEEK_INDEX);
+                break;
+            case MONTH:
+                mActionBar.setSelectedNavigationItem(BUTTON_MONTH_INDEX);
+                break;
+            default:
+                mActionBar.setSelectedNavigationItem(BUTTON_DAY_INDEX);
+                break;
+        }
+    }
+
+
+
+    public void dateView(){
+
+        //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+        Log.i(TAG, "" + c.get(Calendar.DAY_OF_MONTH));
+        Log.i(TAG, "" + c.get(Calendar.DAY_OF_WEEK));
+        int monday = c.get(Calendar.DAY_OF_MONTH) - c.get(Calendar.DAY_OF_WEEK)+2;
+        int friday = monday + 5;
+        DateFormat sdf = SimpleDateFormat.getInstance();
+
+
+
+        c.set(Calendar.DAY_OF_MONTH, monday);
+
+        Log.i(TAG, "Date "+c.getTime());
     }
 
 
@@ -247,5 +316,38 @@ public class MainScreenActivity extends Activity implements DialogInterface {
     void showAddDialog() {
         DialogFragment dialog = new DialogAddPackage();
         dialog.show(getFragmentManager(), "add_entry");
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+       /* switch (itemPosition) {
+            case CalendarViewAdapter.DAY_BUTTON_INDEX:
+                if (mCurrentView != ViewType.DAY) {
+                    mController.sendEvent(this, EventType.GO_TO, null, null, -1, ViewType.DAY);
+                }
+                break;
+            case CalendarViewAdapter.WEEK_BUTTON_INDEX:
+                if (mCurrentView != ViewType.WEEK) {
+                    mController.sendEvent(this, EventType.GO_TO, null, null, -1, ViewType.WEEK);
+                }
+                break;
+            case CalendarViewAdapter.MONTH_BUTTON_INDEX:
+                if (mCurrentView != ViewType.MONTH) {
+                    mController.sendEvent(this, EventType.GO_TO, null, null, -1, ViewType.MONTH);
+                }
+                break;
+            case CalendarViewAdapter.AGENDA_BUTTON_INDEX:
+                if (mCurrentView != ViewType.AGENDA) {
+                    mController.sendEvent(this, EventType.GO_TO, null, null, -1, ViewType.AGENDA);
+                }
+                break;
+            default:
+                Log.w(TAG, "ItemSelected event from unknown button: " + itemPosition);
+                Log.w(TAG, "CurrentView:" + mCurrentView + " Button:" + itemPosition +
+                        " Day:" + mDayTab + " Week:" + mWeekTab + " Month:" + mMonthTab +
+                        " Agenda:" + mAgendaTab);
+                break;
+        }*/
+        return false;
     }
 }

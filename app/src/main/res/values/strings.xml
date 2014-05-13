@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
     <string name="app_name">Powereng Receiving</string>
     <string name="hello_world">Hello world!</string>
@@ -47,5 +47,12 @@
     <string name="action_example">Example action</string>
     <string name="get_signature">Get Signature</string>
     <string name="title_activity_finger_paint">FingerPaint</string>
-
+    <string name="agenda_today">Today</string>
+    <string name="agenda_yesterday">Yesterday</string>
+    <string name="agenda_tomorrow">Tomorrow</string>
+    <!-- This is for displaying the week of the year near the date. Eg. "January, 2011 Week 1" -->
+    <plurals name="weekN">
+        <!-- Label for displaying week of the year for all week values [CHAR LIMIT=16] -->
+        <item quantity="other">WEEK <xliff:g id="count">%d</xliff:g></item>
+    </plurals>
 </resources>

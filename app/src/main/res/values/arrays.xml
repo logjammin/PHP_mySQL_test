@@ -8,4 +8,12 @@
     <item>PaperClips A\'Mor</item>
     <item>Other...</item>
     </string-array>
+
+    <!-- Strings for buttons in drop down menu -->
+    <string-array name="buttons_list">
+        <item>Day</item>
+        <item>Week</item>
+        <item>Month</item>
+    </string-array>
+
 </resources>
