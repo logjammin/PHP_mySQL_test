@@ -165,4 +165,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return result;
 	}
 
+    public synchronized Cursor textViewCursor(String[] projection, String selection, String[] args, String sortOrder) {
+        String colname= projection[1];
+        final SQLiteDatabase db = this.getWritableDatabase();
+        final Cursor cursor = db.query(LogEntry.TABLE_NAME, projection, selection, args, colname, null, sortOrder);
+        return cursor;
+    }
 }

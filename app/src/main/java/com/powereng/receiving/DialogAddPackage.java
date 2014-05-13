@@ -7,10 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -43,8 +43,8 @@ public class DialogAddPackage extends DialogFragment {
 		final EditText inputTracking = (EditText) v.findViewById(R.id.inputTracking);
         final Spinner inputCarrier = (Spinner) v.findViewById(R.id.inputCarrier);
         final EditText inputNumpackages = (EditText) v.findViewById(R.id.inputNumpackages);
-        final AutoCompleteTextView inputSender = (AutoCompleteTextView) v.findViewById(R.id.inputSender);
-        final AutoCompleteTextView inputRecipient = (AutoCompleteTextView) v.findViewById(R.id.inputRecipient);
+        final SenderTextView inputSender = (SenderTextView) v.findViewById(R.id.inputSender);
+        final RecipientTextView inputRecipient = (RecipientTextView) v.findViewById(R.id.inputRecipient);
         final EditText inputPoNum = (EditText) v.findViewById(R.id.inputPoNum);
 
 
@@ -74,30 +74,24 @@ public class DialogAddPackage extends DialogFragment {
 					@Override
 					public void onClick(View v) {
 
-                        ArrayList<String> list = new ArrayList<String>();
-                        list.add(inputTracking.getText().toString());
-                        list.add(inputCarrier.getSelectedItem().toString());
-                        list.add(inputNumpackages.getText().toString());
-                        list.add(inputSender.getText().toString());
-                        list.add(inputRecipient.getText().toString());
-                        list.add(inputPoNum.getText().toString());
+                        if (inputTracking.getText() != null) {
+                            ArrayList<String> list = new ArrayList<String>();
+                            list.add(inputTracking.getText().toString());
+                            list.add(inputCarrier.getSelectedItem().toString());
+                            list.add(inputNumpackages.getText().toString());
+                            list.add(inputSender.getText().toString());
+                            list.add(inputRecipient.getText().toString());
+                            list.add(inputPoNum.getText().toString());
 
-                        Bundle params = new Bundle();
+                            Bundle params = new Bundle();
+                            params.putStringArrayList("values", list);
 
-//                        params.putString("tracking", tracking);
-//                        params.putString("carrier", carrier);
-//                        params.putString("numpackages", numpackages);
-//                        params.putString("sender", sender);
-//                        params.putString("recipient", recipient);
-//                        params.putString("ponum", ponum);
-
-                        params.putStringArrayList("values", list);
-
-                        if (!params.isEmpty()) {
-							// Add in background
-							AddLogEntryService.addEntry(getActivity(), params);
-							getDialog().dismiss();
-						}
+                            if (!params.isEmpty()) {
+                                // Add in background
+                                AddLogEntryService.addEntry(getActivity(), params);
+                                getDialog().dismiss();
+                            }
+                        } else Toast.makeText(getActivity(),"Tracking cannot be empty!", Toast.LENGTH_SHORT).show();
 					}
 				});
 

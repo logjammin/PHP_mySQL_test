@@ -51,7 +51,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
 
-        <AutoCompleteTextView android:id="@+id/inputSender"
+        <com.powereng.receiving.SenderTextView
+            android:id="@+id/inputSender"
             android:hint="@string/sender"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -59,7 +60,9 @@
             android:layout_margin="5dip"
             android:singleLine="true"/>
 
-        <AutoCompleteTextView android:id="@+id/inputRecipient"
+
+        <com.powereng.receiving.RecipientTextView
+            android:id="@+id/inputRecipient"
             android:hint="@string/recipient"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -67,6 +70,9 @@
             android:layout_margin="5dip"
             android:layout_marginBottom="15dip"
             android:singleLine="true"/>
+
+
+
 
         <EditText android:id="@+id/inputPoNum"
             android:hint="@string/ponum"

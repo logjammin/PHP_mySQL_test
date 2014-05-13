@@ -12,7 +12,6 @@ import java.util.ArrayList;
 public class LogProvider extends ContentProvider {
 	public static final String AUTHORITY = "com.powereng.receiving";
 	public static final String SCHEME = "content://";
-    public static final Uri FILE_URI = Uri.parse(SCHEME + AUTHORITY + ".files/");
 
 	private static final UriMatcher sURIMatcher = new UriMatcher(
 			UriMatcher.NO_MATCH);
@@ -188,8 +187,12 @@ public class LogProvider extends ContentProvider {
 			result.setNotificationUri(getContext().getContentResolver(), uri);
 			break;
 		case LogEntry.BASEURICODE:
-			result = handler.getAllLogEntriesCursor(selection, args, sortOrder);
-			result.setNotificationUri(getContext().getContentResolver(), uri);
+            if (projection.length == 2) {
+                result = handler.textViewCursor(projection, selection, args, sortOrder);
+            } else {
+                result = handler.getAllLogEntriesCursor(selection, args, sortOrder);
+            }
+            result.setNotificationUri(getContext().getContentResolver(), uri);
 			break;
 
 		default:

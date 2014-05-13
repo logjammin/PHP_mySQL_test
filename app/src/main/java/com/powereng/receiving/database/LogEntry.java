@@ -109,7 +109,7 @@ public class LogEntry extends DBItem {
 
     public static final String CREATE_TABLE =
 "CREATE TABLE " + TABLE_NAME
-+"  (_id INTEGER PRIMARY KEY,"
++"  (_id INTEGER NOT NULL PRIMARY KEY,"
 +"  tracking TEXT NOT NULL,"
 +"  carrier TEXT NULL,"
 +"  numpackages TEXT NULL,"

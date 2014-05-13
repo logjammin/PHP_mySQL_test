@@ -5,5 +5,11 @@
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
         android:title="@string/delete"/>
+    <item
+        android:id="@+id/action_edit"
+        android:orderInCategory="101"
+        android:showAsAction="ifRoom"
+        android:title="@string/edit_package"/>
+
 
 </menu>

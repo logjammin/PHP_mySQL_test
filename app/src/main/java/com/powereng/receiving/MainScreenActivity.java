@@ -6,6 +6,7 @@ import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -27,18 +28,18 @@ import com.powereng.receiving.sync.SyncUtils;
 import java.util.Collection;
 import java.util.HashMap;
 
-public class MainScreenActivity extends Activity{
+public class MainScreenActivity extends Activity implements DialogInterface {
 
     private AbsListView mListView;
     private DialogEditPackage editPackageFragment;
-    private LogEntry logEntry;
+    private static String TAG = "MainScreenActivity";
     /**
      * The Adapter which will be used to populate the ListView/GridView with
      * Views.
      */
     private CursorAdapter mAdapter;
     private ActionBar mActionBar;
-
+    Boolean mShowing = false;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,8 +57,10 @@ public class MainScreenActivity extends Activity{
         editPackageFragment = (DialogEditPackage) fm.findFragmentByTag("editPackage");
 
         if (editPackageFragment != null) {
-            logEntry = editPackageFragment.getEntry();
-            showEditDialog(fm, logEntry, true);
+            LogEntry entry = editPackageFragment.getEntry();
+            editPackageFragment.dismissAllowingStateLoss();
+            dialogEditPackage(entry);
+
         }
 
         mActionBar = getActionBar();
@@ -80,9 +83,9 @@ public class MainScreenActivity extends Activity{
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1,
                                     int position, long id) {
-                logEntry = new LogEntry((Cursor) mAdapter
+                final LogEntry logEntry = new LogEntry((Cursor) mAdapter
                         .getItem(position));
-                showEditDialog(fm, logEntry, false);
+                dialogEditPackage(logEntry);
 
             }
         });
@@ -98,6 +101,7 @@ public class MainScreenActivity extends Activity{
                 // selected/de-selected,
                 // such as update the title in the CAB
                 if (checked) {
+
                     entries.put(id,
                             new LogEntry((Cursor) mAdapter.getItem(position)));
                 }
@@ -111,9 +115,13 @@ public class MainScreenActivity extends Activity{
                 // Respond to clicks on the actions in the CAB
                 switch (item.getItemId()) {
                     case R.id.action_delete:
+
                         deleteItems(entries.values());
                         mode.finish(); // Action picked, so close the CAB
                         return true;
+                    case R.id.action_edit:
+                        editItems(entries.values());
+                        mode.finish();
                     default:
                         return false;
                 }
@@ -165,6 +173,8 @@ public class MainScreenActivity extends Activity{
         });
     }
 
+
+
     @Override
     protected void onDestroy() {
 
@@ -173,31 +183,31 @@ public class MainScreenActivity extends Activity{
         super.onDestroy();
     }
 
-    public void dialogEditPackage(FragmentManager fm, LogEntry entry, boolean active ) {
-
-
-        if (!active) {
-
-            logEntry = editPackageFragment.getEntry();
-            editPackageFragment.dismissAllowingStateLoss();
-            editPackageFragment = new DialogEditPackage();
-            editPackageFragment.show(fm,"editPackage");
-
-
-
-
-            //editPackageFragment.setLogEntry(logEntry);
-        } else {
-            editPackageFragment = new DialogEditPackage();
-            editPackageFragment.setLogEntry(logEntry);
-            editPackageFragment.show(fm, "editPackage");
-        }
-        editPackageFragment.show(fm, "editPackage");
+    public void dialogEditPackage(LogEntry entry) {
+        Log.d(TAG, "new edit dialog created");
+        editPackageFragment = new DialogEditPackage();
+        editPackageFragment.setLogEntry(entry);
+        editPackageFragment.show(getFragmentManager(), "editPackage");
     }
 
     void deleteItems(Collection<LogEntry> entries) {
         for (LogEntry entry : entries) {
             this.getContentResolver().delete(entry.getUri(), null, null);
+        }
+    }
+
+    void editItems(Collection<LogEntry> entries) {
+
+        for (LogEntry entry : entries) {
+
+            do {
+                mShowing = true;
+                dialogEditPackage(entry);
+
+            } while (!mShowing);
+
+
+
         }
     }
 
@@ -207,6 +217,16 @@ public class MainScreenActivity extends Activity{
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.log_fragment, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public void dismiss() {
+        mShowing = false;
+    }
+
+    @Override
+    public void cancel() {
+        mShowing = false;
     }
 
     @Override
