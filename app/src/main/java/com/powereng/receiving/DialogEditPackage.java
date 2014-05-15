@@ -22,6 +22,7 @@ import android.widget.Spinner;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.powereng.receiving.database.LogEntry;
+import com.powereng.receiving.sync.AddLogEntryService;
 
 import java.io.FileOutputStream;
 import java.util.ArrayList;

@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -32,7 +33,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 
-public class MainScreenActivity extends Activity implements DialogInterface, ActionBar.OnNavigationListener {
+public class MainScreenActivity extends Activity implements DialogInterface,
+        ActionBar.OnNavigationListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     private AbsListView mListView;
     private DialogEditPackage editPackageFragment;
@@ -46,6 +48,7 @@ public class MainScreenActivity extends Activity implements DialogInterface, Act
     private static final int BUTTON_WEEK_INDEX = 1;
     private static final int BUTTON_MONTH_INDEX = 2;
     private boolean mIsTabletConfig = true;
+    Utils mUtils;
     /**
      * The Adapter which will be used to populate the ListView/GridView with
      * Views.
@@ -53,9 +56,13 @@ public class MainScreenActivity extends Activity implements DialogInterface, Act
     private CursorAdapter mAdapter;
     private ActionBar mActionBar;
     Boolean mShowing = false;
+    private final Time mTime = new Time();
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mUtils = Utils.getInstance(this);
+
         setContentView(R.layout.fragment_log_list);
 
         SyncUtils.CreateSyncAccount(this);
@@ -74,9 +81,6 @@ public class MainScreenActivity extends Activity implements DialogInterface, Act
 
         }
 
-        //SpinnerAdapter yodawg = ArrayAdapter.createFromResource(this, R.array.buttons_list,
-         //       android.R.layout.simple_spinner_dropdown_item);
-        //mActionBar.setListNavigationCallbacks(yodawg, mListener);
         configureActionBar(DAY);
         mAdapter = new SimpleCursorAdapter(this,
                 R.layout.list_item, null,
@@ -166,42 +170,61 @@ public class MainScreenActivity extends Activity implements DialogInterface, Act
         });
 
         // Load content
-        getLoaderManager().initLoader(0, null, new LoaderManager.LoaderCallbacks<Cursor>() {
+        getLoaderManager().initLoader(0, null, this);
+    }
 
-            @Override
-            public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String mSelection;
+
+        switch (id) {
+            case DAY:
+                mSelection = args.getString("queryTime");
                 return new CursorLoader(getApplicationContext(), LogEntry.URI(),
                         LogEntry.FIELDS, mSelection + LogEntry.COL_SYNC_STATUS + " IS NOT 3", null,
                         LogEntry.COL_TIMESTAMP + " DESC");
-            }
+            case WEEK:
+                mSelection = args.getString("queryTime");
+                return new CursorLoader(getApplicationContext(), LogEntry.URI(),
+                        LogEntry.FIELDS, mSelection + LogEntry.COL_SYNC_STATUS + " IS NOT 3", null,
+                        LogEntry.COL_TIMESTAMP + " DESC");
+            case MONTH:
+                mSelection = args.getString("queryTime");
+                return new CursorLoader(getApplicationContext(), LogEntry.URI(),
+                        LogEntry.FIELDS, mSelection + LogEntry.COL_SYNC_STATUS + " IS NOT 3", null,
+                        LogEntry.COL_TIMESTAMP + " DESC");
+        default:
+            return new CursorLoader(getApplicationContext(), LogEntry.URI(),
+                LogEntry.FIELDS, LogEntry.COL_SYNC_STATUS + " IS NOT 3", null,
+                LogEntry.COL_TIMESTAMP + " DESC");
+        }
 
-            @Override
-            public void onLoadFinished(Loader<Cursor> arg0, Cursor c) {
-                mAdapter.swapCursor(c);
-            }
-
-            @Override
-            public void onLoaderReset(Loader<Cursor> arg0) {
-                mAdapter.swapCursor(null);
-            }
-        });
     }
 
+    @Override
+    public void onLoadFinished(Loader<Cursor> arg0, Cursor c) {
+        mAdapter.swapCursor(c);
+    }
 
+    @Override
+    public void onLoaderReset(Loader<Cursor> arg0) {
+        mAdapter.swapCursor(null);
+    }
 
     private void configureActionBar(int viewType) {
         createButtonsSpinner(viewType);
        // if (mIsMultipane) {
-        //    mActionBar.setDisplayOptions(
-         //           ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
+            mActionBar.setDisplayOptions(
+                    ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
        // } else {
-            mActionBar.setDisplayOptions(0);
+        //    mActionBar.setDisplayOptions(0);
        // }
     }
 
     private void createButtonsSpinner(int viewType) {
         // If tablet configuration , show spinner with no dates
         mActionBarMenuSpinnerAdapter = new LogViewAdapter (this, viewType, true);
+
         mActionBar = getActionBar();
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         mActionBar.setListNavigationCallbacks(mActionBarMenuSpinnerAdapter, this);
@@ -323,7 +346,7 @@ public class MainScreenActivity extends Activity implements DialogInterface, Act
        /* switch (itemPosition) {
             case CalendarViewAdapter.DAY_BUTTON_INDEX:
                 if (mCurrentView != ViewType.DAY) {
-                    mController.sendEvent(this, EventType.GO_TO, null, null, -1, ViewType.DAY);
+                    this.getLoaderManager().initLoader(DAY, ViewType.DAY);
                 }
                 break;
             case CalendarViewAdapter.WEEK_BUTTON_INDEX:
@@ -336,11 +359,6 @@ public class MainScreenActivity extends Activity implements DialogInterface, Act
                     mController.sendEvent(this, EventType.GO_TO, null, null, -1, ViewType.MONTH);
                 }
                 break;
-            case CalendarViewAdapter.AGENDA_BUTTON_INDEX:
-                if (mCurrentView != ViewType.AGENDA) {
-                    mController.sendEvent(this, EventType.GO_TO, null, null, -1, ViewType.AGENDA);
-                }
-                break;
             default:
                 Log.w(TAG, "ItemSelected event from unknown button: " + itemPosition);
                 Log.w(TAG, "CurrentView:" + mCurrentView + " Button:" + itemPosition +
@@ -350,4 +368,5 @@ public class MainScreenActivity extends Activity implements DialogInterface, Act
         }*/
         return false;
     }
+
 }

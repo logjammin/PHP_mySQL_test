@@ -53,7 +53,7 @@
                 android:resource="@xml/authenticator" />
         </service>
         <service
-            android:name="com.powereng.receiving.AddLogEntryService"
+            android:name=".sync.AddLogEntryService"
             android:exported="false"
             android:label="@string/add_package" >
         </service>
@@ -69,11 +69,6 @@
                 android:resource="@xml/syncadapter" />
         </service>
 
-        <activity
-            android:name="com.powereng.receiving.FingerPaint"
-            android:label="@string/title_activity_finger_paint"
-            android:theme="@android:style/Theme.Holo.Dialog" >
-        </activity>
     </application>
 
 </manifest>

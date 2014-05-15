@@ -19,9 +19,68 @@ package com.powereng.receiving;
 import android.content.Context;
 import android.text.format.Time;
 
+import java.lang.ref.WeakReference;
+import java.util.WeakHashMap;
+
 public class Utils {
 
+    private static WeakHashMap<Context, WeakReference<Utils>> instances =
+            new WeakHashMap<Context, WeakReference<Utils>>();
+    private int mViewType = -1;
+    private final Time mTime = new Time();
+    private final Context mContext;
+    /**
+     * Creates and/or returns an instance of CalendarController associated with
+     * the supplied context. It is best to pass in the current Activity.
+     *
+     * @param context The activity if at all possible.
+     */
+    public static Utils getInstance(Context context) {
+        synchronized (instances) {
+            Utils utils = null;
+            WeakReference<Utils> weakController = instances.get(context);
+            if (weakController != null) {
+                utils = weakController.get();
+            }
 
+            if (utils == null) {
+                utils = new Utils(context);
+                instances.put(context, new WeakReference(utils));
+            }
+            return utils;
+        }
+    }
+
+    /**
+     * Removes an instance when it is no longer needed. This should be called in
+     * an activity's onDestroy method.
+     *
+     * @param context The activity used to create the controller
+     */
+    public static void removeInstance(Context context) {
+        instances.remove(context);
+    }
+
+    private Utils(Context context) {
+        mContext = context;
+        mTime.setToNow();
+    }
+
+    /**
+     * @return the time that this controller is currently pointed at
+     */
+    public long getTime() {
+        return mTime.toMillis(false);
+    }
+
+    /**
+     * Set the time this controller is currently pointed at
+     *
+     * @param millisTime Time since epoch in millis
+     */
+    public void setTime(long millisTime) {
+        mTime.set(millisTime);
+    }
 
     public static int getFirstDayOfWeek(Context context) {
             return Time.MONDAY;
@@ -33,9 +92,8 @@ public class Utils {
      */
     public static boolean getShowWeekNumber(Context context) {
 
-        return false;
+        return true;
     }
-
 
     public static int getWeekNumberFromTime(long millisSinceEpoch, Context context) {
         Time weekTime = new Time(Time.getCurrentTimezone());

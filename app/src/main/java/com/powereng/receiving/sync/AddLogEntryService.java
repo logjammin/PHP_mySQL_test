@@ -1,4 +1,4 @@
-package com.powereng.receiving;
+package com.powereng.receiving.sync;
 
 
 import android.app.IntentService;
@@ -9,8 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import com.powereng.receiving.database.LogEntry;
-import com.powereng.receiving.sync.LogServer;
-import com.powereng.receiving.sync.SyncUtils;
 
 import java.io.File;
 import java.util.ArrayList;

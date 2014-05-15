@@ -27,7 +27,6 @@ public class LogViewAdapter extends BaseAdapter {
     // Day view: show day of the week + full date underneath
     // Week view: show the month + year
     // Month view: show the month + year
-    // Agenda view: show day of the week + full date underneath
     private int mCurrentMainView;
 
     private final LayoutInflater mInflater;
@@ -39,7 +38,6 @@ public class LogViewAdapter extends BaseAdapter {
     public static final int DAY_BUTTON_INDEX = 0;
     public static final int WEEK_BUTTON_INDEX = 1;
     public static final int MONTH_BUTTON_INDEX = 2;
-    public static final int AGENDA_BUTTON_INDEX = 3;
 
     // The current selected event's time, used to calculate the date and day of the week
     // for the buttons.
@@ -220,12 +218,6 @@ public class LogViewAdapter extends BaseAdapter {
                     date.setText(buildMonthDate());
                 }
                 break;
-            case AGENDA_BUTTON_INDEX:
-                viewType.setText(mButtonNames [AGENDA_BUTTON_INDEX]);
-                if (mShowDate) {
-                    date.setText(buildMonthDayDate());
-                }
-                break;
             default:
                 v = convertView;
                 break;
@@ -320,7 +312,6 @@ public class LogViewAdapter extends BaseAdapter {
         return date;
     }
     private String buildWeekDate() {
-
 
         // Calculate the start of the week, taking into account the "first day of the week"
         // setting.

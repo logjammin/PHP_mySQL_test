@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.powereng.receiving.sync.AddLogEntryService;
 
 import java.util.ArrayList;
 
