@@ -131,19 +131,14 @@ public class LogViewAdapter extends BaseAdapter {
                     date.setText(buildFullDate());
                     break;
                 case MainScreenActivity.WEEK:
-                    if (Utils.getShowWeekNumber(mContext)) {
-                        weekDay.setVisibility(View.VISIBLE);
-                        weekDay.setText(buildWeekNum());
-                    } else {
-                        weekDay.setVisibility(View.GONE);
-                    }
+                    weekDay.setVisibility(View.VISIBLE);
+                    weekDay.setText(R.string.week);
                     date.setText(buildMonthYearDate());
                     break;
                 case MainScreenActivity.MONTH:
                     weekDay.setVisibility(View.GONE);
                     date.setText(buildMonthYearDate());
                     break;
-
                 default:
                     v = null;
                     break;
@@ -227,8 +222,9 @@ public class LogViewAdapter extends BaseAdapter {
 
     // Updates the current viewType
     // Used to match the label on the menu button with the calendar view
-    public void setMainView(int viewType) {
+    public void setMainView(int viewType, long time) {
         mCurrentMainView = viewType;
+        setTime(time);
         notifyDataSetChanged();
     }
 
@@ -250,9 +246,9 @@ public class LogViewAdapter extends BaseAdapter {
         mStringBuilder.setLength(0);
 
         if (julianDay == mTodayJulianDay) {
-            dayOfWeek = mContext.getString(R.string.agenda_today,
+            dayOfWeek =
                     DateUtils.formatDateRange(mContext, mFormatter, mMilliTime, mMilliTime,
-                            DateUtils.FORMAT_SHOW_WEEKDAY, mTimeZone).toString());
+                            DateUtils.FORMAT_SHOW_WEEKDAY, mTimeZone).toString();
         } else if (julianDay == mTodayJulianDay - 1) {
             dayOfWeek = mContext.getString(R.string.agenda_yesterday,
                     DateUtils.formatDateRange(mContext, mFormatter, mMilliTime, mMilliTime,
@@ -323,15 +319,15 @@ public class LogViewAdapter extends BaseAdapter {
         int diff = dayOfWeek - firstDayOfWeek;
         if (diff != 0) {
             if (diff < 0) {
-                diff += 7;
+                diff += 5;
             }
             t.monthDay -= diff;
             t.normalize(true /* ignore isDst */);
         }
 
         long weekStartTime = t.toMillis(true);
-        // The end of the week is 6 days after the start of the week
-        long weekEndTime = weekStartTime + DateUtils.WEEK_IN_MILLIS - DateUtils.DAY_IN_MILLIS;
+        // The end of the week is 5 days after the start of the week
+        long weekEndTime = weekStartTime + DateUtils.WEEK_IN_MILLIS - (DateUtils.DAY_IN_MILLIS * 3);
 
         // If week start and end is in 2 different months, use short months names
         Time t1 = new Time(mTimeZone);

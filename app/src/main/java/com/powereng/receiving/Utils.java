@@ -20,6 +20,8 @@ import android.content.Context;
 import android.text.format.Time;
 
 import java.lang.ref.WeakReference;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.WeakHashMap;
 
 public class Utils {
@@ -64,6 +66,7 @@ public class Utils {
     private Utils(Context context) {
         mContext = context;
         mTime.setToNow();
+
     }
 
     /**
@@ -103,17 +106,36 @@ public class Utils {
         // if the date is on Saturday or Sunday and the start of the week
         // isn't Monday we may need to shift the date to be in the correct
         // week
-        if (weekTime.weekDay == Time.SUNDAY
+        if (weekTime.weekDay == Time.FRIDAY
                 && (firstDayOfWeek == Time.SUNDAY || firstDayOfWeek == Time.SATURDAY)) {
             weekTime.monthDay++;
             weekTime.normalize(true);
-        } else if (weekTime.weekDay == Time.SATURDAY && firstDayOfWeek == Time.SATURDAY) {
+        } else if (weekTime.weekDay == Time.SATURDAY && firstDayOfWeek == Time.SUNDAY) {
             weekTime.monthDay += 2;
             weekTime.normalize(true);
         }
         return weekTime.getWeekNumber();
     }
 
+    public static Date getWeekStart(Date date, int weekStart) {
+        Calendar calendar = Calendar.getInstance();
+        while (calendar.get(Calendar.DAY_OF_WEEK) != weekStart) {
+
+            calendar.add(Calendar.DATE, -1);
+        }
+        //startOfDay(calendar);
+        return calendar.getTime();
+    }
+
+    public static Date getWeekEnd(Date date, int weekStart) {
+        Calendar calendar = Calendar.getInstance();
+        while (calendar.get(Calendar.DAY_OF_WEEK) != weekStart) {
+            calendar.add(Calendar.DATE, 1);
+        }
+        calendar.add(Calendar.DATE, -1);
+        //endOfDay(calendar);
+        return calendar.getTime();
+    }
 
 
 }

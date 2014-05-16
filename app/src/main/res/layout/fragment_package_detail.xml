@@ -9,19 +9,19 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp">
 
         <TextView android:id="@+id/detailNumpackages"
             android:layout_width="0dp"
             android:layout_weight=".25"
             android:layout_height="wrap_content"
-            android:inputType="number"
             android:hint="@string/pcs"
             android:layout_margin="5dip"
             android:layout_marginBottom="15dip"
             android:ems="10"
-            android:gravity="center"
-            android:enabled="false" />
+            android:gravity="center"/>
 
         <TextView android:id="@+id/detailTracking"
             android:layout_width="0dp"
@@ -30,15 +30,12 @@
             android:hint="@string/tracking"
             android:layout_margin="5dip"
             android:layout_marginBottom="15dip"
-            android:singleLine="true"
-            android:enabled="false" />
+            android:singleLine="true" />
 
         <TextView android:id="@+id/detailCarrier"
             android:layout_width="0dp"
             android:layout_weight=".75"
-            android:layout_height="wrap_content"
-
-            android:gravity="end" />
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 
@@ -46,7 +43,9 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp">
 
         <TextView android:id="@+id/detailSender"
             android:hint="@string/sender"
@@ -54,8 +53,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_margin="5dip"
-            android:singleLine="true"
-            android:enabled="false" />
+            android:singleLine="true"/>
 
         <TextView android:id="@+id/detailRecipient"
             android:hint="@string/recipient"
@@ -64,8 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dip"
             android:layout_marginBottom="15dip"
-            android:singleLine="true"
-            android:enabled="false" />
+            android:singleLine="true"/>
 
         <TextView android:id="@+id/detailPoNum"
             android:hint="@string/ponum"
@@ -74,8 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dip"
             android:singleLine="true"
-            android:inputType="number"
-            android:enabled="false" />
+            android:inputType="number" />
     </LinearLayout>
 
     <View
@@ -88,7 +84,9 @@
         android:id="@+id/signatureFrame"
         android:layout_width="match_parent"
         android:orientation="vertical"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp">
 
         <AutoCompleteTextView
             android:layout_height="wrap_content"

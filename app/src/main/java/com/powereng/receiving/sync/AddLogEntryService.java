@@ -99,7 +99,8 @@ public class AddLogEntryService extends IntentService {
         values.put(LogEntry.COL_PONUM, list.get(5));
         values.put(LogEntry.COL_SYNC_STATUS, 2);
         } else {
-            values.put(LogEntry.COL_SIG, list.get(6));
+            //TODO: signee's name needs to be passed in.
+           //values.put(LogEntry.COL_SIG, list.get(6));
             values.put(LogEntry.COL_SYNC_STATUS, 4);
         }
         getContentResolver().update(uri, values, null, null);

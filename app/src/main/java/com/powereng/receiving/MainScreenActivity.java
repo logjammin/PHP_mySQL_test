@@ -57,12 +57,15 @@ public class MainScreenActivity extends Activity implements DialogInterface,
     private ActionBar mActionBar;
     Boolean mShowing = false;
     private final Time mTime = new Time();
+    private PackageDetailFragment packageDetailFragment;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        mTime.setToNow();
+        long mMillis = mTime.toMillis(true);
         mUtils = Utils.getInstance(this);
-
+        mUtils.setTime(mMillis);
         setContentView(R.layout.fragment_log_list);
 
         SyncUtils.CreateSyncAccount(this);
@@ -71,9 +74,9 @@ public class MainScreenActivity extends Activity implements DialogInterface,
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
         //setting up the edit fragment to retain data on configuration change
-        FragmentManager fm = getFragmentManager();
+        final FragmentManager fm = getFragmentManager();
         editPackageFragment = (EditPackageFragment) fm.findFragmentByTag("editPackage");
-
+        packageDetailFragment = (PackageDetailFragment) fm.findFragmentByTag("packageDetail");
         if (editPackageFragment != null) {
             LogEntry entry = editPackageFragment.getEntry();
             editPackageFragment.dismissAllowingStateLoss();
@@ -81,7 +84,7 @@ public class MainScreenActivity extends Activity implements DialogInterface,
 
         }
 
-        configureActionBar(DAY);
+        configureActionBar(WEEK, mMillis);
         mAdapter = new SimpleCursorAdapter(this,
                 R.layout.list_item, null,
                 new String[] {LogEntry.COL_TRACKING, LogEntry.COL_CARRIER,
@@ -103,7 +106,8 @@ public class MainScreenActivity extends Activity implements DialogInterface,
                                     int position, long id) {
                 final LogEntry logEntry = new LogEntry((Cursor) mAdapter
                         .getItem(position));
-                dialogEditPackage(logEntry);
+                packageDetail(logEntry);
+                //dialogEditPackage(logEntry);
 
             }
         });
@@ -168,6 +172,7 @@ public class MainScreenActivity extends Activity implements DialogInterface,
                 return false;
             }
         });
+        //mActionBarMenuSpinnerAdapter.setTime(mMillis);
 
         // Load content
         getLoaderManager().initLoader(0, null, this);
@@ -211,13 +216,15 @@ public class MainScreenActivity extends Activity implements DialogInterface,
         mAdapter.swapCursor(null);
     }
 
-    private void configureActionBar(int viewType) {
+    private void configureActionBar(int viewType, Long mMillis) {
+
         createButtonsSpinner(viewType);
+        mActionBarMenuSpinnerAdapter.setMainView(viewType, mMillis);
        // if (mIsMultipane) {
             mActionBar.setDisplayOptions(
                     ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
        // } else {
-        //    mActionBar.setDisplayOptions(0);
+       //    mActionBar.setDisplayOptions(0);
        // }
     }
 
@@ -280,6 +287,13 @@ public class MainScreenActivity extends Activity implements DialogInterface,
         editPackageFragment = new EditPackageFragment();
         editPackageFragment.setLogEntry(entry);
         editPackageFragment.show(getFragmentManager(), "editPackage");
+    }
+
+    public void packageDetail(LogEntry entry) {
+        Log.d(TAG, "new edit dialog created");
+        packageDetailFragment = new PackageDetailFragment();
+        packageDetailFragment.setLogEntry(entry);
+        packageDetailFragment.show(getFragmentManager(), "packageDetail");
     }
 
     void deleteItems(Collection<LogEntry> entries) {
