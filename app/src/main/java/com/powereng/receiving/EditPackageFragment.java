@@ -3,13 +3,8 @@ package com.powereng.receiving;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,23 +19,19 @@ import com.google.zxing.integration.android.IntentResult;
 import com.powereng.receiving.database.LogEntry;
 import com.powereng.receiving.sync.AddLogEntryService;
 
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 
-public class DialogEditPackage extends DialogFragment {
+public class EditPackageFragment extends DialogFragment {
 
 
     Button btnScan;
-    Button btnSig;
     Spinner inputCarrier;
     EditText inputTracking;
     EditText inputNumpackages;
     EditText inputSender;
     EditText inputRecipient;
     EditText inputPoNum;
-    FingerPaintView paintView;
-    View mView;
     String tracking;
     String carrier;
     String numpackages;
@@ -58,7 +49,7 @@ public class DialogEditPackage extends DialogFragment {
         //this.itemId = id;
         this.entry = logEntry;
     }*/
-    public DialogEditPackage(){}
+    public EditPackageFragment(){}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -116,7 +107,6 @@ public class DialogEditPackage extends DialogFragment {
         inputSender = (EditText) v.findViewById(R.id.inputSender);
         inputRecipient = (EditText) v.findViewById(R.id.inputRecipient);
         inputPoNum = (EditText) v.findViewById(R.id.inputPoNum);
-        paintView = (FingerPaintView) v.findViewById(R.id.myPaintView);
         inputNumpackages.setText(numpackages);
         inputTracking.setText(tracking);
         inputCarrier.setSelection(getCarrierNumber(carrier));
@@ -124,9 +114,6 @@ public class DialogEditPackage extends DialogFragment {
         inputRecipient.setText(recipient);
         inputPoNum.setText(ponum);
         yourName = (EditText) v.findViewById(R.id.yourName);
-
-        mSignature = (LinearLayout) v.findViewById(R.id.signatureFrame);
-        btnSig = (Button) v.findViewById(R.id.btnGetSignature);
         btnScan = (Button) v.findViewById(R.id.btnScan);
 
         btnScan.setOnClickListener(new View.OnClickListener() {
@@ -152,7 +139,6 @@ public class DialogEditPackage extends DialogFragment {
 
                     @Override
                     public void onClick(View v) {
-                        paintView.setDrawingCacheEnabled(true);
 
                         ArrayList<String> list = new ArrayList<String>();
                         //list.add(entry.getUri());
@@ -168,43 +154,14 @@ public class DialogEditPackage extends DialogFragment {
                         Uri uri = entry.getUri();
                         String entryUri = uri.toString();
                         params.putString("uri", entryUri);
-
-                        // Add in background
-                        int vis = mSignature.getVisibility();
-                        if(vis != 0) {
-                            params.putBoolean("signed", false);
-                        } else {
-                            sigName += yourName.getText();
-                            if (save(paintView, sigName)) {
-                                params.putBoolean("signed", true);
-                                list.add(sigName);
-                            }
-                        }
+                        params.putBoolean("signed", false);
                         params.putStringArrayList("values", list);
+
                         AddLogEntryService.updateEntry(getActivity(), params);
                         getDialog().dismiss();
                     }
                 }
         );
-
-        btnSig.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //getSignature();
-
-                int vis = mSignature.getVisibility();
-                if(vis != 0) {
-                    yourName.setText(recipient);
-                    mSignature.setVisibility(View.VISIBLE);
-                } else {
-                    yourName.setText("");
-                    mSignature.invalidate();
-                    mSignature.setVisibility(View.GONE);
-                }
-
-            }
-        });
-
         return v;
     }
 
@@ -215,51 +172,6 @@ public class DialogEditPackage extends DialogFragment {
     public LogEntry getEntry() {
         return entry;
     }
-
-    public Boolean save(View view, String name) {
-        //Log.v("log_tag", "Width: " + v.getWidth());
-        //Log.v("log_tag", "Height: " + v.getHeight());
-
-        Bitmap mBitmap = getBitmapFromView(view);
-        String fileName = tracking + "_" + name + ".png";
-
-        try {
-
-            FileOutputStream mFileOutStream;
-            mFileOutStream = getActivity().openFileOutput(fileName, Context.MODE_PRIVATE);
-            mBitmap.compress(Bitmap.CompressFormat.PNG, 90, mFileOutStream);
-            mFileOutStream.flush();
-            mFileOutStream.close();
-            return true;
-        } catch (Exception e) {
-            Log.v("log_tag", e.toString());
-            return false;
-        }
-
-    }
-
-    public static Bitmap getBitmapFromView(View view) {
-
-        //Define a bitmap with the same size as the view
-        Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(),
-                view.getHeight(),Bitmap.Config.RGB_565);
-        //Bind a canvas to it
-        Canvas canvas = new Canvas(returnedBitmap);
-        //Get the view's background
-        Drawable bgDrawable =view.getBackground();
-        if (bgDrawable!=null)
-            //has background drawable, then draw it on the canvas
-            bgDrawable.draw(canvas);
-        else
-            //does not have background drawable, then draw white background on the canvas
-            canvas.drawColor(Color.WHITE);
-        // draw the view on the canvas
-        view.draw(canvas);
-        //return the bitmap
-        return returnedBitmap;
-    }
-
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {

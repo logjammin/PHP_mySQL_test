@@ -90,16 +90,14 @@ public class AddLogEntryService extends IntentService {
         ArrayList<String> list = extras.getStringArrayList("values");
         Boolean signed = extras.getBoolean("signed");
         final ContentValues values = new ContentValues();
-
+        if (!signed) {
         values.put(LogEntry.COL_TRACKING, list.get(0));
         values.put(LogEntry.COL_CARRIER, list.get(1));
         values.put(LogEntry.COL_NUMPACKAGES, list.get(2));
         values.put(LogEntry.COL_SENDER, list.get(3));
         values.put(LogEntry.COL_RECIPIENT, list.get(4));
         values.put(LogEntry.COL_PONUM, list.get(5));
-
-        if (!signed) {
-            values.put(LogEntry.COL_SYNC_STATUS, 2);
+        values.put(LogEntry.COL_SYNC_STATUS, 2);
         } else {
             values.put(LogEntry.COL_SIG, list.get(6));
             values.put(LogEntry.COL_SYNC_STATUS, 4);

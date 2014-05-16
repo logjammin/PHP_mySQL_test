@@ -23,9 +23,9 @@ import java.util.ArrayList;
  * 
  */
 
-public class DialogAddPackage extends DialogFragment {
+public class AddPackageFragment extends DialogFragment {
 
-	public DialogAddPackage() {}
+	public AddPackageFragment() {}
 
     EditText inputTracking;
 

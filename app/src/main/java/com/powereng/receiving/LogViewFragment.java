@@ -225,7 +225,7 @@ public class LogViewFragment extends Fragment {
 
 
 	void showAddDialog() {
-		DialogFragment dialog = new DialogAddPackage();
+		DialogFragment dialog = new AddPackageFragment();
 		dialog.show(getFragmentManager(), "add_entry");
 	}
 

@@ -37,7 +37,7 @@ public class MainScreenActivity extends Activity implements DialogInterface,
         ActionBar.OnNavigationListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     private AbsListView mListView;
-    private DialogEditPackage editPackageFragment;
+    private EditPackageFragment editPackageFragment;
     private static String TAG = "MainScreenActivity";
     private String mSelection = "";
     public static final int DAY = 2;
@@ -72,7 +72,7 @@ public class MainScreenActivity extends Activity implements DialogInterface,
 
         //setting up the edit fragment to retain data on configuration change
         FragmentManager fm = getFragmentManager();
-        editPackageFragment = (DialogEditPackage) fm.findFragmentByTag("editPackage");
+        editPackageFragment = (EditPackageFragment) fm.findFragmentByTag("editPackage");
 
         if (editPackageFragment != null) {
             LogEntry entry = editPackageFragment.getEntry();
@@ -277,7 +277,7 @@ public class MainScreenActivity extends Activity implements DialogInterface,
 
     public void dialogEditPackage(LogEntry entry) {
         Log.d(TAG, "new edit dialog created");
-        editPackageFragment = new DialogEditPackage();
+        editPackageFragment = new EditPackageFragment();
         editPackageFragment.setLogEntry(entry);
         editPackageFragment.show(getFragmentManager(), "editPackage");
     }
@@ -337,7 +337,7 @@ public class MainScreenActivity extends Activity implements DialogInterface,
     }
 
     void showAddDialog() {
-        DialogFragment dialog = new DialogAddPackage();
+        DialogFragment dialog = new AddPackageFragment();
         dialog.show(getFragmentManager(), "add_entry");
     }
 
