@@ -2,11 +2,11 @@ package com.powereng.receiving;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -49,6 +49,7 @@ public class MainScreenActivity extends Activity implements DialogInterface,
     private static final int BUTTON_MONTH_INDEX = 2;
     private boolean mIsTabletConfig = true;
     Utils mUtils;
+    AddPackageFragment addPackage;
     /**
      * The Adapter which will be used to populate the ListView/GridView with
      * Views.
@@ -77,6 +78,13 @@ public class MainScreenActivity extends Activity implements DialogInterface,
         final FragmentManager fm = getFragmentManager();
         editPackageFragment = (EditPackageFragment) fm.findFragmentByTag("editPackage");
         packageDetailFragment = (PackageDetailFragment) fm.findFragmentByTag("packageDetail");
+
+        addPackage = new AddPackageFragment();
+
+
+
+
+
         if (editPackageFragment != null) {
             LogEntry entry = editPackageFragment.getEntry();
             editPackageFragment.dismissAllowingStateLoss();
@@ -351,8 +359,17 @@ public class MainScreenActivity extends Activity implements DialogInterface,
     }
 
     void showAddDialog() {
-        DialogFragment dialog = new AddPackageFragment();
-        dialog.show(getFragmentManager(), "add_entry");
+        View v = findViewById(R.id.header);
+        v.setVisibility(View.GONE);
+        FragmentManager fm = getFragmentManager();
+        fm.beginTransaction().add(R.id.frag_container, addPackage, "addPackage").commit();
+        //DialogFragment dialog = new AddPackageFragment();
+        //dialog.show(getFragmentManager(), "add_entry");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

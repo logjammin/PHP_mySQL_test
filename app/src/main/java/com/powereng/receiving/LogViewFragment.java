@@ -1,7 +1,6 @@
 package com.powereng.receiving;
 
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
@@ -225,8 +224,8 @@ public class LogViewFragment extends Fragment {
 
 
 	void showAddDialog() {
-		DialogFragment dialog = new AddPackageFragment();
-		dialog.show(getFragmentManager(), "add_entry");
+		//DialogFragment dialog = new AddPackageFragment();
+		//dialog.show(getFragmentManager(), "add_entry");
 	}
 
 }

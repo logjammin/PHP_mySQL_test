@@ -91,7 +91,7 @@ public class PackageDetailFragment extends DialogFragment {
         detailRecipient.setText(recipient);
         detailPoNum.setText(ponum);
         yourName = (EditText) v.findViewById(R.id.yourName);
-
+        yourName.setText(recipient);
         mSignature = (LinearLayout) v.findViewById(R.id.signatureFrame);
 
 

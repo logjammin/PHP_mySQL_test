@@ -11,9 +11,9 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 
+import com.google.zxing.integration.android.FragmentIntentIntegrator;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.powereng.receiving.database.LogEntry;
@@ -38,11 +38,8 @@ public class EditPackageFragment extends DialogFragment {
     String sender;
     String recipient;
     String ponum;
-    String sigName = "";
-    LinearLayout mSignature;
     private LogEntry entry;
     Context mContext;
-    EditText yourName;
 
 
     /*public DialogEditPackage(LogEntry logEntry) {
@@ -113,13 +110,12 @@ public class EditPackageFragment extends DialogFragment {
         inputSender.setText(sender);
         inputRecipient.setText(recipient);
         inputPoNum.setText(ponum);
-        yourName = (EditText) v.findViewById(R.id.yourName);
         btnScan = (Button) v.findViewById(R.id.btnScan);
 
         btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                IntentIntegrator intentIntegrator = new IntentIntegrator(getActivity()); // where this is activity
+                FragmentIntentIntegrator intentIntegrator = new FragmentIntentIntegrator(getActivity().getFragmentManager().findFragmentByTag("addPackage")); // where this is activity
                 intentIntegrator.initiateScan(IntentIntegrator.ALL_CODE_TYPES); // or QR_CODE_TYPES if you need to scan QR
             }
         });
@@ -177,7 +173,7 @@ public class EditPackageFragment extends DialogFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
         if (scanResult != null) {
-            inputTracking.setText(scanResult.toString());
+            inputTracking.setText(scanResult.getContents().toString());
         }
         // else continue with any other code you need in the method
     }
