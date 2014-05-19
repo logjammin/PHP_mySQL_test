@@ -87,20 +87,20 @@ public class AddLogEntryService extends IntentService {
             return;
         }
         Uri uri = Uri.parse(extras.getString("uri"));
-        ArrayList<String> list = extras.getStringArrayList("values");
+
         Boolean signed = extras.getBoolean("signed");
         final ContentValues values = new ContentValues();
         if (!signed) {
-        values.put(LogEntry.COL_TRACKING, list.get(0));
-        values.put(LogEntry.COL_CARRIER, list.get(1));
-        values.put(LogEntry.COL_NUMPACKAGES, list.get(2));
-        values.put(LogEntry.COL_SENDER, list.get(3));
-        values.put(LogEntry.COL_RECIPIENT, list.get(4));
-        values.put(LogEntry.COL_PONUM, list.get(5));
-        values.put(LogEntry.COL_SYNC_STATUS, 2);
+            ArrayList<String> list = extras.getStringArrayList("values");
+            values.put(LogEntry.COL_TRACKING, list.get(0));
+            values.put(LogEntry.COL_CARRIER, list.get(1));
+            values.put(LogEntry.COL_NUMPACKAGES, list.get(2));
+            values.put(LogEntry.COL_SENDER, list.get(3));
+            values.put(LogEntry.COL_RECIPIENT, list.get(4));
+            values.put(LogEntry.COL_PONUM, list.get(5));
+            values.put(LogEntry.COL_SYNC_STATUS, 2);
         } else {
-            //TODO: signee's name needs to be passed in.
-           //values.put(LogEntry.COL_SIG, list.get(6));
+            values.put(LogEntry.COL_SIG, extras.getString("signee"));
             values.put(LogEntry.COL_SYNC_STATUS, 4);
         }
         getContentResolver().update(uri, values, null, null);

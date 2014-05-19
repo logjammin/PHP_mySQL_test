@@ -136,6 +136,7 @@ public class LogProvider extends ContentProvider {
                 }
                 sb.append(LogEntry.COL_ID + " IS ?");
                 args.add(uri.getLastPathSegment());
+                //TODO: this is keeping the signatures from being uploaded.
                 values.put(LogEntry.COL_SYNC_STATUS, 2);
                 break;
             default:

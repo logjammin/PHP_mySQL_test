@@ -75,7 +75,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                         //flag entry as "synced" in local db
                         entry.sync_status = SYNCED;
                         db.putEntry(entry);
-
                         break;
 
                     case UPDATE:
@@ -87,7 +86,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                         break;
 
                     case SIGNED:
-                        String fileName = entry.sig + ".png";
+                        String fileName = entry.tracking + "_" + entry.sig + ".png";
                         File file = new File(mContext.getFilesDir(), fileName);
                         TypedFile outFile = new TypedFile("image/png", file);
                         server.addSignature(token, outFile);
