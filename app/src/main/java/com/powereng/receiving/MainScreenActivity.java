@@ -183,7 +183,7 @@ public class MainScreenActivity extends Activity implements DialogInterface,
         //mActionBarMenuSpinnerAdapter.setTime(mMillis);
 
         // Load content
-        getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(5, null, this);
     }
 
     @Override

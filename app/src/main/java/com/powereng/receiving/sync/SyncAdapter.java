@@ -53,16 +53,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 				return;
 			}
 
-			// Just to make sure. Can happen if sync happens in background first
-			// time
-			/*if (null == SyncHelper.getSavedAccountName(getContext())) {
-				PreferenceManager.getDefaultSharedPreferences(getContext())
-						.edit().putString(SyncHelper.KEY_ACCOUNT, account.name)
-						.commit();
-			}*/
-			// token should be good. Transmit
 
-			
 			final LogServer server = SyncUtils.getRESTAdapter();
 			DatabaseHandler db = DatabaseHandler.getInstance(getContext());
 

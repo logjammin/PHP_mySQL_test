@@ -120,6 +120,5 @@ public class LogEntry extends DBItem {
 +"  timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
 +"  sync_status INTEGER NOT NULL DEFAULT 1,"
 +""
-+"  UNIQUE (tracking) ON CONFLICT IGNORE,"
-+"  UNIQUE (timestamp) ON CONFLICT IGNORE);";
++"  UNIQUE (tracking) ON CONFLICT IGNORE);";
 }
