@@ -45,7 +45,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 			ContentProviderClient provider, SyncResult syncResult) {
         try {
 			// Need to get an access token first
-			final String token = "70713aa1e2a83c38f514f5ed9ad34706";
+			final String token = "d3f2ece245bb00d9706234a9f5f0753e";
 
 			if (token == null) {
 				Log.e(TAG, "Token was null. Aborting sync");
@@ -104,7 +104,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 			// Download stuff - but only if this is not an upload-only sync
 			if (!extras.getBoolean(ContentResolver.SYNC_EXTRAS_UPLOAD, false)) {
 				// Check if we synced before
-				final String lastSync = PreferenceManager
+				String lastSync = PreferenceManager
 						.getDefaultSharedPreferences(getContext()).getString(
 								KEY_LASTSYNC, null);
                 //final String lastSync = "2014-04-30 12:24:40.0";
@@ -117,6 +117,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 }
 
 				else {
+                    lastSync = "2014-04-30 12:24:40.0";
                     entries = server.listEntries(token, lastSync);
 					//entries = server.listEntries(token);
 				}

@@ -43,7 +43,6 @@ public class MainScreenActivity extends Activity implements DialogInterface,
     public static final int DAY = 2;
     public static final int WEEK = 3;
     public static final int MONTH = 4;
-    private LogViewAdapter mActionBarMenuSpinnerAdapter;
     private static final int BUTTON_DAY_INDEX = 0;
     private static final int BUTTON_WEEK_INDEX = 1;
     private static final int BUTTON_MONTH_INDEX = 2;
@@ -82,17 +81,12 @@ public class MainScreenActivity extends Activity implements DialogInterface,
         addPackage = new AddPackageFragment();
 
 
-
-
-
         if (editPackageFragment != null) {
             LogEntry entry = editPackageFragment.getEntry();
             editPackageFragment.dismissAllowingStateLoss();
             dialogEditPackage(entry);
 
         }
-
-        configureActionBar(WEEK, mMillis);
         mAdapter = new SimpleCursorAdapter(this,
                 R.layout.list_item, null,
                 new String[] {LogEntry.COL_TRACKING, LogEntry.COL_CARRIER,
@@ -180,8 +174,6 @@ public class MainScreenActivity extends Activity implements DialogInterface,
                 return false;
             }
         });
-        //mActionBarMenuSpinnerAdapter.setTime(mMillis);
-
         // Load content
         getLoaderManager().initLoader(5, null, this);
     }
@@ -190,29 +182,12 @@ public class MainScreenActivity extends Activity implements DialogInterface,
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String mSelection;
 
-        switch (id) {
-            case DAY:
-                mSelection = args.getString("queryTime");
-                return new CursorLoader(getApplicationContext(), LogEntry.URI(),
-                        LogEntry.FIELDS, mSelection + LogEntry.COL_SYNC_STATUS + " IS NOT 3", null,
-                        LogEntry.COL_TIMESTAMP + " DESC");
-            case WEEK:
-                mSelection = args.getString("queryTime");
-                return new CursorLoader(getApplicationContext(), LogEntry.URI(),
-                        LogEntry.FIELDS, mSelection + LogEntry.COL_SYNC_STATUS + " IS NOT 3", null,
-                        LogEntry.COL_TIMESTAMP + " DESC");
-            case MONTH:
-                mSelection = args.getString("queryTime");
-                return new CursorLoader(getApplicationContext(), LogEntry.URI(),
-                        LogEntry.FIELDS, mSelection + LogEntry.COL_SYNC_STATUS + " IS NOT 3", null,
-                        LogEntry.COL_TIMESTAMP + " DESC");
-        default:
             return new CursorLoader(getApplicationContext(), LogEntry.URI(),
                 LogEntry.FIELDS, LogEntry.COL_SYNC_STATUS + " IS NOT 3", null,
                 LogEntry.COL_TIMESTAMP + " DESC");
-        }
-
     }
+
+
 
     @Override
     public void onLoadFinished(Loader<Cursor> arg0, Cursor c) {
@@ -224,40 +199,7 @@ public class MainScreenActivity extends Activity implements DialogInterface,
         mAdapter.swapCursor(null);
     }
 
-    private void configureActionBar(int viewType, Long mMillis) {
 
-        createButtonsSpinner(viewType);
-        mActionBarMenuSpinnerAdapter.setMainView(viewType, mMillis);
-       // if (mIsMultipane) {
-            mActionBar.setDisplayOptions(
-                    ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
-       // } else {
-       //    mActionBar.setDisplayOptions(0);
-       // }
-    }
-
-    private void createButtonsSpinner(int viewType) {
-        // If tablet configuration , show spinner with no dates
-        mActionBarMenuSpinnerAdapter = new LogViewAdapter (this, viewType, true);
-
-        mActionBar = getActionBar();
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        mActionBar.setListNavigationCallbacks(mActionBarMenuSpinnerAdapter, this);
-        switch (viewType) {
-            case DAY:
-                mActionBar.setSelectedNavigationItem(BUTTON_DAY_INDEX);
-                break;
-            case WEEK:
-                mActionBar.setSelectedNavigationItem(BUTTON_WEEK_INDEX);
-                break;
-            case MONTH:
-                mActionBar.setSelectedNavigationItem(BUTTON_MONTH_INDEX);
-                break;
-            default:
-                mActionBar.setSelectedNavigationItem(BUTTON_DAY_INDEX);
-                break;
-        }
-    }
 
 
 
