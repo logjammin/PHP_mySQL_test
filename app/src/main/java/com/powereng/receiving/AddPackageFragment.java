@@ -79,6 +79,9 @@ public class AddPackageFragment extends DialogFragment {
                         View v = getActivity().findViewById(R.id.header);
                         v.setVisibility(View.VISIBLE);
                     }
+                    //TODO: clear this fragment
+                    //FragmentManager fm = Manager();
+
                     //notify user that tracking number can't be empty
                 } else Toast.makeText(getActivity(),"Tracking cannot be empty!", Toast.LENGTH_SHORT).show();
                 break;

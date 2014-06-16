@@ -124,7 +124,7 @@ public class PackageDetailFragment extends DialogFragment {
                             params.putBoolean("signed", true);
                             params.putString("signee", sigName);
 
-                            AddLogEntryService.updateEntry(getActivity(), params);
+                            AddLogEntryService.addSignature(getActivity(), params);
                             getDialog().dismiss();
                         } else {
                             Toast.makeText(getActivity(),"Signature capture failed!", Toast.LENGTH_SHORT).show();

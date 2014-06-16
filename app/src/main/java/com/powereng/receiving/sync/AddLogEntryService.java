@@ -68,7 +68,7 @@ public class AddLogEntryService extends IntentService {
 			} else if (ACTION_UPDATE.equals(action)) {
                 updateEntry(intent.getBundleExtra(EXTRA_PACKAGE));
             } else {
-                addSignature(intent.getBundleExtra(EXTRA_SIGNATURE));
+                updateEntry(intent.getBundleExtra(EXTRA_SIGNATURE));
             }
 		}
 	}
