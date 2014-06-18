@@ -22,12 +22,11 @@ import android.widget.CursorAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
-import com.powereng.receiving.database.LogEntry;
+import com.powereng.receiving.database.POEntry;
 import com.powereng.receiving.sync.SyncUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
-
 
 
 public class LogViewFragment extends Fragment {
@@ -60,9 +59,9 @@ public class LogViewFragment extends Fragment {
 
 		mAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.list_item, null,
-				new String[] {LogEntry.COL_TRACKING, LogEntry.COL_CARRIER,
-                LogEntry.COL_SENDER, LogEntry.COL_RECIPIENT, LogEntry.COL_NUMPACKAGES,
-                LogEntry.COL_PONUM, LogEntry.COL_SIG, LogEntry.COL_TIMESTAMP},
+				new String[] {POEntry.COL_PONUM, POEntry.COL_VENDOR,
+                POEntry.COL_UNIT_TYPE, POEntry.COL_TOTAL, POEntry.COL_DESCRIPTION,
+                POEntry.COL_PROJECTNUM, POEntry.COL_PRICE, POEntry.COL_VALID_FROM},
 				new int[] { R.id.tracking, R.id.carrier, R.id.sender,
                         R.id.recipient, R.id.numpackages, R.id.ponum, R.id.signature }, 0);
 	}
@@ -96,7 +95,7 @@ public class LogViewFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					int position, long id) {
-				 final LogEntry LogEntry = new LogEntry((Cursor) mAdapter
+				 final POEntry POEntry = new POEntry((Cursor) mAdapter
 						.getItem(position));
 
                 //DialogFragment dialog = new DialogEditPackage();
@@ -107,7 +106,7 @@ public class LogViewFragment extends Fragment {
 
 		mListView.setMultiChoiceModeListener(new MultiChoiceModeListener() {
 
-			HashMap<Long, LogEntry> entries = new HashMap<Long, LogEntry>();
+			HashMap<Long, POEntry> entries = new HashMap<Long, POEntry>();
 
 			@Override
 			public void onItemCheckedStateChanged(ActionMode mode,
@@ -117,7 +116,7 @@ public class LogViewFragment extends Fragment {
 				// such as update the title in the CAB
 				if (checked) {
 					entries.put(id,
-                            new LogEntry((Cursor) mAdapter.getItem(position)));
+                            new POEntry((Cursor) mAdapter.getItem(position)));
 				}
 				else {
 					entries.remove(id);
@@ -166,9 +165,9 @@ public class LogViewFragment extends Fragment {
 
 			@Override
 			public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-				return new CursorLoader(getActivity(), LogEntry.URI(),
-						LogEntry.FIELDS, LogEntry.COL_SYNC_STATUS + " IS NOT 3", null,
-						LogEntry.COL_TIMESTAMP + " DESC");
+				return new CursorLoader(getActivity(), POEntry.URI(),
+						POEntry.FIELDS, POEntry.COL_STATUS + " IS NOT 3", null,
+						POEntry.COL_VALID_FROM + " DESC");
 			}
 
 			@Override
@@ -185,8 +184,8 @@ public class LogViewFragment extends Fragment {
 		return view;
 	}
 
-	void deleteItems(Collection<LogEntry> entries) {
-		for (LogEntry entry : entries) {
+	void deleteItems(Collection<POEntry> entries) {
+		for (POEntry entry : entries) {
 			getActivity().getContentResolver().delete(entry.getUri(), null, null);
 		}
 	}

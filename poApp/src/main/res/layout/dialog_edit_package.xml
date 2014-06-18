@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_edit_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <EditText android:id="@+id/inputNumpackages"
+            android:layout_width="0dp"
+            android:layout_weight=".25"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="@string/pcs"
+            android:layout_margin="5dip"
+            android:layout_marginBottom="15dip"
+            android:ems="10"
+            android:gravity="center"/>
+
+        <EditText android:id="@+id/inputTracking"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content"
+            android:hint="@string/tracking"
+            android:layout_margin="5dip"
+            android:layout_marginBottom="15dip"
+            android:singleLine="true"/>
+
+        <Button android:id="@+id/btnScan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/scan" />
+
+        <Spinner android:id="@+id/inputCarrier"
+            android:layout_width="0dp"
+            android:layout_weight=".75"
+            android:layout_height="wrap_content"
+            android:entries="@array/carriers"
+            android:gravity="end" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <AutoCompleteTextView android:id="@+id/inputSender"
+            android:hint="@string/sender"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dip"
+            android:singleLine="true"/>
+
+        <AutoCompleteTextView android:id="@+id/inputRecipient"
+            android:hint="@string/recipient"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dip"
+            android:layout_marginBottom="15dip"
+            android:singleLine="true"/>
+
+        <EditText android:id="@+id/inputPoNum"
+            android:hint="@string/ponum"
+            android:layout_width="0dp"
+            android:layout_weight=".5"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dip"
+            android:singleLine="true"
+            android:inputType="number"/>
+    </LinearLayout>
+
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/dividerHorizontal" />
+
+
+
+
+    <include layout="@layout/dialog_ok_cancel"/>
+
+
+
+</LinearLayout>

@@ -20,7 +20,7 @@ import retrofit.mime.TypedFile;
 /**
 * Created by qgallup on 5/2/2014.
 */
-public interface LogServer {
+public interface RetroServer {
 
     public static final String API_URL = "http://10.102.5.229";
 

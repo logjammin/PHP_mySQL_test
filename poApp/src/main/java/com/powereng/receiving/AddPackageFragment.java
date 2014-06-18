@@ -1,6 +1,6 @@
 package com.powereng.receiving;
 
-import android.app.Fragment;
+import android.app.DialogFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,13 +17,18 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.FragmentIntentIntegrator;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.powereng.receiving.sync.AddLogEntryService;
+import com.powereng.receiving.sync.AddPOEntryService;
 
 import java.util.ArrayList;
 
-public class AddPackageFragment extends Fragment {
+/**
+ * Simple confirm dialog fragment.
+ * 
+ */
 
-    public AddPackageFragment() {}
+public class AddPackageFragment extends DialogFragment {
+
+	public AddPackageFragment() {}
 
     EditText inputTracking;
     Spinner inputCarrier;
@@ -31,15 +36,6 @@ public class AddPackageFragment extends Fragment {
     SenderTextView inputSender;
     RecipientTextView inputRecipient;
     EditText inputPoNum;
-    ArrayList<EditText> editTexts;
-    private final int TRACKING = 0;
-    private final int NUMPACKAGES = 1;
-    private final int SENDER = 2;
-    private final int RECIPIENT = 3;
-    private final int PONUM = 4;
-
-
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -63,62 +59,40 @@ public class AddPackageFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_ok:
-                ArrayList<String> list = verifyParams();
-                if (list != null) {
+                if (inputTracking.getText() != null) {
+                    ArrayList<String> list = new ArrayList<String>();
+                    list.add(inputTracking.getText().toString());
+                    list.add(inputCarrier.getSelectedItem().toString());
+                    list.add(inputNumpackages.getText().toString());
+                    list.add(inputSender.getText().toString());
+                    list.add(inputRecipient.getText().toString());
+                    list.add(inputPoNum.getText().toString());
+
                     Bundle params = new Bundle();
-                    params.putString("carrier", inputCarrier.getSelectedItem().toString());
                     params.putStringArrayList("values", list);
+
                     if (!params.isEmpty()) {
                         // Add in background
-                        AddLogEntryService.addEntry(getActivity(), params);
+                        AddPOEntryService.addPOEntry(getActivity(), params);
+                        //getDialog().dismiss();
+                        dismiss();
+                        View v = getActivity().findViewById(R.id.header);
+                        v.setVisibility(View.VISIBLE);
                     }
-                    View v = getActivity().findViewById(R.id.header);
-                    v.setVisibility(View.VISIBLE);
-                    getActivity().getFragmentManager().beginTransaction().remove(this).commit();
-                    getActivity().getFragmentManager().popBackStack();
-                    //notify user that tracking number can't be empty
-                } else Toast.makeText(getActivity(),"Missing required param!", Toast.LENGTH_SHORT).show();
+                    //TODO: clear this fragment
+                    //FragmentManager fm = Manager();
+
+                    //notify user that ponum number can't be empty
+                } else Toast.makeText(getActivity(),"Tracking cannot be empty!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_cancel:
-                clear();
+                dismiss();
                 View v = getActivity().findViewById(R.id.header);
                 v.setVisibility(View.VISIBLE);
-                getActivity().getFragmentManager().popBackStack();
-                getActivity().getFragmentManager().beginTransaction().remove(this).commit();
                 break;
         }
+
         return false;
-    }
-
-    private boolean isEmpty(EditText etText) {
-        return etText.getText().toString().trim().length() == 0;
-    }
-
-    private ArrayList verifyParams() {
-        ArrayList<String> list = new ArrayList<String>();
-        int numEntries = 0;
-        for (EditText i: editTexts) {
-            //if (isEmpty(i)) {
-            //    break;
-            //} else {
-                list.add(i.getText().toString());
-                numEntries++;
-            //}
-        }
-        if (numEntries < 4 ) {
-            list.clear();
-            return null;
-        } else {
-            //list.add(inputCarrier.getSelectedItem().toString());
-            return list;
-        }
-    }
-
-    private void clear() {
-        for (EditText i: editTexts) {
-            i.setText("");
-        }
-        inputCarrier.setSelection(0);
     }
 
     @Override
@@ -126,18 +100,15 @@ public class AddPackageFragment extends Fragment {
 			Bundle savedInstanceState) {
 		//getDialog().setTitle(R.string.add_package);
 		final View v = inflater.inflate(R.layout.add_package_newline, container, false);
+        
+		inputTracking = (EditText) v.findViewById(R.id.tracking);
         inputCarrier = (Spinner) v.findViewById(R.id.carrier);
-		/** inputTracking = (EditText) v.findViewById(R.id.tracking);
         inputNumpackages = (EditText) v.findViewById(R.id.numpackages);
         inputSender = (SenderTextView) v.findViewById(R.id.sender);
         inputRecipient = (RecipientTextView) v.findViewById(R.id.recipient);
-        inputPoNum = (EditText) v.findViewById(R.id.ponum);*/
-        editTexts = new ArrayList<EditText>();
-        editTexts.add(TRACKING,(EditText) v.findViewById(R.id.tracking));
-        editTexts.add(NUMPACKAGES,(EditText) v.findViewById(R.id.numpackages));
-        editTexts.add(SENDER, (EditText) v.findViewById(R.id.sender));
-        editTexts.add(RECIPIENT, (EditText) v.findViewById(R.id.recipient));
-        editTexts.add(PONUM, (EditText) v.findViewById(R.id.ponum));
+        inputPoNum = (EditText) v.findViewById(R.id.ponum);
+
+
 
         final Button btnScan = (Button) v.findViewById(R.id.btnScan);
 
@@ -163,7 +134,7 @@ public class AddPackageFragment extends Fragment {
 
 					@Override
 					public void onClick(View v) {
-                        //make sure tracking number is set
+                        //make sure ponum number is set
                         if (inputTracking.getText() != null) {
                             ArrayList<String> list = new ArrayList<String>();
                             list.add(inputTracking.getText().toString());
@@ -178,11 +149,11 @@ public class AddPackageFragment extends Fragment {
 
                             if (!params.isEmpty()) {
                                 // Add in background
-                                AddLogEntryService.addEntry(getActivity(), params);
+                                AddLogEntryService.addPOEntry(getActivity(), params);
                                 //getDialog().dismiss();
                                 dismiss();
                             }
-                          //notify user that tracking number can't be empty
+                          //notify user that ponum number can't be empty
                         } else Toast.makeText(getActivity(),"Tracking cannot be empty!", Toast.LENGTH_SHORT).show();
 					}
 				});*/

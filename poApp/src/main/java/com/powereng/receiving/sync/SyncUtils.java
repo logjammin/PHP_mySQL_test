@@ -9,7 +9,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.powereng.receiving.accounts.GenericAccountService;
-import com.powereng.receiving.database.LogProvider;
+import com.powereng.receiving.database.PoProvider;
 
 import retrofit.RestAdapter;
 
@@ -19,7 +19,7 @@ import retrofit.RestAdapter;
 public class SyncUtils {
 
     private static final long SYNC_FREQUENCY = 60 * 60;  // 1 hour (in seconds)
-    private static final String CONTENT_AUTHORITY = LogProvider.AUTHORITY;
+    private static final String CONTENT_AUTHORITY = PoProvider.AUTHORITY;
     private static final String PREF_SETUP_COMPLETE = "setup_complete";
     private static final String TAG = "Powereng Receiving";
 
@@ -72,13 +72,13 @@ public class SyncUtils {
         //b.putBoolean(ContentResolver.SYNC_EXTRAS_UPLOAD, true);
         ContentResolver.requestSync(
                 GenericAccountService.GetAccount(),      // Sync account
-                LogProvider.AUTHORITY, // Content authority
+                PoProvider.AUTHORITY, // Content authority
                 b);                                      // Extras
     }
 
-    public static RetroServer getRESTAdapter() {
+    public static POServer getRESTAdapter() {
         RestAdapter restAdapter = (new RestAdapter.Builder()).
-                setEndpoint(RetroServer.API_URL).
+                setEndpoint(POServer.API_URL).
                 setLogLevel(RestAdapter.LogLevel.FULL).
                 setLog(new RestAdapter.Log() {
                     @Override
@@ -87,7 +87,7 @@ public class SyncUtils {
                     }
                 }).
                 build();
-        return restAdapter.create(RetroServer.class);
+        return restAdapter.create(POServer.class);
     }
 
 }

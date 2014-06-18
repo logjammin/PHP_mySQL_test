@@ -11,7 +11,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.powereng.receiving.database.DatabaseHandler;
-import com.powereng.receiving.database.LogEntry;
+import com.powereng.receiving.database.POEntry;
 
 import java.io.File;
 
@@ -54,46 +54,46 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 			}
 
 
-			final RetroServer server = SyncUtils.getRESTAdapter();
+			final POServer server = SyncUtils.getRESTAdapter();
 			DatabaseHandler db = DatabaseHandler.getInstance(getContext());
 
 			// Upload stuff
-			for (LogEntry entry : db.getAllLogEntries(LogEntry.COL_SYNC_STATUS
+			for (POEntry entry : db.getAllLogEntries(POEntry.COL_STATUS
 					+ " IS NOT " + SYNCED, null, null)) {
 
-                switch(entry.sync_status) {
+                switch(entry.status) {
 
                     case DELETE:
-                        server.deleteEntry(token, entry.tracking);
+                        server.deletePOEntry(token, entry.ponum);
                         db.deleteEntry(entry);
                         break;
 
                     case INSERT:
-                        server.addEntry(token, new RetroServer.LogMSG(entry));
+                        server.addPOEntry(token, new POServer.POMsg(entry));
                         //TODO: needs some kind of error checking
                         syncResult.stats.numInserts++;
                         //flag entry as "synced" in local db
-                        entry.sync_status = SYNCED;
+                        entry.status = SYNCED;
                         db.putEntry(entry);
                         break;
 
                     case UPDATE:
-                        server.updateEntry(token, entry.tracking, new RetroServer.LogMSG(entry));
+                        server.getPOEntry(token, entry.ponum, new POServer.POMsg(entry));
                         syncResult.stats.numUpdates++;
                         //flag entry as "synced" in local db
-                        entry.sync_status = SYNCED;
+                        entry.status = SYNCED;
                         db.putEntry(entry);
                         break;
 
                     case SIGNED:
-                        String fileName = entry.tracking + "_" + entry.sig + ".png";
+                        String fileName = entry.ponum + "_" + entry.unitPrice + ".png";
                         File file = new File(mContext.getFilesDir(), fileName);
                         TypedFile outFile = new TypedFile("image/png", file);
                         server.addSignature(token, outFile);
-                        server.updateEntry(token, entry.tracking, new RetroServer.LogMSG(entry));
+                        server.getPOEntry(token, entry.ponum, new POServer.POMsg(entry));
                         syncResult.stats.numUpdates++;
                         //flag entry as "synced" in local db
-                        entry.sync_status = SYNCED;
+                        entry.status = SYNCED;
                         db.putEntry(entry);
                         break;
                 }
@@ -109,7 +109,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 								KEY_LASTSYNC, null);
                 //final String lastSync = "2014-04-30 12:24:40.0";
 
-				final RetroServer.LogEntries entries;
+				final POServer.POEntries entries;
 				if (lastSync != null && !lastSync.isEmpty()) {
 
 					entries = server.listEntries(token, lastSync);
@@ -123,22 +123,22 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 				}
 
 				if (entries != null && entries.entries != null) {
-					for (RetroServer.LogMSG msg : entries.entries) {
-						Log.d(TAG, "got tracking:" + msg.tracking);
-						final LogEntry entry = msg.toDBItem();
+					for (POServer.POMsg msg : entries.entries) {
+						Log.d(TAG, "got ponum:" + msg.tracking);
+						final POEntry entry = msg.toDBItem();
 						//if (msg.deleted) {
 						//	Log.d(TAG, "Deleting:" + msg.id);
-						//	db.deleteEntry(entry);
+						//	db.deletePOEntry(entry);
 						//}
 						//else {
-							Log.d(TAG, "Adding tracking:" + entry.tracking);
-							entry.sync_status = SYNCED;
+							Log.d(TAG, "Adding ponum:" + entry.ponum);
+							entry.status = SYNCED;
 							db.putEntry(entry);
 						//}
 					}
 				}
 
-				// Save sync timestamp
+				// Save sync validFrom
                 //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				PreferenceManager.getDefaultSharedPreferences(getContext())
 						.edit().putString(KEY_LASTSYNC, entries.latestTimestamp)

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
+
+    <string name="app_name">Powereng Receiving</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="tracking">Tracking #</string>
+    <string name="carrier">Carrier</string>
+    <string name="sender">Sender</string>
+    <string name="recipient">Recipient</string>
+    <string name="pcs">pcs</string>
+    <string name="signature">Signature</string>
+    <string name="ponum">PO #</string>
+    <string name="scan">Scan</string>
+    <string name="save">Save/Modify</string>
+    <string name="delete">Delete</string>
+    <string name="update">Update</string>
+    <string name="refresh">Refresh</string>
+    <string name="hello">Hello World, CaptureSignatureActivity!</string>
+    <string name="external_dir">GetSignature</string>
+    <string name="nextItem">Next Item</string>
+    <string name="back">Previous Item</string>
+    <string name="log_name">Receiving Log</string>
+    <string name="add">Add Package</string>
+    <string name="delete_message">Delete this item from Receiving Log?</string>
+    <string name="delete_title">Confirm Delete</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="new_package">Add New Package</string>
+    <string name="edit_package">Edit Package</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_package_list">Packages</string>
+    <string name="title_package_detail">Package Detail</string>
+    <string name="additional">Additional Packages</string>
+    <string name="loading">Waiting for sync...</string>
+    <string name="select_account">Select Account</string>
+    <string name="link_added">Package added!</string>
+    <string name="add_package">Add New Package</string>
+    <string name="sync">sync</string>
+    <string name="syncing_">Syncing data with server...</string>
+    <string name="title_activity_main">Log View</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_example">Example action</string>
+    <string name="get_signature">Get Signature</string>
+    <string name="title_activity_finger_paint">FingerPaint</string>
+    <string name="agenda_today">Today</string>
+    <string name="agenda_yesterday">Yesterday</string>
+    <string name="agenda_tomorrow">Tomorrow</string>
+    <string name="week">Week</string>
+    <!-- This is for displaying the week of the year near the date. Eg. "January, 2011 Week 1" -->
+    <plurals name="weekN">
+        <!-- Label for displaying week of the year for all week values [CHAR LIMIT=16] -->
+        <item quantity="other">WEEK <xliff:g id="count">%d</xliff:g></item>
+    </plurals>
+</resources>

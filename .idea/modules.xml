@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/PHP_mySQL_test.iml" filepath="$PROJECT_DIR$/PHP_mySQL_test.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/poApp/poApp.iml" filepath="$PROJECT_DIR$/poApp/poApp.iml" />
     </modules>
   </component>
 </project>

@@ -75,7 +75,7 @@ public class AddLogEntryService extends IntentService {
 
     private void addSignature(Bundle extras) {
         String fileName = extras.getString("fname");
-        LogServer server = SyncUtils.getRESTAdapter();
+        RetroServer server = SyncUtils.getRESTAdapter();
         File file = new File(getApplicationContext().getFilesDir(), fileName);
         TypedFile outFile = new TypedFile("image/png",file);
         String token = "70713aa1e2a83c38f514f5ed9ad34706";
@@ -111,17 +111,20 @@ public class AddLogEntryService extends IntentService {
 		if (extras == null) {
 			return;
 		}
-
+        String po = "";
         ArrayList<String> list = extras.getStringArrayList("values");
 
         final ContentValues values = new ContentValues();
-
+        String carrier = extras.getString("carrier");
         values.put(LogEntry.COL_TRACKING, list.get(0));
-        values.put(LogEntry.COL_CARRIER, list.get(1));
-        values.put(LogEntry.COL_NUMPACKAGES, list.get(2));
-        values.put(LogEntry.COL_SENDER, list.get(3));
-        values.put(LogEntry.COL_RECIPIENT, list.get(4));
-        values.put(LogEntry.COL_PONUM, list.get(5));
+        values.put(LogEntry.COL_CARRIER, carrier);
+        values.put(LogEntry.COL_NUMPACKAGES, list.get(1));
+        values.put(LogEntry.COL_SENDER, list.get(2));
+        values.put(LogEntry.COL_RECIPIENT, list.get(3));
+        if (list.size() > 4) {
+            po = list.get(4);
+        }
+        values.put(LogEntry.COL_PONUM, po);
         values.put(LogEntry.COL_SYNC_STATUS, 1);
 
 		getContentResolver().insert(LogEntry.URI(), values);

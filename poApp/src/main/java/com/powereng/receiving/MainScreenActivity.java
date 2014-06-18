@@ -2,9 +2,7 @@ package com.powereng.receiving;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
@@ -12,6 +10,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -24,10 +23,14 @@ import android.widget.CursorAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
-import com.powereng.receiving.database.LogEntry;
+import com.powereng.receiving.database.POEntry;
 import com.powereng.receiving.sync.SyncUtils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 
 public class MainScreenActivity extends Activity implements DialogInterface,
@@ -53,11 +56,16 @@ public class MainScreenActivity extends Activity implements DialogInterface,
     private CursorAdapter mAdapter;
     private ActionBar mActionBar;
     Boolean mShowing = false;
+    private final Time mTime = new Time();
     private PackageDetailFragment packageDetailFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mTime.setToNow();
+        long mMillis = mTime.toMillis(true);
+        mUtils = Utils.getInstance(this);
+        mUtils.setTime(mMillis);
         setContentView(R.layout.fragment_log_list);
 
         SyncUtils.CreateSyncAccount(this);
@@ -69,18 +77,21 @@ public class MainScreenActivity extends Activity implements DialogInterface,
         final FragmentManager fm = getFragmentManager();
         editPackageFragment = (EditPackageFragment) fm.findFragmentByTag("editPackage");
         packageDetailFragment = (PackageDetailFragment) fm.findFragmentByTag("packageDetail");
+
         addPackage = new AddPackageFragment();
+
+
         if (editPackageFragment != null) {
-            LogEntry entry = editPackageFragment.getEntry();
+            POEntry entry = editPackageFragment.getEntry();
             editPackageFragment.dismissAllowingStateLoss();
             dialogEditPackage(entry);
 
         }
         mAdapter = new SimpleCursorAdapter(this,
                 R.layout.list_item, null,
-                new String[] {LogEntry.COL_TRACKING, LogEntry.COL_CARRIER,
-                        LogEntry.COL_SENDER, LogEntry.COL_RECIPIENT, LogEntry.COL_NUMPACKAGES,
-                        LogEntry.COL_PONUM, LogEntry.COL_SIG, LogEntry.COL_TIMESTAMP},
+                new String[] {POEntry.COL_PONUM, POEntry.COL_VENDOR,
+                        POEntry.COL_UNIT_TYPE, POEntry.COL_TOTAL, POEntry.COL_DESCRIPTION,
+                        POEntry.COL_PROJECTNUM, POEntry.COL_PRICE, POEntry.COL_VALID_FROM},
                 new int[] { R.id.tracking, R.id.carrier, R.id.sender,
                         R.id.recipient, R.id.numpackages, R.id.ponum, R.id.signature }, 0);
 
@@ -95,16 +106,17 @@ public class MainScreenActivity extends Activity implements DialogInterface,
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1,
                                     int position, long id) {
-                final LogEntry LogEntry = new LogEntry((Cursor) mAdapter
+                final POEntry POEntry = new POEntry((Cursor) mAdapter
                         .getItem(position));
-                packageDetail(LogEntry);
+                packageDetail(POEntry);
                 //dialogEditPackage(logEntry);
+
             }
         });
 
         mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
 
-            HashMap<Long, LogEntry> entries = new HashMap<Long, LogEntry>();
+            HashMap<Long, POEntry> entries = new HashMap<Long, POEntry>();
 
             @Override
             public void onItemCheckedStateChanged(ActionMode mode,
@@ -115,7 +127,7 @@ public class MainScreenActivity extends Activity implements DialogInterface,
                 if (checked) {
 
                     entries.put(id,
-                            new LogEntry((Cursor) mAdapter.getItem(position)));
+                            new POEntry((Cursor) mAdapter.getItem(position)));
                 }
                 else {
                     entries.remove(id);
@@ -170,9 +182,9 @@ public class MainScreenActivity extends Activity implements DialogInterface,
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String mSelection;
 
-            return new CursorLoader(getApplicationContext(), LogEntry.URI(),
-                LogEntry.FIELDS, LogEntry.COL_SYNC_STATUS + " IS NOT 3", null,
-                LogEntry.COL_TIMESTAMP + " DESC");
+            return new CursorLoader(getApplicationContext(), POEntry.URI(),
+                POEntry.FIELDS, POEntry.COL_STATUS + " IS NOT 3", null,
+                POEntry.COL_VALID_FROM + " DESC");
     }
 
 
@@ -187,6 +199,31 @@ public class MainScreenActivity extends Activity implements DialogInterface,
         mAdapter.swapCursor(null);
     }
 
+
+
+
+
+    public void dateView(){
+
+        //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+        Log.i(TAG, "" + c.get(Calendar.DAY_OF_MONTH));
+        Log.i(TAG, "" + c.get(Calendar.DAY_OF_WEEK));
+        int monday = c.get(Calendar.DAY_OF_MONTH) - c.get(Calendar.DAY_OF_WEEK)+2;
+        int friday = monday + 5;
+        DateFormat sdf = SimpleDateFormat.getInstance();
+
+
+
+        c.set(Calendar.DAY_OF_MONTH, monday);
+
+        Log.i(TAG, "Date "+c.getTime());
+    }
+
+
+
     @Override
     protected void onDestroy() {
 
@@ -195,29 +232,29 @@ public class MainScreenActivity extends Activity implements DialogInterface,
         super.onDestroy();
     }
 
-    public void dialogEditPackage(LogEntry entry) {
+    public void dialogEditPackage(POEntry entry) {
         Log.d(TAG, "new edit dialog created");
         editPackageFragment = new EditPackageFragment();
         editPackageFragment.setLogEntry(entry);
         editPackageFragment.show(getFragmentManager(), "editPackage");
     }
 
-    public void packageDetail(LogEntry entry) {
+    public void packageDetail(POEntry entry) {
         Log.d(TAG, "new edit dialog created");
         packageDetailFragment = new PackageDetailFragment();
         packageDetailFragment.setLogEntry(entry);
         packageDetailFragment.show(getFragmentManager(), "packageDetail");
     }
 
-    void deleteItems(Collection<LogEntry> entries) {
-        for (LogEntry entry : entries) {
+    void deleteItems(Collection<POEntry> entries) {
+        for (POEntry entry : entries) {
             this.getContentResolver().delete(entry.getUri(), null, null);
         }
     }
 
-    void editItems(Collection<LogEntry> entries) {
+    void editItems(Collection<POEntry> entries) {
 
-        for (LogEntry entry : entries) {
+        for (POEntry entry : entries) {
 
             do {
                 mShowing = true;
@@ -266,19 +303,10 @@ public class MainScreenActivity extends Activity implements DialogInterface,
     void showAddDialog() {
         View v = findViewById(R.id.header);
         v.setVisibility(View.GONE);
-        FragmentTransaction fm = getFragmentManager().beginTransaction();
-        //fm.remove(addPackage);
-        fm.add(R.id.frag_container, addPackage, "addPackage").commit();
+        FragmentManager fm = getFragmentManager();
+        fm.beginTransaction().add(R.id.frag_container, addPackage, "addPackage").commit();
         //DialogFragment dialog = new AddPackageFragment();
         //dialog.show(getFragmentManager(), "add_entry");
-    }
-
-    public void dismissFragment(Fragment fragment) {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.remove(fragment).commit();
-        View v = findViewById(R.id.header);
-        v.setVisibility(View.VISIBLE);
-
     }
 
     @Override

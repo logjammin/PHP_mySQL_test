@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:divider="@android:drawable/title_bar">
+
+
+    <EditText
+        android:id="@+id/tracking"
+        android:layout_width="0dp"
+        android:layout_weight="2"
+        android:layout_height="wrap_content"
+        android:paddingTop="6dip"
+        android:paddingLeft="6dip"
+        android:hint="@string/tracking"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:layout_gravity="bottom"
+        android:singleLine="false"
+        android:longClickable="true" />
+
+    <Button android:id="@+id/btnScan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/scan" />
+
+    <Spinner android:id="@+id/carrier"
+
+        android:layout_width="0dp"
+        android:layout_weight=".75"
+        android:layout_height="wrap_content"
+        android:entries="@array/carriers"
+        android:gravity="end" />
+
+    <com.powereng.receiving.SenderTextView
+        android:id="@+id/sender"
+        android:layout_width="0dp"
+        android:hint="@string/sender"
+        android:layout_weight="1.5"
+        android:layout_height="wrap_content"
+        android:paddingTop="6dip"
+        android:paddingLeft="6dip"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:layout_gravity="center" />
+
+    <com.powereng.receiving.RecipientTextView
+        android:id="@+id/recipient"
+        android:layout_width="0dp"
+        android:layout_weight="1.5"
+        android:layout_height="wrap_content"
+        android:paddingTop="6dip"
+        android:paddingLeft="6dip"
+        android:hint="@string/recipient"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:layout_gravity="center" />
+    <EditText
+        android:id="@+id/numpackages"
+        android:layout_width="0dp"
+        android:layout_weight=".5"
+        android:inputType="number"
+        android:layout_height="wrap_content"
+        android:paddingTop="6dip"
+        android:paddingLeft="6dip"
+        android:hint="@string/pcs"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:layout_gravity="center" />
+    <EditText
+        android:id="@+id/ponum"
+        android:layout_width="0dp"
+        android:inputType="number"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:paddingTop="6dip"
+        android:paddingLeft="6dip"
+        android:hint="@string/ponum"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:layout_gravity="center" />
+
+</LinearLayout>
