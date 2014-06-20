@@ -74,6 +74,7 @@ public class AddPackageFragment extends Fragment {
                     }
                     View v = getActivity().findViewById(R.id.header);
                     v.setVisibility(View.VISIBLE);
+                    clear();
                     getActivity().getFragmentManager().beginTransaction().remove(this).commit();
                     getActivity().getFragmentManager().popBackStack();
                     //notify user that tracking number can't be empty
@@ -98,12 +99,12 @@ public class AddPackageFragment extends Fragment {
         ArrayList<String> list = new ArrayList<String>();
         int numEntries = 0;
         for (EditText i: editTexts) {
-            //if (isEmpty(i)) {
-            //    break;
-            //} else {
+            if (isEmpty(i)) {
+                break;
+            } else {
                 list.add(i.getText().toString());
                 numEntries++;
-            //}
+            }
         }
         if (numEntries < 4 ) {
             list.clear();
@@ -124,21 +125,15 @@ public class AddPackageFragment extends Fragment {
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		//getDialog().setTitle(R.string.add_package);
 		final View v = inflater.inflate(R.layout.add_package_newline, container, false);
         inputCarrier = (Spinner) v.findViewById(R.id.carrier);
-		/** inputTracking = (EditText) v.findViewById(R.id.tracking);
-        inputNumpackages = (EditText) v.findViewById(R.id.numpackages);
-        inputSender = (SenderTextView) v.findViewById(R.id.sender);
-        inputRecipient = (RecipientTextView) v.findViewById(R.id.recipient);
-        inputPoNum = (EditText) v.findViewById(R.id.ponum);*/
+
         editTexts = new ArrayList<EditText>();
         editTexts.add(TRACKING,(EditText) v.findViewById(R.id.tracking));
         editTexts.add(NUMPACKAGES,(EditText) v.findViewById(R.id.numpackages));
         editTexts.add(SENDER, (EditText) v.findViewById(R.id.sender));
         editTexts.add(RECIPIENT, (EditText) v.findViewById(R.id.recipient));
         editTexts.add(PONUM, (EditText) v.findViewById(R.id.ponum));
-
         final Button btnScan = (Button) v.findViewById(R.id.btnScan);
 
         btnScan.setOnClickListener(new View.OnClickListener() {
@@ -199,6 +194,7 @@ public class AddPackageFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+        inputTracking = editTexts.get(TRACKING);
         if (scanResult != null) {
             inputTracking.setText(scanResult.getContents().toString());
         }

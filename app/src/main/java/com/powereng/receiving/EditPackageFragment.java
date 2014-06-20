@@ -115,7 +115,7 @@ public class EditPackageFragment extends DialogFragment {
         btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentIntentIntegrator intentIntegrator = new FragmentIntentIntegrator(getActivity().getFragmentManager().findFragmentByTag("addPackage")); // where this is activity
+                FragmentIntentIntegrator intentIntegrator = new FragmentIntentIntegrator(getActivity().getFragmentManager().findFragmentByTag("editPackage")); // where this is activity
                 intentIntegrator.initiateScan(IntentIntegrator.ALL_CODE_TYPES); // or QR_CODE_TYPES if you need to scan QR
             }
         });

@@ -8,7 +8,6 @@ import android.app.FragmentTransaction;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -280,11 +279,11 @@ public class MainScreenActivity extends Activity implements DialogInterface,
         v.setVisibility(View.VISIBLE);
 
     }
-
+/*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-    }
+    }*/
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {

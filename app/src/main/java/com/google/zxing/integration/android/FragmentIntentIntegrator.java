@@ -11,6 +11,7 @@ public final class FragmentIntentIntegrator extends IntentIntegrator {
     private final Fragment fragment;
 
     public FragmentIntentIntegrator(Fragment fragment) {
+
         super(fragment.getActivity());
         this.fragment = fragment;
     }
